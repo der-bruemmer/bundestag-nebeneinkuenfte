@@ -1,0 +1,89 @@
+@import url(../runo/styles.css);
+
+*/
+.v-gridlayout .v-textfield-readonly {
+	border-style: solid;
+	border-width: thin;
+	border-color: #cccccc;
+}
+
+.v-table-cell-content-outdated {
+	color: #cccccc;
+}
+
+.outdated .v-datefield-textfield {
+	color: #cccccc;
+}
+
+/* Set the amount of both vertical and horizontal cell spacing
+ * in a specific element with the "-spacingexample" style. */
+.v-gridlayout-filterGrid .v-gridlayout-spacing-on {
+	padding-top: 5px;
+	padding-left: 5px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+
+/* Set the amount of both vertical and horizontal cell spacing
+ * in a specific element with the "-spacingexample" style. */
+.v-gridlayout-fieldGrid .v-gridlayout-spacing-on {
+	padding-top: 0px;
+	padding-left: 20px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+
+.v-gridlayout-filterGrid .v-gridlayout-spacing-on {
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+
+.v-caption-my-style {
+   font-weight: bold;
+   font-size: 18px;
+   color: #F14C1A;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   }
+   
+ .v-caption-tbinvit-style {
+   font-weight: lighter;
+   font-style: italic;
+   font-size: 14px;
+   color: #000000;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   }
+
+.v-label-orange {
+	color: #F14C1A;
+}
+
+.v-absolutelayout-Solitaire {
+   
+    background:  rgb(0, 109, 85);
+}
+
+/* Lay the options horizontally */
+.v-select-optiongroup-horizontal .v-select-option {
+    display: inline-block;
+}
+
+/* Avoid wrapping if the layout is too tight */
+.v-select-optiongroup-horizontal {
+    white-space: nowrap;
+}
+
+/* Some extra spacing is needed */
+.v-select-optiongroup-horizontal
+  .v-select-option.v-radiobutton {
+    padding-right: 10px;
+}
+
+/* orange rows for tables */
+.v-table-row.v-table-row-highlight-red,
+.v-table-row-odd.v-table-row-highlight-red {
+  background-color: #F14C1A;
+}
