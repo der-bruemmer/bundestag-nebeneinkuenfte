@@ -1,7 +1,5 @@
 package de.ulei.nebeneinkuenfte.controller;
 
-import java.util.Date;
-
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Label;
 

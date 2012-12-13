@@ -1,9 +1,8 @@
 package de.ulei.nebeneinkuenfte.controller;
 
-import java.io.File;
-
 import com.vaadin.data.util.BeanItemContainer;
 
+import de.ulei.nebeneinkuenfte.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
 import de.ulei.nebeneinkuenfte.crawler.BundestagConverter;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
@@ -30,10 +29,12 @@ public class BasicController extends AbstractController implements
 
 	private void fetchPersons() {
 
+		String path = NebeneinkuenfteApplication.getInstance().getContext()
+				.getBaseDirectory()
+				+ "/abgeordnete";
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false);
-		// conv.writeNebentaetigkeitenToFile();
+				false, path);
 
 		personContainer = new BeanItemContainer<Abgeordneter>(
 				Abgeordneter.class);
@@ -53,13 +54,6 @@ public class BasicController extends AbstractController implements
 			break;
 		}
 
-	}
-
-	public static void main(String[] args) {
-		File mdbFolder = new File("./abgeordnete");
-		for (File mdbFile : mdbFolder.listFiles()) {
-			System.out.println(mdbFile);
-		}
 	}
 
 }
