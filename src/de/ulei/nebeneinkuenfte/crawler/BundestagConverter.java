@@ -202,7 +202,7 @@ public class BundestagConverter {
 		}
 		
 		try {
-			File mdbFolder = new File("./abgeordnete");
+			File mdbFolder = new File("/home/sip/projects/bundestag-nebeneinkuenfte/abgeordnete");
 			for(File mdbFile : mdbFolder.listFiles()) {
 				fis = new FileInputStream(mdbFile);
 				ois = new ObjectInputStream(fis);			
@@ -382,7 +382,7 @@ public class BundestagConverter {
 	
 	
 	public static void main(String[] args) {
-		BundestagConverter conv = new BundestagConverter("http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",false);	
+		BundestagConverter conv = new BundestagConverter("http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",true);	
 		//conv.writeNebentaetigkeitenToFile();
 		for(Abgeordneter mdb : conv.getAbgeordnete()) {
 			System.out.println(mdb.getHomepage());
