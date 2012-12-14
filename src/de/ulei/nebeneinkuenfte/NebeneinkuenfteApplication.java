@@ -30,7 +30,7 @@ public class NebeneinkuenfteApplication extends Application implements
 		setLocale(Locale.GERMANY);
 
 		MainFrameWindow mainFrame = new MainFrameWindow("mainFrame");
-		MainController controller = new MainController(mainFrame);
+		new MainController(mainFrame);
 
 		super.addWindow(mainFrame);
 		setMainWindow(mainFrame);
@@ -38,16 +38,19 @@ public class NebeneinkuenfteApplication extends Application implements
 	}
 
 	public static NebeneinkuenfteApplication getInstance() {
-		if (threadLocal.get() == null) {
+
+		if (threadLocal.get() == null)
 			threadLocal = new ThreadLocal<NebeneinkuenfteApplication>();
-		}
+
 		return threadLocal.get();
+
 	}
 
 	public static void setInstance(NebeneinkuenfteApplication app) {
 
 		threadLocal = new ThreadLocal<NebeneinkuenfteApplication>();
 		threadLocal.set(app);
+
 	}
 
 	/*
@@ -60,6 +63,7 @@ public class NebeneinkuenfteApplication extends Application implements
 
 		// setting this instance of NebeneinkuenfteApplication as ThreadLocal
 		NebeneinkuenfteApplication.setInstance(this);
+
 	}
 
 	@Override
@@ -68,6 +72,7 @@ public class NebeneinkuenfteApplication extends Application implements
 
 		// removing application instance from thread local
 		threadLocal.remove();
+
 	}
 
 }

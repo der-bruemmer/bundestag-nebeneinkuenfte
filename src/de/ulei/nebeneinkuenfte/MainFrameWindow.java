@@ -1,19 +1,11 @@
 package de.ulei.nebeneinkuenfte;
 
 import com.vaadin.terminal.Resource;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
-import de.ulei.nebeneinkuenfte.controller.BasicController;
-import de.ulei.nebeneinkuenfte.view.BasicView;
-import de.ulei.nebeneinkuenfte.view.OriginView;
-import de.ulei.nebeneinkuenfte.view.PartyView;
-import de.ulei.nebeneinkuenfte.view.PersonView;
 
 public class MainFrameWindow extends Window {
 
@@ -22,13 +14,6 @@ public class MainFrameWindow extends Window {
 	private Header header;
 	private Panel panel;
 	private TabSheet tabSheet;
-
-	private BasicController basicController;
-
-	private BasicView basicView;
-	private PersonView personView;
-	private PartyView partyView;
-	private OriginView originView;
 
 	public MainFrameWindow(String caption) {
 
