@@ -94,6 +94,7 @@ public class BasicTable extends FilterTable {
 
 				link = new Link(url, new ExternalResource(url));
 				link.setCaption(abgeordneter.getWahlkreisName());
+				link.setTargetName("_blank");
 				return link;
 
 			}
