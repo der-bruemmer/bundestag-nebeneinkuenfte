@@ -1,5 +1,7 @@
 package de.ulei.nebeneinkuenfte.table;
 
+import java.io.Serializable;
+
 import org.tepi.filtertable.FilterGenerator;
 
 import com.vaadin.data.Container.Filter;
@@ -7,7 +9,9 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.ComboBox;
 
-public class TableFilterGenerator implements FilterGenerator {
+public class TableFilterGenerator implements FilterGenerator, Serializable {
+
+	private static final long serialVersionUID = 4329855437898067359L;
 
 	@Override
 	public Filter generateFilter(Object propertyId, Object value) {

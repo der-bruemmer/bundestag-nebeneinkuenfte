@@ -1,5 +1,6 @@
 package de.ulei.nebeneinkuenfte.table;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 
 import org.tepi.filtertable.FilterDecorator;
@@ -7,7 +8,9 @@ import org.tepi.filtertable.numberfilter.NumberFilterPopupConfig;
 
 import com.vaadin.terminal.Resource;
 
-public class TableFilterDecorator implements FilterDecorator {
+public class TableFilterDecorator implements FilterDecorator, Serializable {
+
+	private static final long serialVersionUID = 1991373449160943299L;
 
 	@Override
 	public String getEnumFilterDisplayName(Object propertyId, Object value) {

@@ -40,6 +40,7 @@ public class BasicController extends AbstractController implements
 		basicView.setTableFooter("lastname", String.valueOf(list.size()));
 
 		Abgeordneter a;
+		@SuppressWarnings("unchecked")
 		Iterator<Abgeordneter> it = (Iterator<Abgeordneter>) list.iterator();
 		while (it.hasNext()) {
 
@@ -77,8 +78,10 @@ public class BasicController extends AbstractController implements
 	@Override
 	public void handleAction(ActionEvent event) {
 		switch (event.getActionType()) {
-		case HOME:
+		case HOME_PERSON:
 			fireEvent(event.getActionType());
+			break;
+		case EXPORT:
 			break;
 		case FILTER:
 			setTableFooter();

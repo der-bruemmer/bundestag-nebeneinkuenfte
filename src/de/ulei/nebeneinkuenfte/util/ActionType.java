@@ -13,12 +13,18 @@ public enum ActionType {
 	/**
 	 * Home button was called to get back to basic table
 	 */
-	HOME,
+	HOME_PERSON,
 
 	/**
 	 * Table was filtered
 	 */
 
-	FILTER
+	FILTER,
+
+	/**
+	 * Export table content
+	 */
+
+	EXPORT
 
 }

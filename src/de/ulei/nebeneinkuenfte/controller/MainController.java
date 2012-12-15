@@ -6,6 +6,7 @@ import com.vaadin.ui.Label;
 import de.ulei.nebeneinkuenfte.MainFrameWindow;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
+import de.ulei.nebeneinkuenfte.view.AbstractView;
 import de.ulei.nebeneinkuenfte.view.BasicView;
 import de.ulei.nebeneinkuenfte.view.OriginView;
 import de.ulei.nebeneinkuenfte.view.PartyView;
@@ -19,6 +20,8 @@ public class MainController implements IActionListener {
 	private PersonController personController;
 	private PartyController partyController;
 	private OriginController originController;
+
+	private AbstractView actualPersonView;
 
 	private BasicView basicView;
 	private PersonView personView;
@@ -51,6 +54,7 @@ public class MainController implements IActionListener {
 
 		mainFrame.addTab(basicView, "Person", new ThemeResource(
 				"icons/16/user.png"));
+		actualPersonView = basicView;
 
 		mainFrame.addTab(new Label("In Bearbeitung"), "Partei",
 				new ThemeResource("icons/16/users.png"));
@@ -61,13 +65,35 @@ public class MainController implements IActionListener {
 	public void handleAction(ActionEvent event) {
 
 		switch (event.getActionType()) {
-		case HOME:
+		case HOME_PERSON:
+			setActualPersonView(basicView);
 			break;
 
 		default:
 			break;
 		}
 
+	}
+
+	private AbstractView getActualPersonView() {
+		return actualPersonView;
+	}
+
+	private void setActualPersonView(AbstractView actualView) {
+
+		// remove actual view
+		int tabIndex = mainFrame.getTabIndex(getActualPersonView());
+		mainFrame.removeTab(getActualPersonView());
+
+		// add new view
+		mainFrame.addTab(actualView, "Person", new ThemeResource(
+				"icons/16/user.png"), tabIndex);
+
+		// select new view
+		mainFrame.selectTab(actualView);
+
+		// set actual view
+		this.actualPersonView = actualView;
 	}
 
 }

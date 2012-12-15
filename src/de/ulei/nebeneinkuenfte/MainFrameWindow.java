@@ -46,12 +46,29 @@ public class MainFrameWindow extends Window {
 		tabSheet.addTab(component, caption, icon);
 	}
 
+	public void addTab(Component component, String caption, Resource icon,
+			int position) {
+		tabSheet.addTab(component, caption, icon, position);
+	}
+
 	public void replaceTab(Component oldComponent, Component newComponent) {
 		tabSheet.replaceComponent(oldComponent, newComponent);
 	}
 
 	public void removeTab(Component component) {
 		tabSheet.removeComponent(component);
+	}
+
+	public int getTabIndex(Component component) {
+		return tabSheet.getTabPosition(tabSheet.getTab(component));
+	}
+
+	public void selectTab(int index) {
+		tabSheet.setSelectedTab(index);
+	}
+
+	public void selectTab(Component component) {
+		tabSheet.setSelectedTab(component);
 	}
 
 }
