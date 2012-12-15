@@ -104,7 +104,7 @@ public class BasicView extends AbstractView {
 
 		basicTable.setVisibleColumns(IConstants.ABGEORDNETER_VISIBLE_COLUMNS);
 		basicTable.setColumnHeaders(IConstants.ABGEORDNETER_COLUMN_HEADER);
-		basicTable.setColumnCollapsed("wahlkreis", true);
+		basicTable.setColumnCollapsed("wahlkreisUri", true);
 		basicTable.setColumnCollapsed("email", true);
 
 	}
