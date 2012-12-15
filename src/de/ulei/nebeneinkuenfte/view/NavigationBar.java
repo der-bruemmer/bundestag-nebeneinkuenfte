@@ -50,6 +50,7 @@ public class NavigationBar extends AbstractView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
+				fireEvent(ActionType.EXPORT);
 			}
 		});
 
@@ -66,7 +67,7 @@ public class NavigationBar extends AbstractView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.HOME);
+				fireEvent(ActionType.HOME_PERSON);
 			}
 		});
 
