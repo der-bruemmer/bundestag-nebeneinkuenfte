@@ -91,4 +91,20 @@ public class NavigationBar extends AbstractView {
 
 	}
 
+	public void setHomeButtonCaption(String caption) {
+		home.setCaption(caption);
+	}
+
+	public void setHomeButtonIcon(ThemeResource icon) {
+		home.setIcon(icon);
+	}
+
+	public void setExportButtonCaption(String caption) {
+		export.setCaption(caption);
+	}
+
+	public void setExportButtonIcon(ThemeResource icon) {
+		export.setIcon(icon);
+	}
+
 }

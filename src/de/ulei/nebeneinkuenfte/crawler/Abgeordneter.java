@@ -8,6 +8,12 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Abgeordneter implements Serializable {
 
+	@Override
+	public String toString() {
+		return "Abgeordneter [uri=" + uri + ", forename=" + forename
+				+ ", lastname=" + lastname + "]";
+	}
+
 	private static final long serialVersionUID = 1447162980745311414L;
 	
 	private String uri;
