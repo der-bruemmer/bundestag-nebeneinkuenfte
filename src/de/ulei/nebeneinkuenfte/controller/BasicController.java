@@ -23,13 +23,6 @@ public class BasicController extends AbstractController implements
 		this.basicView.addListener(this);
 
 		fetchPersons();
-		basicView.setPersonContainerDataSource(personContainer);
-		Abgeordneter abgeordneter = new Abgeordneter();
-		abgeordneter.setForename("Sebastian");
-		abgeordneter.setLastname("Lippert");
-		abgeordneter.setEmail("Big_KH@web.de");
-		abgeordneter.setHomepage("google.de");
-		basicView.addPerson(abgeordneter);
 
 	}
 
@@ -47,6 +40,7 @@ public class BasicController extends AbstractController implements
 		for (Abgeordneter mdb : conv.getAbgeordnete()) {
 			personContainer.addItem(mdb);
 		}
+		basicView.setPersonContainerDataSource(personContainer);
 
 	}
 
