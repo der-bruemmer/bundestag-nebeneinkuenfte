@@ -3,15 +3,14 @@ package de.ulei.nebeneinkuenfte.view;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.Runo;
 
-import de.ulei.nebeneinkuenfte.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
 import de.ulei.nebeneinkuenfte.table.BasicTable;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class BasicView extends AbstractView {
 
@@ -29,7 +28,7 @@ public class BasicView extends AbstractView {
 
 		createTableSection();
 		createNavigationSection();
-		// addTableListener();
+		addTableListener();
 
 	}
 
@@ -42,7 +41,7 @@ public class BasicView extends AbstractView {
 			@Override
 			public void itemClick(ItemClickEvent event) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 		});
@@ -89,12 +88,7 @@ public class BasicView extends AbstractView {
 	public void addPerson(Abgeordneter person) {
 
 		basicTable.addItem(person);
-		basicTable.setVisibleColumns(new String[] { "forename", "lastname",
-				"homepage", "email", "fraktion", "minZusatzeinkommen",
-				"maxZusatzeinkommen" });
-		basicTable.setColumnHeaders(new String[] { "Vorname", "Nachname",
-				"Homepage", "Email", "Partei", "Zusatzeinkommen (min)",
-				"Zusatzeinkommen (max)" });
+		updateTable();
 
 	}
 
@@ -102,12 +96,16 @@ public class BasicView extends AbstractView {
 			BeanItemContainer<Abgeordneter> container) {
 
 		basicTable.setContainerDataSource(container);
-		basicTable.setVisibleColumns(new String[] { "forename", "lastname",
-				"homepage", "email", "fraktion", "minZusatzeinkommen",
-				"maxZusatzeinkommen" });
-		basicTable.setColumnHeaders(new String[] { "Vorname", "Nachname",
-				"Homepage", "Email", "Partei", "Zusatzeinkommen (min)",
-				"Zusatzeinkommen (max)" });
+		updateTable();
+
+	}
+
+	private void updateTable() {
+
+		basicTable.setVisibleColumns(IConstants.ABGEORDNETER_VISIBLE_COLUMNS);
+		basicTable.setColumnHeaders(IConstants.ABGEORDNETER_COLUMN_HEADER);
+		basicTable.setColumnCollapsed("wahlkreis", true);
+		basicTable.setColumnCollapsed("email", true);
 
 	}
 
