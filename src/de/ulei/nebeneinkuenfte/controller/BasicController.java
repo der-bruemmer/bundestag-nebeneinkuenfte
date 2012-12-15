@@ -12,7 +12,7 @@ import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 import de.ulei.nebeneinkuenfte.view.BasicView;
 
-public class BasicController extends AbstractController implements
+public class BasicController extends AbstractPersonController implements
 		IActionListener {
 
 	private static final long serialVersionUID = 3304961841215841349L;
@@ -77,14 +77,27 @@ public class BasicController extends AbstractController implements
 
 	@Override
 	public void handleAction(ActionEvent event) {
+
 		switch (event.getActionType()) {
 		case HOME_PERSON:
 			fireEvent(event.getActionType());
 			break;
+
 		case EXPORT:
 			break;
 		case FILTER:
 			setTableFooter();
+			break;
+		case CLICK_PARTY:
+			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
+			fireEvent(event.getActionType());
+			break;
+		case CLICK_PERSON:
+			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
+			fireEvent(event.getActionType());
+			break;
+		case TABLE_SELECT:
+			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
 			break;
 		default:
 			break;

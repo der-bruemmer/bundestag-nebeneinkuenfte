@@ -1,9 +1,11 @@
 package de.ulei.nebeneinkuenfte.controller;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Label;
 
 import de.ulei.nebeneinkuenfte.MainFrameWindow;
+import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
+import de.ulei.nebeneinkuenfte.crawler.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 import de.ulei.nebeneinkuenfte.view.AbstractView;
@@ -22,6 +24,7 @@ public class MainController implements IActionListener {
 	private OriginController originController;
 
 	private AbstractView actualPersonView;
+	private AbstractController actualController;
 
 	private BasicView basicView;
 	private PersonView personView;
@@ -55,9 +58,10 @@ public class MainController implements IActionListener {
 		mainFrame.addTab(basicView, "Person", new ThemeResource(
 				"icons/16/user.png"));
 		actualPersonView = basicView;
+		setActualController(basicController);
 
-		mainFrame.addTab(new Label("In Bearbeitung"), "Partei",
-				new ThemeResource("icons/16/users.png"));
+		// mainFrame.addTab(new Label("In Bearbeitung"), "Partei",
+		// new ThemeResource("icons/16/users.png"));
 
 	}
 
@@ -66,11 +70,47 @@ public class MainController implements IActionListener {
 
 		switch (event.getActionType()) {
 		case HOME_PERSON:
-			setActualPersonView(basicView);
+			setActualPersonView(basicView, basicController);
 			break;
-
+		case CLICK_PARTY:
+			break;
+		case CLICK_PERSON:
+			handlePersonClick();
+			break;
 		default:
 			break;
+		}
+
+	}
+
+	private void handlePersonClick() {
+
+		if (getActualController() instanceof AbstractPersonController) {
+
+			AbstractPersonController controller = (AbstractPersonController) getActualController();
+			Abgeordneter person = controller.getActualPerson();
+
+			if (person != null) {
+
+				BeanItemContainer<Nebentaetigkeit> container = new BeanItemContainer<Nebentaetigkeit>(
+						Nebentaetigkeit.class);
+
+				for (Nebentaetigkeit nt : person.getNebentaetigkeiten())
+					container.addItem(nt);
+
+				String caption = "";
+				caption = caption.concat(person.getForename());
+				caption = caption.concat(" ");
+				caption = caption.concat(person.getLastname());
+				caption = caption.concat(", ");
+				caption = caption.concat(person.getFraktion());
+
+				personView.setSidelineJobContainerDataSource(container);
+				personView.setPanelCaption(caption);
+				setActualPersonView(personView, personController);
+
+			}
+
 		}
 
 	}
@@ -79,7 +119,8 @@ public class MainController implements IActionListener {
 		return actualPersonView;
 	}
 
-	private void setActualPersonView(AbstractView actualView) {
+	private void setActualPersonView(AbstractView actualView,
+			AbstractController controller) {
 
 		// remove actual view
 		int tabIndex = mainFrame.getTabIndex(getActualPersonView());
@@ -92,8 +133,18 @@ public class MainController implements IActionListener {
 		// select new view
 		mainFrame.selectTab(actualView);
 
-		// set actual view
+		// set actual view and controller
 		this.actualPersonView = actualView;
+		this.setActualController(controller);
+
+	}
+
+	public AbstractController getActualController() {
+		return actualController;
+	}
+
+	public void setActualController(AbstractController actualController) {
+		this.actualController = actualController;
 	}
 
 }

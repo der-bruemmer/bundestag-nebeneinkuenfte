@@ -2,6 +2,8 @@ package de.ulei.nebeneinkuenfte.view;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Container.ItemSetChangeEvent;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -23,6 +25,7 @@ public class BasicView extends AbstractView {
 
 	public BasicView() {
 
+		setImmediate(true);
 		setColumnExpandRatio(0, 0.6f);
 		setColumnExpandRatio(1, 1.2f);
 		setColumnExpandRatio(2, 0.3f);
@@ -43,7 +46,17 @@ public class BasicView extends AbstractView {
 
 			@Override
 			public void itemClick(ItemClickEvent event) {
-				// TODO Auto-generated method stub
+
+				fireEvent(ActionType.TABLE_SELECT);
+
+				if (event.isDoubleClick()) {
+					if (event.getPropertyId().equals("fraktion")) {
+						fireEvent(ActionType.CLICK_PARTY);
+					} else if (event.getPropertyId().equals("forename")
+							|| event.getPropertyId().equals("lastname")) {
+						fireEvent(ActionType.CLICK_PERSON);
+					}
+				}
 
 			}
 
@@ -56,6 +69,18 @@ public class BasicView extends AbstractView {
 			@Override
 			public void containerItemSetChange(ItemSetChangeEvent event) {
 				fireEvent(ActionType.FILTER);
+
+			}
+		});
+
+		basicTable.addListener(new Property.ValueChangeListener() {
+
+			private static final long serialVersionUID = 3455396944268723575L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+
+				fireEvent(ActionType.TABLE_SELECT);
 
 			}
 		});

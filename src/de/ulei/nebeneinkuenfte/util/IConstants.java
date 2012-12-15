@@ -10,4 +10,10 @@ public interface IConstants {
 			"Vorname", "Nachname", "Homepage", "Email", "Partei", "Wahlkreis",
 			"Zusatzeinkommen (min)", "Zusatzeinkommen (max)" };
 
+	public static String[] NEBENTAETIGKEIT_VISIBLE_COLUMNS = new String[] {
+			"auftraggeber", "type", "place", "year", "stufe" };
+
+	public static String[] NEBENTAETIGKEIT_COLUMN_HEADER = new String[] {
+			"Auftraggeber", "Art", "Ort", "Jahr", "Stufe" };
+
 }

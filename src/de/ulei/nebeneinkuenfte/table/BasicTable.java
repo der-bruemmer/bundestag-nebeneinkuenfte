@@ -21,6 +21,7 @@ public class BasicTable extends FilterTable {
 
 	public BasicTable() {
 
+		setImmediate(true);
 		setFilterGenerator(new TableFilterGenerator());
 		setFilterDecorator(new TableFilterDecorator());
 		setFilterBarVisible(true);
@@ -49,13 +50,9 @@ public class BasicTable extends FilterTable {
 	protected Object getPropertyValue(Object rowId, Object colId,
 			Property property) {
 
-		// handle homepage
-		if (colId.equals("homepage") || colId.equals("mail")) {
+		// handle homepage link
+		if (colId.equals("homepage")) {
 
-			/*
-			 * link must start with protocol definition http or https. otherwise
-			 * the link can not opened.
-			 */
 			Link link;
 			String url = (String) property.getValue();
 			if (url != null) {
@@ -67,7 +64,7 @@ public class BasicTable extends FilterTable {
 			}
 
 		}
-		// handle email
+		// handle email link
 		else if (colId.equals("email")) {
 
 			Link link;
@@ -83,7 +80,7 @@ public class BasicTable extends FilterTable {
 			}
 
 		}
-		// handle wahlkreis
+		// handle wahlkreis link
 		else if (colId.equals("wahlkreisUri")) {
 
 			Abgeordneter abgeordneter = (Abgeordneter) rowId;

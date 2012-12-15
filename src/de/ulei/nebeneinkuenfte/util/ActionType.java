@@ -25,6 +25,23 @@ public enum ActionType {
 	 * Export table content
 	 */
 
-	EXPORT
+	EXPORT,
 
+	/**
+	 * click on person occurred
+	 */
+
+	CLICK_PERSON,
+
+	/**
+	 * click on party occurred
+	 */
+
+	CLICK_PARTY,
+
+	/**
+	 * item from table was selected
+	 */
+
+	TABLE_SELECT
 }

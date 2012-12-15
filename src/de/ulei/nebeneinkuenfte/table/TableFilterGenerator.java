@@ -25,6 +25,8 @@ public class TableFilterGenerator implements FilterGenerator, Serializable {
 
 			ComboBox box = new ComboBox();
 			box.setNullSelectionAllowed(false);
+			box.setImmediate(true);
+
 			box.addItem("");
 			box.setItemCaption("", "Alle");
 			box.addItem("Die Linke");
@@ -39,6 +41,23 @@ public class TableFilterGenerator implements FilterGenerator, Serializable {
 			box.setItemIcon("FDP", new ThemeResource("icons/16/yellow.png"));
 			box.addItem("SPD");
 			box.setItemIcon("SPD", new ThemeResource("icons/16/red.png"));
+
+			box.select("");
+			return box;
+
+		}
+
+		else if (propertyId.equals("stufe")) {
+
+			ComboBox box = new ComboBox();
+			box.setNullSelectionAllowed(false);
+			box.setImmediate(true);
+
+			box.addItem("");
+			box.setItemCaption("", "Alle");
+			box.addItem("Stufe 1");
+			box.addItem("Stufe 2");
+			box.addItem("Stufe 3");
 
 			box.select("");
 			return box;
