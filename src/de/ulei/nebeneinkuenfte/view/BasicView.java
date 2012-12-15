@@ -1,9 +1,13 @@
 package de.ulei.nebeneinkuenfte.view;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.Runo;
 
+import de.ulei.nebeneinkuenfte.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
 import de.ulei.nebeneinkuenfte.table.BasicTable;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
@@ -25,6 +29,23 @@ public class BasicView extends AbstractView {
 
 		createTableSection();
 		createNavigationSection();
+		// addTableListener();
+
+	}
+
+	private void addTableListener() {
+
+		basicTable.addListener(new ItemClickListener() {
+
+			private static final long serialVersionUID = -793315320795502970L;
+
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+
+		});
 
 	}
 
@@ -58,7 +79,7 @@ public class BasicView extends AbstractView {
 		basicTable = new BasicTable();
 		basicTable.setWidth("100%");
 		basicTable.setHeight("100%");
-//		basicTable.setPageLength(15);
+		// basicTable.setPageLength(15);
 
 		tablePanel.addComponent(basicTable);
 		addComponent(tablePanel, 0, 0, 1, 0);
@@ -69,9 +90,11 @@ public class BasicView extends AbstractView {
 
 		basicTable.addItem(person);
 		basicTable.setVisibleColumns(new String[] { "forename", "lastname",
-				"fraktion" });
+				"homepage", "email", "fraktion", "minZusatzeinkommen",
+				"maxZusatzeinkommen" });
 		basicTable.setColumnHeaders(new String[] { "Vorname", "Nachname",
-				"Partei" });
+				"Homepage", "Email", "Partei", "Zusatzeinkommen (min)",
+				"Zusatzeinkommen (max)" });
 
 	}
 
@@ -80,9 +103,11 @@ public class BasicView extends AbstractView {
 
 		basicTable.setContainerDataSource(container);
 		basicTable.setVisibleColumns(new String[] { "forename", "lastname",
-				"fraktion", "minZusatzeinkommen", "maxZusatzeinkommen" });
+				"homepage", "email", "fraktion", "minZusatzeinkommen",
+				"maxZusatzeinkommen" });
 		basicTable.setColumnHeaders(new String[] { "Vorname", "Nachname",
-				"Partei", "Zusatzeinkommen (min)", "Zusatzeinkommen (max)" });
+				"Homepage", "Email", "Partei", "Zusatzeinkommen (min)",
+				"Zusatzeinkommen (max)" });
 
 	}
 

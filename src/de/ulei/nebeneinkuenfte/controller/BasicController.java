@@ -17,13 +17,19 @@ public class BasicController extends AbstractController implements
 	private BasicView basicView;
 	private BeanItemContainer<Abgeordneter> personContainer;
 
-	public BasicController(BasicView view) {
+	public BasicController(BasicView basicView) {
 
-		this.basicView = view;
+		this.basicView = basicView;
 		this.basicView.addListener(this);
 
 		fetchPersons();
-		view.setPersonContainerDataSource(personContainer);
+		basicView.setPersonContainerDataSource(personContainer);
+		Abgeordneter abgeordneter = new Abgeordneter();
+		abgeordneter.setForename("Sebastian");
+		abgeordneter.setLastname("Lippert");
+		abgeordneter.setEmail("Big_KH@web.de");
+		abgeordneter.setHomepage("google.de");
+		basicView.addPerson(abgeordneter);
 
 	}
 
