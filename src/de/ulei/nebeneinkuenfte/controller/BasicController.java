@@ -1,5 +1,8 @@
 package de.ulei.nebeneinkuenfte.controller;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import com.vaadin.data.util.BeanItemContainer;
 
 import de.ulei.nebeneinkuenfte.NebeneinkuenfteApplication;
@@ -23,6 +26,32 @@ public class BasicController extends AbstractController implements
 		this.basicView.addListener(this);
 
 		fetchPersons();
+		setTableFooter();
+	}
+
+	private void setTableFooter() {
+
+		Collection<?> list = basicView.getBasicTable().getItemIds();
+
+		int min = 0;
+		int max = 0;
+
+		basicView.setTableFooter("forename", "Gesamt:");
+		basicView.setTableFooter("lastname", String.valueOf(list.size()));
+
+		Abgeordneter a;
+		Iterator<Abgeordneter> it = (Iterator<Abgeordneter>) list.iterator();
+		while (it.hasNext()) {
+
+			a = it.next();
+
+			min += a.getMinZusatzeinkommen();
+			max += a.getMaxZusatzeinkommen();
+
+		}
+
+		basicView.setTableFooter("minZusatzeinkommen", String.valueOf(min));
+		basicView.setTableFooter("maxZusatzeinkommen", String.valueOf(max));
 
 	}
 
@@ -40,6 +69,7 @@ public class BasicController extends AbstractController implements
 		for (Abgeordneter mdb : conv.getAbgeordnete()) {
 			personContainer.addItem(mdb);
 		}
+
 		basicView.setPersonContainerDataSource(personContainer);
 
 	}
@@ -49,6 +79,9 @@ public class BasicController extends AbstractController implements
 		switch (event.getActionType()) {
 		case HOME:
 			fireEvent(event.getActionType());
+			break;
+		case FILTER:
+			setTableFooter();
 			break;
 		default:
 			break;

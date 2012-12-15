@@ -492,7 +492,7 @@ public class Solitaire {
 		MenuItem gameMenu = menu.addItem("Spiel", null);
 		MenuItem settings = menu.addItem("Option", null);
 		settings.addItem("3 Karten", new ThemeResource(
-				"images/menuchecked.png"), new Command() {
+				"icons/16/menuchecked.png"), new Command() {
 
 			private static final long serialVersionUID = -3315369080053857921L;
 

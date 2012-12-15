@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Abgeordneter implements Serializable {
+
+	private static final long serialVersionUID = 1447162980745311414L;
 	
 	private String uri;
 	private String label;
