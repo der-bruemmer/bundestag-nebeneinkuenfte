@@ -10,11 +10,11 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Runo;
 
 import de.ulei.nebeneinkuenfte.util.ActionType;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class NavigationBar extends AbstractView {
 
 	private static final long serialVersionUID = -22603405987137766L;
-	private static int BUTTON_WIDTH = 150;
 
 	private GridLayout buttonLayout;
 
@@ -42,7 +42,7 @@ public class NavigationBar extends AbstractView {
 
 		export = new Button("Export");
 		export.setImmediate(true);
-		export.setWidth(BUTTON_WIDTH, UNITS_PIXELS);
+		export.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 		export.setIcon(new ThemeResource("icons/16/document-save-as.png"));
 		export.addListener(new Button.ClickListener() {
 
@@ -55,11 +55,11 @@ public class NavigationBar extends AbstractView {
 		});
 
 		separator = new Label("<hr/>", Label.CONTENT_XHTML);
-		separator.setWidth(BUTTON_WIDTH, UNITS_PIXELS);
+		separator.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 
 		home = new Button("Home");
 		home.setImmediate(true);
-		home.setWidth(BUTTON_WIDTH, UNITS_PIXELS);
+		home.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 		home.setIcon(new ThemeResource("icons/16/home.png"));
 		home.addListener(new Button.ClickListener() {
 
@@ -85,7 +85,7 @@ public class NavigationBar extends AbstractView {
 
 	public void addButton(Button button) {
 
-		button.setWidth(BUTTON_WIDTH, UNITS_PIXELS);
+		button.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 		buttonLayout.addComponent(button);
 		buttonLayout.setComponentAlignment(button, Alignment.TOP_CENTER);
 

@@ -87,6 +87,7 @@ public class BasicController extends AbstractPersonController implements
 			break;
 		case FILTER:
 			setTableFooter();
+			setActualPerson(null);
 			break;
 		case CLICK_PARTY:
 			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
@@ -103,6 +104,15 @@ public class BasicController extends AbstractPersonController implements
 			break;
 		}
 
+	}
+
+	@Override
+	public void setActualPerson(Abgeordneter actualPerson) {
+
+		basicView.enablePersonDetailsButton(actualPerson != null);
+		basicView.enablePartyDetailsButton(actualPerson != null);
+
+		super.setActualPerson(actualPerson);
 	}
 
 }
