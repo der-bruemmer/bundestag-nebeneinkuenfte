@@ -43,5 +43,17 @@ public enum ActionType {
 	 * item from table was selected
 	 */
 
-	TABLE_SELECT
+	TABLE_SELECT, 
+	
+	/**
+	 * open a selected person
+	 */
+	
+	OPEN_PERSON, 
+	
+	/**
+	 * open party of selected person
+	 */
+	
+	OPEN_PARTY
 }

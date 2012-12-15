@@ -7,7 +7,10 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Runo;
 
 import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
@@ -22,6 +25,8 @@ public class BasicView extends AbstractView {
 	private static final long serialVersionUID = -7926845225077002139L;
 
 	private BasicTable basicTable;
+	private Button personDetails;
+	private Button partyDetails;
 
 	public BasicView() {
 
@@ -89,6 +94,33 @@ public class BasicView extends AbstractView {
 
 	private void createNavigationSection() {
 
+		personDetails = new Button("Open Person");
+		personDetails.setImmediate(true);
+		personDetails.setIcon(new ThemeResource("icons/16/user.png"));
+		personDetails.setEnabled(false);
+		personDetails.addListener(new Button.ClickListener() {
+
+			private static final long serialVersionUID = 5261319030685442466L;
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				fireEvent(ActionType.CLICK_PERSON);
+			}
+		});
+
+		partyDetails = new Button("Open Party");
+		partyDetails.setIcon(new ThemeResource("icons/16/users.png"));
+		partyDetails.setEnabled(false);
+		partyDetails.addListener(new Button.ClickListener() {
+
+			private static final long serialVersionUID = 5261319030685442466L;
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				fireEvent(ActionType.CLICK_PARTY);
+			}
+		});
+
 		NavigationBar bar = new NavigationBar();
 		bar.addListener(new IActionListener() {
 
@@ -97,9 +129,11 @@ public class BasicView extends AbstractView {
 			@Override
 			public void handleAction(ActionEvent event) {
 				fireEvent(event.getActionType());
-
 			}
 		});
+
+		bar.addButton(personDetails);
+		bar.addButton(partyDetails);
 
 		addComponent(bar, 2, 0);
 
@@ -151,6 +185,14 @@ public class BasicView extends AbstractView {
 		basicTable.setColumnCollapsed("wahlkreisUri", true);
 		basicTable.setColumnCollapsed("email", true);
 
+	}
+
+	public void enablePersonDetailsButton(boolean isEnabled) {
+		personDetails.setEnabled(isEnabled);
+	}
+
+	public void enablePartyDetailsButton(boolean isEnabled) {
+		partyDetails.setEnabled(isEnabled);
 	}
 
 	public BasicTable getBasicTable() {

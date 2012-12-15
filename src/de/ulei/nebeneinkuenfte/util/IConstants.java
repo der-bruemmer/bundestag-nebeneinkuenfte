@@ -1,6 +1,8 @@
 package de.ulei.nebeneinkuenfte.util;
 
 public interface IConstants {
+	
+	public static int BUTTON_WIDTH = 150;
 
 	public static String[] ABGEORDNETER_VISIBLE_COLUMNS = new String[] {
 			"forename", "lastname", "homepage", "email", "fraktion",
