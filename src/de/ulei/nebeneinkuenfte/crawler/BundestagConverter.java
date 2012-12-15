@@ -33,7 +33,7 @@ public class BundestagConverter {
 	 */
 
 	public BundestagConverter(String URI, boolean scrape) {
-		this(URI, scrape, "./WebContent/abgeordnete");
+		this(URI, scrape, "./WebContent/abgeordnete/");
 	}
 
 	/**
@@ -48,22 +48,25 @@ public class BundestagConverter {
 
 	public BundestagConverter(String URI, boolean scrape, String path) {
 		this.startUri = URI;
+		ArrayList<String> failed = new ArrayList<String>();
 		if (scrape) {
 			this.fillMdBList(URI);
 			int count = 0;
 			for (Abgeordneter mdb : this.mdbs) {
 				count++;
-				if (this.parseMdB(mdb) != null) {
+				if (!this.parseMdB(mdb)) {
 					// parse failed
 					System.out.println("Trying again.");
-					wait(2);
-					this.parseMdB(mdb);
+					wait(2000);
+					if(!this.parseMdB(mdb)) {
+						failed.add(mdb.getURI());
+					}
 				}
 
-				this.writeMdBObjectToFile(mdb);
+				this.writeMdBObjectToFile(path, mdb);
 				System.out.println("Parsed Mdb " + count + " of "
 						+ this.mdbs.size());
-				wait(2);
+				wait(500);
 			}
 		} else {
 			this.readMdbsFromFolder(path);
@@ -76,8 +79,8 @@ public class BundestagConverter {
 		try {
 			Document doc = Jsoup
 					.connect(URI)
-					.userAgent(
-							"Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
+					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
+					.timeout(20000)
 					.get();
 			Elements abgeordnetenLinks = doc.getElementsByClass("linkIntern");
 			Iterator<Element> it = abgeordnetenLinks.iterator();
@@ -125,45 +128,65 @@ public class BundestagConverter {
 		return absUri;
 	}
 
-	private String parseMdB(Abgeordneter mdb) {
+	private boolean parseMdB(Abgeordneter mdb) {
 
-		String failUri = null;
+		boolean success = false;
 
 		try {
 			Document doc = Jsoup
 					.connect(mdb.getURI())
-					.userAgent(
-							"Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
+					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
+					.timeout(20000)
 					.get();
 			Elements externeLinks = doc.getElementsByClass("linkExtern");
-			// Element kontakt = doc.getElementsByClass("standardBox").html();
 
 			if (externeLinks.first() != null) {
-				String homepage = doc.getElementsByClass("linkExtern").first()
+				String homepage = externeLinks.first()
 						.child(0).attr("href");
 				mdb.setHomepage(homepage);
+			}
+			
+			Elements mail = doc.getElementsByClass("linkEmail");
+			
+			if(mail.first() != null) {
+				String email = mail.first().attr("href");
+				mdb.setEmail(email);
+			}
+			
+			Elements wahlkreis = doc.getElementsByClass("linkIntern");
+			
+			if(wahlkreis != null) {
+				Iterator<Element> wahlkreisIt = wahlkreis.iterator();
+				while(wahlkreisIt.hasNext()) {
+					Element wahlkreisEl = wahlkreisIt.next();
+					if(wahlkreisEl.text().toLowerCase().contains("wahlkreis")) {
+						mdb.setWahlkreisUri(this.makeAbsoluteURI(wahlkreisEl.baseUri(), wahlkreisEl.child(0).attr("href")));
+						mdb.setWahlkreisName(wahlkreisEl.child(0).text());
+					}
+				}
 			}
 
 			Element voa = doc.getElementsByClass("voa").first();
 			this.parseNebentaetigkeiten(mdb, voa);
+			success = true;
 
 		} catch (IOException ioe) {
 			System.out.println("URL " + mdb.getURI()
 					+ " could not be retrieved. Skipping.");
-			failUri = mdb.getURI();
+			
 		}
 
-		return failUri;
+		return success;
 
 	}
 
-	private void writeMdBObjectToFile(Abgeordneter mdb) {
+	private void writeMdBObjectToFile(String path, Abgeordneter mdb) {
 		ObjectOutputStream outputStream = null;
 
 		try {
 
 			// Construct the LineNumberReader object
-			FileOutputStream fileOut = new FileOutputStream("./abgeordnete/"
+			FileOutputStream fileOut = new FileOutputStream(path
 					+ mdb.getLastname() + "_" + mdb.getForename());
 			outputStream = new ObjectOutputStream(fileOut);
 			outputStream.writeObject(mdb);
@@ -184,38 +207,6 @@ public class BundestagConverter {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-	private void readMdbsFromList() {
-		FileInputStream fis = null;
-		ObjectInputStream ois = null;
-
-		if (this.mdbs.size() != 0) {
-			this.mdbs.clear();
-		}
-
-		try {
-			fis = new FileInputStream("../abgeordnete");
-			ois = new ObjectInputStream(fis);
-			Abgeordneter mdb = null;
-			while (fis.available() > 0) {
-				if ((mdb = (Abgeordneter) ois.readObject()) != null) {
-					this.mdbs.add(mdb);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			// Close the ObjectOutputStream
-			try {
-				if (ois != null) {
-					ois.close();
-				}
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-
 	}
 
 	private void readMdbsFromFolder(String path) {
@@ -258,7 +249,7 @@ public class BundestagConverter {
 		time0 = System.currentTimeMillis();
 		do {
 			time1 = System.currentTimeMillis();
-		} while ((time1 - time0) < k * 1000);
+		} while ((time1 - time0) < k);
 	}
 
 	private void parseNebentaetigkeiten(Abgeordneter mdb, Element voa) {
@@ -418,10 +409,15 @@ public class BundestagConverter {
 	public static void main(String[] args) {
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				true);
+				false);
 		// conv.writeNebentaetigkeitenToFile();
+		int count = 0;
 		for (Abgeordneter mdb : conv.getAbgeordnete()) {
-			System.out.println(mdb.getHomepage());
+			
+			System.out.println(mdb.getWahlkreisName());
+			System.out.println(mdb.getWahlkreisUri());
+			System.out.println(mdb.getEmail());
+			
 		}
 
 		// SpendenParser spend = new SpendenParser();

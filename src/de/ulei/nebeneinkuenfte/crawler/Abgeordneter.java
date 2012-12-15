@@ -14,7 +14,8 @@ public class Abgeordneter implements Serializable {
 	private String lastname;
 	private String homepage;
 	private String email;
-	private String wahlkreis;
+	private String wahlkreisUri;
+	private String wahlkreisName;
 	private String fraktion;
 	private int anzahlNebeneinkuenfte = 0;
 	private int minZusatzeinkommen = 0;
@@ -88,12 +89,20 @@ public class Abgeordneter implements Serializable {
 		this.email = email;
 	}
 
-	public String getWahlkreis() {
-		return wahlkreis;
+	public String getWahlkreisUri() {
+		return wahlkreisUri;
 	}
 
-	public void setWahlkreis(String wahlkreis) {
-		this.wahlkreis = wahlkreis;
+	public void setWahlkreisUri(String wahlkreisUri) {
+		this.wahlkreisUri = wahlkreisUri;
+	}
+	
+	public String getWahlkreisName() {
+		return wahlkreisName;
+	}
+
+	public void setWahlkreisName(String wahlkreisName) {
+		this.wahlkreisName = wahlkreisName;
 	}
 	
 	public String getFraktion() {
@@ -152,7 +161,7 @@ public class Abgeordneter implements Serializable {
 			}
 		}
 		if(!canMax) {
-			this.maxZusatzeinkommen=-1;
+			this.maxZusatzeinkommen=1000000;
 		}
 		this.setAnzahlNebeneinkuenfte(nebentaetigkeiten.size());
 	}
