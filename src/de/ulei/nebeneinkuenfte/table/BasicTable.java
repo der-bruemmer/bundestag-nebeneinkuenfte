@@ -18,8 +18,6 @@ public class BasicTable extends FilterTable {
 	private static final long serialVersionUID = 1037222921294665317L;
 
 	private ThemeResource mailResource = new ThemeResource("icons/16/mail.png");
-	private ThemeResource placeResource = new ThemeResource(
-			"icons/16/map-compass.png");
 
 	public BasicTable() {
 
@@ -41,6 +39,7 @@ public class BasicTable extends FilterTable {
 		});
 
 		setColumnCollapsingAllowed(true);
+		setAlwaysRecalculateColumnWidths(true);
 		setSelectable(true);
 		setSizeFull();
 
@@ -57,9 +56,15 @@ public class BasicTable extends FilterTable {
 			 * link must start with protocol definition http or https. otherwise
 			 * the link can not opened.
 			 */
+			Link link;
 			String url = (String) property.getValue();
-			if (url != null)
-				return new Link(url, new ExternalResource(url));
+			if (url != null) {
+
+				link = new Link(url, new ExternalResource(url));
+				link.setTargetName("_blank");
+				return link;
+
+			}
 
 		}
 		// handle email
@@ -72,13 +77,14 @@ public class BasicTable extends FilterTable {
 				link = new Link(url, new ExternalResource(url));
 				link.setCaption("Email senden");
 				link.setIcon(mailResource);
+				link.setTargetName("_blank");
 				return link;
 
 			}
 
 		}
 		// handle wahlkreis
-		else if (colId.equals("wahlkreis")) {
+		else if (colId.equals("wahlkreisUri")) {
 
 			Abgeordneter abgeordneter = (Abgeordneter) rowId;
 			Link link = null;
@@ -87,8 +93,7 @@ public class BasicTable extends FilterTable {
 			if (url != null) {
 
 				link = new Link(url, new ExternalResource(url));
-				link.setCaption("Wahlkreis");
-				link.setIcon(placeResource);
+				link.setCaption(abgeordneter.getWahlkreisName());
 				return link;
 
 			}
