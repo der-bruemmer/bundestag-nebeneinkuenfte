@@ -1,5 +1,7 @@
 package de.ulei.nebeneinkuenfte.view;
 
+import com.vaadin.data.Container;
+import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -9,6 +11,7 @@ import com.vaadin.ui.themes.Runo;
 import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
 import de.ulei.nebeneinkuenfte.table.BasicTable;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
+import de.ulei.nebeneinkuenfte.util.ActionType;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
@@ -46,6 +49,17 @@ public class BasicView extends AbstractView {
 
 		});
 
+		basicTable.addListener(new Container.ItemSetChangeListener() {
+
+			private static final long serialVersionUID = -5412002348163503472L;
+
+			@Override
+			public void containerItemSetChange(ItemSetChangeEvent event) {
+				fireEvent(ActionType.FILTER);
+
+			}
+		});
+
 	}
 
 	private void createNavigationSection() {
@@ -78,6 +92,7 @@ public class BasicView extends AbstractView {
 		basicTable = new BasicTable();
 		basicTable.setWidth("100%");
 		basicTable.setHeight("100%");
+		basicTable.setFooterVisible(true);
 		// basicTable.setPageLength(15);
 
 		tablePanel.addComponent(basicTable);
@@ -100,6 +115,10 @@ public class BasicView extends AbstractView {
 
 	}
 
+	public void setTableFooter(Object propertyId, String footer) {
+		basicTable.setColumnFooter(propertyId, footer);
+	}
+
 	private void updateTable() {
 
 		basicTable.setVisibleColumns(IConstants.ABGEORDNETER_VISIBLE_COLUMNS);
@@ -107,6 +126,10 @@ public class BasicView extends AbstractView {
 		basicTable.setColumnCollapsed("wahlkreisUri", true);
 		basicTable.setColumnCollapsed("email", true);
 
+	}
+
+	public BasicTable getBasicTable() {
+		return basicTable;
 	}
 
 }

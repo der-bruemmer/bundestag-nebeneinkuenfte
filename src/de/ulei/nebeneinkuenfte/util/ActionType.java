@@ -9,12 +9,16 @@ package de.ulei.nebeneinkuenfte.util;
  */
 
 public enum ActionType {
-	
+
 	/**
 	 * Home button was called to get back to basic table
 	 */
-	HOME
+	HOME,
 
-	
-	
+	/**
+	 * Table was filtered
+	 */
+
+	FILTER
+
 }
