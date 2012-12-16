@@ -4,10 +4,12 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Runo;
 
-import de.ulei.nebeneinkuenfte.crawler.Nebentaetigkeit;
+import de.ulei.nebeneinkuenfte.model.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.table.BasicTable;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.ActionType;
@@ -20,6 +22,8 @@ public class PersonView extends AbstractView {
 
 	private BasicTable basicTable;
 	private Panel tablePanel;
+
+	private Button back;
 
 	public PersonView() {
 
@@ -53,9 +57,20 @@ public class PersonView extends AbstractView {
 
 	private void createNavigationSection() {
 
+		back = new Button("Return");
+		back.setIcon(new ThemeResource("icons/16/edit-undo.png"));
+		back.addListener(new Button.ClickListener() {
+
+			private static final long serialVersionUID = -6745818656464476271L;
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				fireEvent(ActionType.GO_BACK);
+
+			}
+		});
 		NavigationBar bar = new NavigationBar();
-		bar.setHomeButtonCaption("Zurück");
-		bar.setHomeButtonIcon(new ThemeResource("icons/16/edit-undo.png"));
+		bar.addButton(back);
 		bar.addListener(new IActionListener() {
 
 			private static final long serialVersionUID = 3016750239145013536L;
@@ -79,12 +94,10 @@ public class PersonView extends AbstractView {
 		tablePanel.setImmediate(true);
 		tablePanel.setSizeFull();
 
-		// table for user data
 		basicTable = new BasicTable();
 		basicTable.setWidth("100%");
 		basicTable.setHeight("100%");
 		basicTable.setFooterVisible(true);
-		// basicTable.setPageLength(15);
 
 		tablePanel.addComponent(basicTable);
 		addComponent(tablePanel, 0, 0, 1, 0);

@@ -1,4 +1,4 @@
-package de.ulei.nebeneinkuenfte.crawler;
+package de.ulei.nebeneinkuenfte.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -20,7 +20,6 @@ public class NavigationBar extends AbstractView {
 
 	private Button home;
 	private Label separator;
-	private Button export;
 
 	public NavigationBar() {
 
@@ -40,20 +39,6 @@ public class NavigationBar extends AbstractView {
 		buttonLayout.setSpacing(true);
 		buttonLayout.setWidth(100, UNITS_PERCENTAGE);
 
-		export = new Button("Export");
-		export.setImmediate(true);
-		export.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
-		export.setIcon(new ThemeResource("icons/16/document-save-as.png"));
-		export.addListener(new Button.ClickListener() {
-
-			private static final long serialVersionUID = -6896210990876900350L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.EXPORT);
-			}
-		});
-
 		separator = new Label("<hr/>", Label.CONTENT_XHTML);
 		separator.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 
@@ -67,7 +52,7 @@ public class NavigationBar extends AbstractView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.HOME_PERSON);
+				fireEvent(ActionType.OPEN_PERSON_BASIC);
 			}
 		});
 
@@ -75,8 +60,6 @@ public class NavigationBar extends AbstractView {
 		buttonLayout.setComponentAlignment(home, Alignment.TOP_CENTER);
 		buttonLayout.addComponent(separator);
 		buttonLayout.setComponentAlignment(separator, Alignment.TOP_CENTER);
-		buttonLayout.addComponent(export);
-		buttonLayout.setComponentAlignment(export, Alignment.TOP_CENTER);
 
 		panel.addComponent(buttonLayout);
 		addComponent(panel);
@@ -97,14 +80,6 @@ public class NavigationBar extends AbstractView {
 
 	public void setHomeButtonIcon(ThemeResource icon) {
 		home.setIcon(icon);
-	}
-
-	public void setExportButtonCaption(String caption) {
-		export.setCaption(caption);
-	}
-
-	public void setExportButtonIcon(ThemeResource icon) {
-		export.setIcon(icon);
 	}
 
 }

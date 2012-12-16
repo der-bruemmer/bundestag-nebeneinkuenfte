@@ -19,6 +19,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import de.ulei.nebeneinkuenfte.model.Abgeordneter;
+import de.ulei.nebeneinkuenfte.model.Nebentaetigkeit;
+
 public class BundestagConverter {
 
 	String startUri = null;
@@ -409,16 +412,16 @@ public class BundestagConverter {
 	public static void main(String[] args) {
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false);
+				true);
 		// conv.writeNebentaetigkeitenToFile();
-		int count = 0;
-		for (Abgeordneter mdb : conv.getAbgeordnete()) {
-			
-			System.out.println(mdb.getWahlkreisName());
-			System.out.println(mdb.getWahlkreisUri());
-			System.out.println(mdb.getEmail());
-			
-		}
+//		int count = 0;
+//		for (Abgeordneter mdb : conv.getAbgeordnete()) {
+//			
+//			System.out.println(mdb.getWahlkreisName());
+//			System.out.println(mdb.getWahlkreisUri());
+//			System.out.println(mdb.getEmail());
+//			
+//		}
 
 		// SpendenParser spend = new SpendenParser();
 		// spend.parseSpenden("spenden.csv");
