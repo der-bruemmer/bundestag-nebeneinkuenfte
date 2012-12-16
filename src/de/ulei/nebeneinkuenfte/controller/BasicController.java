@@ -3,11 +3,7 @@ package de.ulei.nebeneinkuenfte.controller;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.vaadin.data.util.BeanItemContainer;
-
-import de.ulei.nebeneinkuenfte.NebeneinkuenfteApplication;
-import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
-import de.ulei.nebeneinkuenfte.crawler.BundestagConverter;
+import de.ulei.nebeneinkuenfte.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 import de.ulei.nebeneinkuenfte.view.BasicView;
@@ -18,14 +14,12 @@ public class BasicController extends AbstractPersonController implements
 	private static final long serialVersionUID = 3304961841215841349L;
 
 	private BasicView basicView;
-	private BeanItemContainer<Abgeordneter> personContainer;
 
 	public BasicController(BasicView basicView) {
 
 		this.basicView = basicView;
 		this.basicView.addListener(this);
 
-		fetchPersons();
 		setTableFooter();
 	}
 
@@ -56,44 +50,24 @@ public class BasicController extends AbstractPersonController implements
 
 	}
 
-	private void fetchPersons() {
-
-		String path = NebeneinkuenfteApplication.getInstance().getContext()
-				.getBaseDirectory()
-				+ "/abgeordnete";
-		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false, path);
-
-		personContainer = new BeanItemContainer<Abgeordneter>(
-				Abgeordneter.class);
-		for (Abgeordneter mdb : conv.getAbgeordnete()) {
-			personContainer.addItem(mdb);
-		}
-
-		basicView.setPersonContainerDataSource(personContainer);
-
-	}
-
 	@Override
 	public void handleAction(ActionEvent event) {
 
 		switch (event.getActionType()) {
-		case HOME_PERSON:
+		case OPEN_PERSON_BASIC:
 			fireEvent(event.getActionType());
 			break;
-
 		case EXPORT:
 			break;
 		case FILTER:
 			setTableFooter();
 			setActualPerson(null);
 			break;
-		case CLICK_PARTY:
+		case OPEN_PERSON_PARTY:
 			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
 			fireEvent(event.getActionType());
 			break;
-		case CLICK_PERSON:
+		case OPEN_PERSON_PERSON:
 			setActualPerson((Abgeordneter) basicView.getBasicTable().getValue());
 			fireEvent(event.getActionType());
 			break;

@@ -11,7 +11,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.TableFieldFactory;
 
-import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
+import de.ulei.nebeneinkuenfte.model.Abgeordneter;
 
 public class BasicTable extends FilterTable {
 

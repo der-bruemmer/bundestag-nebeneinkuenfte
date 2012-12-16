@@ -15,6 +15,10 @@ public class NebeneinkuenfteApplication extends Application implements
 
 	private static final long serialVersionUID = 8818244775327742466L;
 
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 	/*
 	 * thread local creates a static NebeneinkuenfteApplication instance of the
 	 * current session which is accessible with

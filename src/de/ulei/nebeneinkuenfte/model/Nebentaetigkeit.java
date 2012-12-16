@@ -1,8 +1,10 @@
-package de.ulei.nebeneinkuenfte.crawler;
+package de.ulei.nebeneinkuenfte.model;
 
 import java.io.Serializable;
 
 public class Nebentaetigkeit implements Serializable {
+	
+	private static final long serialVersionUID = -2834030362807009074L;
 	
 	private String auftraggeber;
 	private String type;

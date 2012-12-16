@@ -2,7 +2,7 @@ package de.ulei.nebeneinkuenfte.controller;
 
 import java.io.Serializable;
 
-import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
+import de.ulei.nebeneinkuenfte.model.Abgeordneter;
 
 public abstract class AbstractPersonController extends AbstractController
 		implements Serializable {

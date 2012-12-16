@@ -13,7 +13,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Runo;
 
-import de.ulei.nebeneinkuenfte.crawler.Abgeordneter;
+import de.ulei.nebeneinkuenfte.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.table.BasicTable;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.ActionType;
@@ -56,10 +56,10 @@ public class BasicView extends AbstractView {
 
 				if (event.isDoubleClick()) {
 					if (event.getPropertyId().equals("fraktion")) {
-						fireEvent(ActionType.CLICK_PARTY);
+						fireEvent(ActionType.OPEN_PERSON_PARTY);
 					} else if (event.getPropertyId().equals("forename")
 							|| event.getPropertyId().equals("lastname")) {
-						fireEvent(ActionType.CLICK_PERSON);
+						fireEvent(ActionType.OPEN_PERSON_PERSON);
 					}
 				}
 
@@ -104,7 +104,7 @@ public class BasicView extends AbstractView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.CLICK_PERSON);
+				fireEvent(ActionType.OPEN_PERSON_PERSON);
 			}
 		});
 
@@ -117,7 +117,7 @@ public class BasicView extends AbstractView {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.CLICK_PARTY);
+				fireEvent(ActionType.OPEN_PERSON_PARTY);
 			}
 		});
 
@@ -147,12 +147,10 @@ public class BasicView extends AbstractView {
 		tablePanel.setImmediate(true);
 		tablePanel.setSizeFull();
 
-		// table for user data
 		basicTable = new BasicTable();
 		basicTable.setWidth("100%");
 		basicTable.setHeight("100%");
 		basicTable.setFooterVisible(true);
-		// basicTable.setPageLength(15);
 
 		tablePanel.addComponent(basicTable);
 		addComponent(tablePanel, 0, 0, 1, 0);
@@ -184,7 +182,9 @@ public class BasicView extends AbstractView {
 		basicTable.setColumnHeaders(IConstants.ABGEORDNETER_COLUMN_HEADER);
 		basicTable.setColumnCollapsed("wahlkreisUri", true);
 		basicTable.setColumnCollapsed("email", true);
-
+		enablePersonDetailsButton(false);
+		enablePartyDetailsButton(false);
+		
 	}
 
 	public void enablePersonDetailsButton(boolean isEnabled) {

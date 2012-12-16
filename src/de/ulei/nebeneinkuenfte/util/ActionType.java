@@ -13,7 +13,7 @@ public enum ActionType {
 	/**
 	 * Home button was called to get back to basic table
 	 */
-	HOME_PERSON,
+	OPEN_PERSON_BASIC,
 
 	/**
 	 * Table was filtered
@@ -31,29 +31,35 @@ public enum ActionType {
 	 * click on person occurred
 	 */
 
-	CLICK_PERSON,
+	OPEN_PERSON_PERSON,
 
 	/**
 	 * click on party occurred
 	 */
 
-	CLICK_PARTY,
+	OPEN_PERSON_PARTY,
 
 	/**
 	 * item from table was selected
 	 */
 
-	TABLE_SELECT, 
-	
+	TABLE_SELECT,
+
 	/**
 	 * open a selected person
 	 */
-	
-	OPEN_PERSON, 
-	
+
+	OPEN_PERSON,
+
 	/**
 	 * open party of selected person
 	 */
-	
-	OPEN_PARTY
+
+	OPEN_PARTY,
+
+	/**
+	 * click on origin occurred
+	 */
+
+	GO_BACK, OPEN_PERSON_ORIGIN
 }
