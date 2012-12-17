@@ -1,11 +1,11 @@
 package de.ulei.nebeneinkuenfte.controller;
 
-import de.ulei.nebeneinkuenfte.model.Abgeordneter;
+import de.ulei.nebeneinkuenfte.model.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 import de.ulei.nebeneinkuenfte.view.PersonView;
 
-public class PersonController extends AbstractPersonController implements
+public class PersonController extends AbstractSidelineJobController implements
 		IActionListener {
 
 	private static final long serialVersionUID = 7065013836922459523L;
@@ -29,23 +29,28 @@ public class PersonController extends AbstractPersonController implements
 		case GO_BACK:
 			fireEvent(event.getActionType());
 			break;
-		case EXPORT:
-			break;
 		case FILTER:
 			// setTableFooter();
 			break;
-		case OPEN_PERSON_PARTY:
-			setActualPerson((Abgeordneter) personView.getBasicTable()
+		case OPEN_PERSON_ORIGIN:
+			setActualSidelineJob((Nebentaetigkeit) personView.getBasicTable()
 					.getValue());
 			fireEvent(event.getActionType());
 			break;
-		case OPEN_PERSON_PERSON:
-			setActualPerson((Abgeordneter) personView.getBasicTable()
+		case TABLE_SELECT:
+			setActualSidelineJob((Nebentaetigkeit) personView.getBasicTable()
 					.getValue());
-			fireEvent(event.getActionType());
 			break;
 		default:
 			break;
 		}
+	}
+
+	@Override
+	public void setActualSidelineJob(Nebentaetigkeit actualSidelineJob) {
+
+		personView.enableOpenOriginButton(actualSidelineJob != null);
+		super.setActualSidelineJob(actualSidelineJob);
+		
 	}
 }

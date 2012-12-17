@@ -61,5 +61,11 @@ public enum ActionType {
 	 * click on origin occurred
 	 */
 
-	GO_BACK, OPEN_PERSON_ORIGIN
+	GO_BACK,
+
+	/**
+	 * click on origin occurred
+	 */
+
+	OPEN_PERSON_ORIGIN
 }

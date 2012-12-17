@@ -20,11 +20,11 @@ public class BasicController extends AbstractPersonController implements
 		this.basicView = basicView;
 		this.basicView.addListener(this);
 
-		setTableFooter();
+		refreshTableFooter();
 	}
 
-	private void setTableFooter() {
-
+	public void refreshTableFooter() {
+		
 		Collection<?> list = basicView.getBasicTable().getItemIds();
 
 		int min = 0;
@@ -60,7 +60,7 @@ public class BasicController extends AbstractPersonController implements
 		case EXPORT:
 			break;
 		case FILTER:
-			setTableFooter();
+			refreshTableFooter();
 			setActualPerson(null);
 			break;
 		case OPEN_PERSON_PARTY:
@@ -83,8 +83,8 @@ public class BasicController extends AbstractPersonController implements
 	@Override
 	public void setActualPerson(Abgeordneter actualPerson) {
 
-		basicView.enablePersonDetailsButton(actualPerson != null);
-		basicView.enablePartyDetailsButton(actualPerson != null);
+		basicView.enableOpenPersonButton(actualPerson != null);
+		basicView.enableOpenPartyButton(actualPerson != null);
 
 		super.setActualPerson(actualPerson);
 	}
