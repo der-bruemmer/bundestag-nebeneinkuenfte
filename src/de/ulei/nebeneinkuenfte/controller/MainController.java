@@ -69,6 +69,7 @@ public class MainController implements IActionListener {
 				"icons/16/user.png"));
 		actualPersonView = basicView;
 		openPersonBasicView();
+		basicController.refreshTableFooter();
 
 	}
 
@@ -117,6 +118,9 @@ public class MainController implements IActionListener {
 
 		for (Abgeordneter mdb : conv.getAbgeordnete())
 			container.addItem(mdb);
+
+		path = null;
+		conv = null;
 
 		basicView.setPersonContainerDataSource(container);
 

@@ -6,13 +6,11 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.Runo;
 
-import de.ulei.nebeneinkuenfte.util.ActionType;
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class NavigationBar extends AbstractView {
+public class NavigationBar extends GridLayout {
 
 	private static final long serialVersionUID = -22603405987137766L;
 
@@ -21,14 +19,14 @@ public class NavigationBar extends AbstractView {
 	private Button home;
 	private Label separator;
 
-	public NavigationBar() {
+	public NavigationBar(AbstractView view) {
 
 		setSizeFull();
-		createButtonSection();
+		createButtonSection(view);
 
 	}
 
-	private void createButtonSection() {
+	private void createButtonSection(AbstractView view) {
 
 		Panel panel = new Panel(" ");
 		panel.setStyleName(Runo.PANEL_LIGHT);
@@ -42,19 +40,7 @@ public class NavigationBar extends AbstractView {
 		separator = new Label("<hr/>", Label.CONTENT_XHTML);
 		separator.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
 
-		home = new Button("Home");
-		home.setImmediate(true);
-		home.setWidth(IConstants.BUTTON_WIDTH, UNITS_PIXELS);
-		home.setIcon(new ThemeResource("icons/16/home.png"));
-		home.addListener(new Button.ClickListener() {
-
-			private static final long serialVersionUID = -6896210990876900350L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				fireEvent(ActionType.OPEN_PERSON_BASIC);
-			}
-		});
+		home = ButtonFactory.getButton(ButtonFactory.OPEN_BASIC_BUTTON, view);
 
 		buttonLayout.addComponent(home);
 		buttonLayout.setComponentAlignment(home, Alignment.TOP_CENTER);

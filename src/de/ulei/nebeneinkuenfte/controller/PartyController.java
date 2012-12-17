@@ -54,7 +54,7 @@ public class PartyController extends AbstractPersonController implements
 	@Override
 	public void setActualPerson(Abgeordneter actualPerson) {
 
-		partyView.enablePersonDetailsButton(actualPerson != null);
+		partyView.enableOpenPersonButton(actualPerson != null);
 		super.setActualPerson(actualPerson);
 		
 	}
