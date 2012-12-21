@@ -5,7 +5,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Button;
 
-import de.ulei.nebeneinkuenfte.model.Fraktion;
+import de.ulei.nebeneinkuenfte.model.FraktionAuftraggeber;
 import de.ulei.nebeneinkuenfte.util.ActionType;
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
@@ -15,6 +15,7 @@ public class PartyView extends AbstractView {
 
 	private Button goBackButton;
 	private Button openPersonButton;
+	private Button openOriginButton;
 
 	public PartyView() {
 
@@ -38,8 +39,8 @@ public class PartyView extends AbstractView {
 				if (event.isDoubleClick()) {
 					if (event.getPropertyId().equals("auftraggeber")) {
 						fireEvent(ActionType.OPEN_PERSON_ORIGIN);
-					} else if (event.getPropertyId().equals("forenamePerson")
-							|| event.getPropertyId().equals("lastnamePerson")) {
+					} else if (event.getPropertyId().equals("forename")
+							|| event.getPropertyId().equals("lastname")) {
 						fireEvent(ActionType.OPEN_PERSON_PERSON);
 					}
 				}
@@ -59,12 +60,17 @@ public class PartyView extends AbstractView {
 				ButtonFactory.OPEN_PERSON_BUTTON, this);
 		openPersonButton.setEnabled(false);
 
+		openOriginButton = ButtonFactory.getButton(
+				ButtonFactory.OPEN_ORIGIN_BUTTON, this);
+		openOriginButton.setEnabled(false);
+
 		navigationBar.addButton(goBackButton);
 		navigationBar.addButton(openPersonButton);
+		navigationBar.addButton(openOriginButton);
 
 	}
 
-	public void addParty(Fraktion fraktion) {
+	public void addParty(FraktionAuftraggeber fraktion) {
 
 		basicTable.addItem(fraktion);
 		updateTable();
@@ -72,7 +78,7 @@ public class PartyView extends AbstractView {
 	}
 
 	public void setPartyContainerDataSource(
-			BeanItemContainer<Fraktion> container) {
+			BeanItemContainer<FraktionAuftraggeber> container) {
 
 		basicTable.setContainerDataSource(container);
 		updateTable();
@@ -89,6 +95,10 @@ public class PartyView extends AbstractView {
 
 	public void enableOpenPersonButton(boolean isEnabled) {
 		openPersonButton.setEnabled(isEnabled);
+	}
+
+	public void enableOpenOriginButton(boolean isEnabled) {
+		openOriginButton.setEnabled(isEnabled);
 	}
 
 }
