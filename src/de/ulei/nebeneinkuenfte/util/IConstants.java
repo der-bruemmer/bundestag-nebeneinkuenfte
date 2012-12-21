@@ -24,10 +24,17 @@ public interface IConstants {
 			"Auftraggeber", "Art", "Ort", "Jahr", "Stufe" };
 
 	public static String[] FRAKTION_VISIBLE_COLUMNS = new String[] {
-			"forenamePerson", "lastnamePerson", "auftraggeber", "type", "place", "year",
-			"stufe" };
+			"forename", "lastname", "auftraggeber", "type",
+			"place", "year", "stufe" };
 
 	public static String[] FRAKTION_COLUMN_HEADER = new String[] { "Vorname",
 			"Nachname", "Auftraggeber", "Art", "Ort", "Jahr", "Stufe" };
+
+	public static String[] AUFTRAGGEBER_VISIBLE_COLUMNS = new String[] {
+			"forename", "lastname", "fraktion", "type",
+			"place", "year", "stufe" };
+
+	public static String[] AUFTRAGGEBER_COLUMN_HEADER = new String[] { "Vorname",
+			"Nachname", "Partei", "Art", "Ort", "Jahr", "Stufe" };
 
 }
