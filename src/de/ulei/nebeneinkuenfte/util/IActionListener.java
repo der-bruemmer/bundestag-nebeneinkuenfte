@@ -2,7 +2,7 @@ package de.ulei.nebeneinkuenfte.util;
 
 import java.io.Serializable;
 
-import de.ulei.nebeneinkuenfte.view.AbstractView;
+import de.ulei.nebeneinkuenfte.ui.view.AbstractView;
 
 /**
  * Interface for {@link AbstractView} listener.
