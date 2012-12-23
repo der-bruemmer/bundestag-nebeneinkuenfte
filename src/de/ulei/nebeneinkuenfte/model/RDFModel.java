@@ -19,6 +19,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.ulei.nebeneinkuenfte.model.crawler.BundestagConverter;
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
+import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
 
 public class RDFModel {
 
@@ -61,10 +62,12 @@ public class RDFModel {
 	private DatatypeProperty propNebeneinkuenfteMinimum;
 	private DatatypeProperty propNebeneinkuenfteMaximum;
 	private DatatypeProperty propNebeneinkuenftStufe;
+	private DatatypeProperty propNebeneinkuenftJahr;
+	private DatatypeProperty propNebeneinkuenftTyp;
+	private DatatypeProperty propNebeneinkuenftOrt;
 
 	// ObjectProperties
 	private ObjectProperty propHomepage;
-	private ObjectProperty propWahlkreis;
 	private ObjectProperty propMbox;
 	private ObjectProperty propMember;
 	private ObjectProperty propHatNebeneinkunft;
@@ -83,7 +86,7 @@ public class RDFModel {
 		createClasses();
 		createDatatypeProperties();
 		createObjectProperties();
-		
+
 		// create Resources for all known factions
 		createFraktionResources();
 
@@ -122,7 +125,10 @@ public class RDFModel {
 				+ "maxNebeneinkuenfte");
 		propNebeneinkuenftStufe = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
 				+ "stufeNebeneinkunft");
-
+		propNebeneinkuenftJahr = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
+				+ "jahrNebeneinkunft");
+		propNebeneinkuenftTyp = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "typNebeneinkunft");
+		propNebeneinkuenftOrt = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "ortNebeneinkunft");
 	}
 
 	private void createObjectProperties() {
@@ -130,7 +136,7 @@ public class RDFModel {
 		// existing properties
 		propHomepage = model.createObjectProperty(model.getNsPrefixURI(INamespace.FOAF) + "homepage");
 		propMbox = model.createObjectProperty(model.getNsPrefixURI(INamespace.FOAF) + "mbox");
-		propWahlkreis = model.createObjectProperty(model.getNsPrefixURI(INamespace.BTD) + "wahlkreis");
+		propHatWahlkreis = model.createObjectProperty(model.getNsPrefixURI(INamespace.BTD) + "wahlkreis");
 		propMember = model.createObjectProperty(model.getNsPrefixURI(INamespace.FOAF) + "member");
 		propIsPartOf = model.createObjectProperty(model.getNsPrefixURI(INamespace.DC) + "isPartOf");
 
@@ -178,24 +184,59 @@ public class RDFModel {
 		createPersonResources(personList);
 	}
 
+	/**
+	 * TODO: identify same origins and give them identical IDs!!!
+	 */
+	
 	private void createPersonResources(List<Abgeordneter> personList) {
 
-		Resource abgeordneter;
+		Resource politician;
+		Resource sidelineJob;
+		Resource origin;
+		int index = 0;
 
-		// create Resource for each member of the parliament
+		// create resource for each member of the parliament
 		for (Abgeordneter mdb : personList) {
 
-			abgeordneter = model.createResource(mdb.getURI(), classAbgeordneter);
-			abgeordneter.addProperty(propFirstName, mdb.getForename());
-			abgeordneter.addProperty(propGivenName, mdb.getLastname());
-			abgeordneter.addProperty(propMbox, mdb.getEmail() != null ? mdb.getEmail() : "");
-			abgeordneter.addProperty(propHomepage, mdb.getHomepage() != null ? mdb.getHomepage() : "");
-			abgeordneter.addProperty(propNebeneinkuenfteAnzahl,
-					model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
-			abgeordneter.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
-			abgeordneter.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
-			abgeordneter.addProperty(propHatWahlkreis, createWahlkreisResource(mdb));
-			abgeordneter.addProperty(propIsPartOf, createFraktionResource(mdb));
+			politician = model.createResource(mdb.getURI(), classAbgeordneter);
+			politician.addProperty(propFirstName, mdb.getForename());
+			politician.addProperty(propGivenName, mdb.getLastname());
+			politician.addProperty(propMbox, mdb.getEmail() != null ? mdb.getEmail() : "");
+			politician.addProperty(propHomepage, mdb.getHomepage() != null ? mdb.getHomepage() : "");
+			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
+			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
+			politician.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
+			politician.addProperty(propHatWahlkreis, createWahlkreisResource(mdb));
+			politician.addProperty(propIsPartOf, createFraktionResource(mdb, politician));
+
+			// create resource for each sideline job of the politician
+			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+
+				// create resource for origin
+				origin = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "auftraggeber" + index,
+						classAuftraggeber);
+				origin.addProperty(RDFS.label,
+						model.createLiteral(nt.getAuftraggeber() != null ? nt.getAuftraggeber() : "unbekannt"));
+
+				// create resource for the job itself
+				sidelineJob = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "nebeneinkunft_" + index,
+						classNebeneinkunft);
+				sidelineJob.addProperty(propNebeneinkuenftStufe,
+						model.createLiteral(nt.getStufe() != null ? nt.getStufe() : "unbekannt"));
+				sidelineJob.addProperty(propNebeneinkuenftJahr,
+						model.createLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
+				sidelineJob.addProperty(propNebeneinkuenftTyp,
+						model.createLiteral(nt.getType() != null ? nt.getType() : "unbekannt"));
+				sidelineJob.addProperty(propNebeneinkuenftOrt,
+						model.createLiteral(nt.getPlace() != null ? nt.getPlace() : "unbekannt"));
+
+				// set origin and job in relation
+				sidelineJob.addProperty(propHatAuftraggeber, origin);
+				// set politician and origin in relation
+				origin.addProperty(propBezahlt, politician);
+				index++;
+
+			}
 
 		}
 
@@ -234,7 +275,7 @@ public class RDFModel {
 
 	}
 
-	private Resource createFraktionResource(Abgeordneter abgeordneter) {
+	private Resource createFraktionResource(Abgeordneter abgeordneter, Resource politician) {
 
 		String fraktionURI = abgeordneter.getWahlkreisUri();
 		if (fraktionURI == null || fraktionURI.trim().isEmpty())
@@ -256,12 +297,15 @@ public class RDFModel {
 			}
 		}
 
-		if (fraktion != null)
+		if (fraktion != null) {
+			fraktion.addProperty(propMember, politician);
 			return fraktion;
+		}
 
 		fraktion = model.createResource(fraktionURI, classFraktion);
 		fraktion.addProperty(RDFS.label,
 				model.createTypedLiteral(abgeordneter.getFraktion() != null ? abgeordneter.getFraktion() : "unbekannt"));
+		fraktion.addProperty(propMember, politician);
 		return fraktion;
 
 	}
