@@ -187,7 +187,7 @@ public class RDFModel {
 	/**
 	 * TODO: identify same origins and give them identical IDs!!!
 	 */
-	
+
 	private void createPersonResources(List<Abgeordneter> personList) {
 
 		Resource politician;
@@ -199,10 +199,10 @@ public class RDFModel {
 		for (Abgeordneter mdb : personList) {
 
 			politician = model.createResource(mdb.getURI(), classAbgeordneter);
-			politician.addProperty(propFirstName, mdb.getForename());
-			politician.addProperty(propGivenName, mdb.getLastname());
-			politician.addProperty(propMbox, mdb.getEmail() != null ? mdb.getEmail() : "");
-			politician.addProperty(propHomepage, mdb.getHomepage() != null ? mdb.getHomepage() : "");
+			politician.addProperty(propFirstName, model.createLiteral(mdb.getForename()));
+			politician.addProperty(propGivenName, model.createLiteral(mdb.getLastname()));
+			politician.addProperty(propMbox, model.createLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
+			politician.addProperty(propHomepage, model.createLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
 			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
 			politician.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
