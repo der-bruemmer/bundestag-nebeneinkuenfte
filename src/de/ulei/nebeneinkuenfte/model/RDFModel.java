@@ -45,7 +45,7 @@ public class RDFModel {
 
 	// classes
 	private OntClass classAbgeordneter;
-	private OntClass classPartei;
+	private OntClass classFraktion;
 	private OntClass classNebeneinkunft;
 	private OntClass classAuftraggeber;
 	private OntClass classWahlkreis;
@@ -83,6 +83,9 @@ public class RDFModel {
 		createClasses();
 		createDatatypeProperties();
 		createObjectProperties();
+		
+		// create Resources for all known factions
+		createFraktionResources();
 
 	}
 
@@ -94,8 +97,8 @@ public class RDFModel {
 
 		// self defined classes
 		classWahlkreis = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Wahlkreis");
-		classPartei = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Partei");
-		classPartei.addProperty(RDF.type, classOrganization);
+		classFraktion = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Fraktion");
+		classFraktion.addProperty(RDF.type, classOrganization);
 		classNebeneinkunft = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Nebeneinkunft");
 		classAuftraggeber = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Auftraggeber");
 		classAbgeordneter = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Abgeordneter");
@@ -150,12 +153,36 @@ public class RDFModel {
 
 	}
 
-	protected void createPersonResources(List<Abgeordneter> personList) {
+	private void createFraktionResources() {
 
-		createParteiResources();
+		Resource partei = null;
+
+		partei = model.createResource(SPD_FRAKTION, classFraktion);
+		partei.addProperty(RDFS.label, SPD_LABEL);
+
+		partei = model.createResource(CDU_CSU_FRAKTION, classFraktion);
+		partei.addProperty(RDFS.label, CDU_CSU_LABEL);
+
+		partei = model.createResource(DIE_LINKE_FRAKTION, classFraktion);
+		partei.addProperty(RDFS.label, DIE_LINKE_LABEL);
+
+		partei = model.createResource(FDP_FRAKTION, classFraktion);
+		partei.addProperty(RDFS.label, FDP_LABEL);
+
+		partei = model.createResource(GRUENE_FRAKTION, classFraktion);
+		partei.addProperty(RDFS.label, GRUENE_LABEL);
+
+	}
+
+	public void createModel(List<Abgeordneter> personList) {
+		createPersonResources(personList);
+	}
+
+	private void createPersonResources(List<Abgeordneter> personList) {
 
 		Resource abgeordneter;
 
+		// create Resource for each member of the parliament
 		for (Abgeordneter mdb : personList) {
 
 			abgeordneter = model.createResource(mdb.getURI(), classAbgeordneter);
@@ -167,14 +194,14 @@ public class RDFModel {
 					model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			abgeordneter.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
 			abgeordneter.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
-			abgeordneter.addProperty(propHatWahlkreis, getWahlkreisResource(mdb));
-			abgeordneter.addProperty(propIsPartOf, getParteiRessource(mdb));
+			abgeordneter.addProperty(propHatWahlkreis, createWahlkreisResource(mdb));
+			abgeordneter.addProperty(propIsPartOf, createFraktionResource(mdb));
 
 		}
 
 	}
 
-	private Resource getWahlkreisResource(Abgeordneter abgeordneter) {
+	private Resource createWahlkreisResource(Abgeordneter abgeordneter) {
 
 		String wahlkreisURI = abgeordneter.getWahlkreisUri();
 		if (wahlkreisURI == null || wahlkreisURI.trim().isEmpty())
@@ -202,60 +229,40 @@ public class RDFModel {
 		wahlkreis = model.createResource(wahlkreisURI, classWahlkreis);
 		wahlkreis.addProperty(RDFS.label,
 				model.createTypedLiteral(abgeordneter.getWahlkreisName() != null ? abgeordneter.getWahlkreisName()
-						: "Wahlkreis unbekannt"));
+						: "unbekannt"));
 		return wahlkreis;
 
 	}
 
-	private void createParteiResources() {
+	private Resource createFraktionResource(Abgeordneter abgeordneter) {
 
-		Resource partei = null;
+		String fraktionURI = abgeordneter.getWahlkreisUri();
+		if (fraktionURI == null || fraktionURI.trim().isEmpty())
+			fraktionURI = "http://keinefaraktion.de";
 
-		partei = model.createResource(SPD_FRAKTION, classPartei);
-		partei.addProperty(RDFS.label, SPD_LABEL);
+		Resource fraktion = null;
 
-		partei = model.createResource(CDU_CSU_FRAKTION, classPartei);
-		partei.addProperty(RDFS.label, CDU_CSU_LABEL);
+		Individual fraktionInstance;
+		ExtendedIterator<? extends OntResource> instances = classFraktion.listInstances();
 
-		partei = model.createResource(DIE_LINKE_FRAKTION, classPartei);
-		partei.addProperty(RDFS.label, DIE_LINKE_LABEL);
+		while (instances.hasNext()) {
 
-		partei = model.createResource(FDP_FRAKTION, classPartei);
-		partei.addProperty(RDFS.label, FDP_LABEL);
+			fraktionInstance = (Individual) instances.next();
+			if (fraktionInstance.getURI() != null) {
+				if (fraktionInstance.getURI().equals(abgeordneter.getFraktionUri())) {
+					fraktion = fraktionInstance;
+					break;
+				}
+			}
+		}
 
-		partei = model.createResource(GRUENE_FRAKTION, classPartei);
-		partei.addProperty(RDFS.label, GRUENE_LABEL);
+		if (fraktion != null)
+			return fraktion;
 
-	}
-
-	/**
-	 * TODO: fix getResoure part
-	 */
-	private Resource getParteiRessource(Abgeordneter abgeordneter) {
-
-		Resource partei = null;
-		String fraktion = abgeordneter.getFraktion().trim();
-
-		if (fraktion.equals(SPD_LABEL))
-			return model.getResource(SPD_FRAKTION);
-		else if (fraktion.equals(CDU_CSU_LABEL))
-			return model.getResource(CDU_CSU_FRAKTION);
-		else if (fraktion.equals(DIE_LINKE_LABEL))
-			return model.getResource(DIE_LINKE_FRAKTION);
-		else if (fraktion.equals(FDP_LABEL))
-			return model.getResource(FDP_FRAKTION);
-		else if (fraktion.equals(GRUENE_LABEL))
-			return model.getResource(GRUENE_FRAKTION);
-
-		// emergency case
-		partei = model.getResource(abgeordneter.getFraktion());
-
-		if (partei != null)
-			return partei;
-
-		partei = model.createResource(abgeordneter.getWahlkreisUri(), classPartei);
-		partei.addProperty(RDFS.label, model.createTypedLiteral(abgeordneter.getWahlkreisName()));
-		return partei;
+		fraktion = model.createResource(fraktionURI, classFraktion);
+		fraktion.addProperty(RDFS.label,
+				model.createTypedLiteral(abgeordneter.getFraktion() != null ? abgeordneter.getFraktion() : "unbekannt"));
+		return fraktion;
 
 	}
 
@@ -264,7 +271,7 @@ public class RDFModel {
 	 * 
 	 * 
 	 * @param path
-	 *            Path to the folder that should conatain the file
+	 *            absolute path to target file
 	 * @param rdfType
 	 *            Type for RDF format
 	 */
@@ -285,9 +292,9 @@ public class RDFModel {
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 
 		RDFModel model = new RDFModel();
-		model.createPersonResources(conv.getAbgeordnete());
+		model.createModel(conv.getAbgeordnete());
 
-		String path = System.getProperty("user.home") + "/Desktop/nebeneinkunft." + IRDFExport.TYPES.get(IRDFExport.N3);
+		String path = System.getProperty("user.home") + "/Desktop/nebeneinkunft";
 		model.fileExport(path, IRDFExport.N3);
 		System.out.println("done");
 
