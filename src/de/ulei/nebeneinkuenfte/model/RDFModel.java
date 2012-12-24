@@ -2,6 +2,7 @@ package de.ulei.nebeneinkuenfte.model;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.DatatypeProperty;
@@ -11,8 +12,16 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -199,10 +208,11 @@ public class RDFModel {
 		for (Abgeordneter mdb : personList) {
 
 			politician = model.createResource(mdb.getURI(), classAbgeordneter);
-			politician.addProperty(propFirstName, model.createLiteral(mdb.getForename()));
-			politician.addProperty(propGivenName, model.createLiteral(mdb.getLastname()));
-			politician.addProperty(propMbox, model.createLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
-			politician.addProperty(propHomepage, model.createLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
+			politician.addProperty(propFirstName, model.createTypedLiteral(mdb.getForename()));
+			politician.addProperty(propGivenName, model.createTypedLiteral(mdb.getLastname()));
+			politician.addProperty(propMbox, model.createTypedLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
+			politician.addProperty(propHomepage,
+					model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
 			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
 			politician.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
@@ -213,22 +223,22 @@ public class RDFModel {
 			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
 
 				// create resource for origin
-				origin = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "auftraggeber" + index,
+				origin = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "auftraggeber_" + index,
 						classAuftraggeber);
 				origin.addProperty(RDFS.label,
-						model.createLiteral(nt.getAuftraggeber() != null ? nt.getAuftraggeber() : "unbekannt"));
+						model.createTypedLiteral(nt.getAuftraggeber() != null ? nt.getAuftraggeber() : "unbekannt"));
 
 				// create resource for the job itself
 				sidelineJob = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "nebeneinkunft_" + index,
 						classNebeneinkunft);
 				sidelineJob.addProperty(propNebeneinkuenftStufe,
-						model.createLiteral(nt.getStufe() != null ? nt.getStufe() : "unbekannt"));
+						model.createTypedLiteral(nt.getStufe() != null ? nt.getStufe() : "unbekannt"));
 				sidelineJob.addProperty(propNebeneinkuenftJahr,
-						model.createLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
+						model.createTypedLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
 				sidelineJob.addProperty(propNebeneinkuenftTyp,
-						model.createLiteral(nt.getType() != null ? nt.getType() : "unbekannt"));
+						model.createTypedLiteral(nt.getType() != null ? nt.getType() : "unbekannt"));
 				sidelineJob.addProperty(propNebeneinkuenftOrt,
-						model.createLiteral(nt.getPlace() != null ? nt.getPlace() : "unbekannt"));
+						model.createTypedLiteral(nt.getPlace() != null ? nt.getPlace() : "unbekannt"));
 
 				// set origin and job in relation
 				sidelineJob.addProperty(propHatAuftraggeber, origin);
@@ -330,6 +340,99 @@ public class RDFModel {
 
 	}
 
+	/**
+	 * 
+	 * Export model into triple store
+	 * 
+	 * @param graph
+	 *            Name of the graph
+	 * @param url
+	 *            SPARQL endpoint adress
+	 * 
+	 * @return true if everything was correct, else false
+	 * 
+	 */
+
+	public int tripleStoreExport(String graph, String url) throws Exception {
+
+		boolean graphExists = false;
+
+		// graph = "http://mygraph.com";
+		// url = "http://127.0.0.1:8890/sparql";
+		String q = "select  distinct ?g  where { GRAPH ?g { ?s ?p ?o } }";
+
+		Query query = QueryFactory.create(q);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(url, query);
+
+		// graph already exists?
+		ResultSet results = qexec.execSelect();
+		while (results.hasNext()) {
+
+			if (results.next().getResource("g").toString().equals(graph)) {
+
+				graphExists = true;
+				break;
+
+			}
+
+		}
+
+		// create graph
+		if (!graphExists) {
+
+			q = "CREATE GRAPH '" + graph + "'";
+			QueryEngineHTTP qeh = new QueryEngineHTTP(url, q);
+			qeh.execSelect();
+			qeh.close();
+
+		}
+		// clear graph
+		else {
+
+			q = "CLEAR GRAPH '" + graph + "'";
+			QueryEngineHTTP qeh = new QueryEngineHTTP(url, q);
+			qeh.execSelect();
+			qeh.close();
+
+		}
+
+		/*
+		 * workaround to HTTP length limit
+		 * 
+		 * every statement will be treated as new OntModel and is inserted to
+		 * the given graph by single HTTP request instead of creating one
+		 * statement for whole model. Not fast but it works.
+		 */
+
+		QueryEngineHTTP qeh;
+		OntModel statementModel;
+		StringWriter writer;
+		Statement statement;
+		StmtIterator it = model.listStatements();
+		int result = 0;
+
+		while (it.hasNext()) {
+
+			statement = it.next();
+			statementModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+			statementModel.add(statement);
+
+			writer = new StringWriter();
+			writer.append("INSERT DATA IN GRAPH '" + graph + "'" + " {");
+			statementModel.write(writer, "N-TRIPLE");
+			writer.append(" }");
+			writer.flush();
+
+			// open connection and run statement
+			qeh = new QueryEngineHTTP(url, writer.toString());
+			qeh.execSelect();
+			qeh.close();
+
+		}
+
+		return result;
+	}
+
 	public static void main(String[] args) {
 
 		BundestagConverter conv = new BundestagConverter(
@@ -340,6 +443,13 @@ public class RDFModel {
 
 		String path = System.getProperty("user.home") + "/Desktop/nebeneinkunft";
 		model.fileExport(path, IRDFExport.N3);
+
+		try {
+			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		System.out.println("done");
 
 	}
