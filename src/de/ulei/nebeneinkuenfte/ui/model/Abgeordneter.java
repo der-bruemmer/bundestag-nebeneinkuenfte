@@ -176,19 +176,49 @@ public class Abgeordneter implements Serializable {
 		return nebentaetigkeiten;
 	}
 
+	//incorporate start and stop dates
+	//1 legislaturperiode = 4 years
 	public void setNebentaetigkeiten(List<Nebentaetigkeit> nebentaetigkeiten) {
 		this.nebentaetigkeiten = nebentaetigkeiten;
 		boolean canMax = true;
 		for (Nebentaetigkeit nt : nebentaetigkeiten) {
 			if (nt.getStufe() != null) {
 				if (nt.getStufe().contains("1")) {
-					this.minZusatzeinkommen += 1000;
-					this.maxZusatzeinkommen += 3499;
+					//48 months
+					if(nt.isMonthly()) {
+						this.minZusatzeinkommen += 48000;
+						this.maxZusatzeinkommen += 167952;
+					//4 years
+					} else if(nt.isYearly()) {
+						this.minZusatzeinkommen += 4000;
+						this.maxZusatzeinkommen += 13996;
+					} else {
+						this.minZusatzeinkommen += 1000;
+						this.maxZusatzeinkommen += 3499;
+					}
 				} else if (nt.getStufe().contains("2")) {
-					this.minZusatzeinkommen += 3500;
-					this.maxZusatzeinkommen += 6999;
+					//48 months
+					if(nt.isMonthly()) {
+						this.minZusatzeinkommen += 168000;
+						this.maxZusatzeinkommen += 335952;
+					//4 years
+					} else if(nt.isYearly()) {
+						this.minZusatzeinkommen += 14000;
+						this.maxZusatzeinkommen += 27996;
+					} else {
+						this.minZusatzeinkommen += 3500;
+						this.maxZusatzeinkommen += 6999;
+					}
 				} else if (nt.getStufe().contains("3")) {
-					this.minZusatzeinkommen += 7000;
+					//48 months
+					if(nt.isMonthly()) {
+						this.minZusatzeinkommen += 336000;
+					//4 years
+					} else if(nt.isYearly()) {
+						this.minZusatzeinkommen += 28000;
+					} else {
+						this.minZusatzeinkommen += 7000;
+					}
 					canMax = false;
 				}
 			} else {
@@ -196,7 +226,7 @@ public class Abgeordneter implements Serializable {
 			}
 		}
 		if (!canMax) {
-			this.maxZusatzeinkommen = 1000000;
+			this.maxZusatzeinkommen = 2500000;
 		}
 		this.setAnzahlNebeneinkuenfte(nebentaetigkeiten.size());
 	}

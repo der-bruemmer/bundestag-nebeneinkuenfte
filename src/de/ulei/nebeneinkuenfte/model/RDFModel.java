@@ -210,6 +210,7 @@ public class RDFModel {
 			politician = model.createResource(mdb.getURI(), classAbgeordneter);
 			politician.addProperty(propFirstName, model.createTypedLiteral(mdb.getForename()));
 			politician.addProperty(propGivenName, model.createTypedLiteral(mdb.getLastname()));
+			if(mdb.getLastname().contains("Brüd")) System.out.println(mdb.getEmail());
 			politician.addProperty(propMbox, model.createTypedLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
 			politician.addProperty(propHomepage,
 					model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
