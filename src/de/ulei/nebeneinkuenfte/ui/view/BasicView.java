@@ -86,6 +86,8 @@ public class BasicView extends AbstractView {
 
 		basicTable.setVisibleColumns(IConstants.ABGEORDNETER_VISIBLE_COLUMNS);
 		basicTable.setColumnHeaders(IConstants.ABGEORDNETER_COLUMN_HEADER);
+		basicTable.setSortContainerPropertyId("minZusatzeinkommen");
+		basicTable.setSortAscending(false);
 		basicTable.setColumnCollapsed("wahlkreisUri", true);
 		basicTable.setColumnCollapsed("email", true);
 		enableOpenPersonButton(false);
