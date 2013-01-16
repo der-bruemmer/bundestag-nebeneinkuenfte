@@ -62,6 +62,7 @@ public class RDFModel {
 
 	private OntClass classPerson;
 	private OntClass classOrganization;
+	private OntClass classPlace;
 
 	// DatatypeProperties
 	private DatatypeProperty propFirstName;
@@ -106,6 +107,7 @@ public class RDFModel {
 		// existing classes
 		classPerson = model.createClass(model.getNsPrefixURI(INamespace.FOAF) + "Person");
 		classOrganization = model.createClass(model.getNsPrefixURI(INamespace.FOAF) + "Organization");
+		classPlace = model.createClass(model.getNsPrefixURI(INamespace.DBPO) + "PopulatedPlace");
 
 		// self defined classes
 		classWahlkreis = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Wahlkreis");
@@ -210,13 +212,12 @@ public class RDFModel {
 			politician = model.createResource(mdb.getURI(), classAbgeordneter);
 			politician.addProperty(propFirstName, model.createTypedLiteral(mdb.getForename()));
 			politician.addProperty(propGivenName, model.createTypedLiteral(mdb.getLastname()));
-			if(mdb.getLastname().contains("Brüd")) System.out.println(mdb.getEmail());
 			politician.addProperty(propMbox, model.createTypedLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
-			politician.addProperty(propHomepage,
-					model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
+			politician.addProperty(propHomepage, model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
 			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
 			politician.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
+			
 			politician.addProperty(propHatWahlkreis, createWahlkreisResource(mdb));
 			politician.addProperty(propIsPartOf, createFraktionResource(mdb, politician));
 

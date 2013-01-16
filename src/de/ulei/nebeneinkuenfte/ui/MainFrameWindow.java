@@ -31,7 +31,7 @@ public class MainFrameWindow extends Window {
 		VerticalLayout vl = new VerticalLayout();
 
 		header = new Header();
-		panel = new Panel("Nebeneinkuenfte");
+		panel = new Panel("");
 		panel.setSizeFull();
 
 		panel.addComponent(tabSheet);

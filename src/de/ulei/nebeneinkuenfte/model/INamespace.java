@@ -38,6 +38,10 @@ public interface INamespace {
 	 */
 	public static final String XSD = "xsd";
 	/**
+	 * prefix for http://www.w3.org/2003/01/geo/wgs84_pos#
+	 */
+	public static final String GEO = "geo";
+	/**
 	 * Map contains prefix as key and uri as value
 	 */
 	public static final Map<String, String> NAMSESPACE_MAP = new HashMap<String, String>() {
@@ -51,7 +55,8 @@ public interface INamespace {
 			put(DBPR, "http://dbpedia.org/resource/");
 			put(DBPO, "http://dbpedia.org/ontology/");
 			put(DC, "http://purl.org/dc/elements/1.1/");
-			put(XSD,"http://www.w3.org/2001/XMLSchema#");
+			put(XSD, "http://www.w3.org/2001/XMLSchema#");
+			put(GEO, "http://www.w3.org/2003/01/geo/wgs84_pos#");
 
 		}
 
