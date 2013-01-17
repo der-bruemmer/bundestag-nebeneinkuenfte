@@ -15,6 +15,7 @@ public class PersonView extends AbstractView {
 
 	private Button gobBackButton;
 	private Button openOriginButton;
+	private Button openMapButton;
 
 	public PersonView() {
 
@@ -48,15 +49,19 @@ public class PersonView extends AbstractView {
 
 	private void createNavigationSection() {
 
-		gobBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON,
-				this);
-
-		openOriginButton = ButtonFactory.getButton(
-				ButtonFactory.OPEN_ORIGIN_BUTTON, this);
+		gobBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON, this);
+		
+		openMapButton = ButtonFactory.getButton(ButtonFactory.OPEN_MAP_BUTTON, this);
+		
+		openOriginButton = ButtonFactory.getButton(ButtonFactory.OPEN_ORIGIN_BUTTON, this);
 		openOriginButton.setEnabled(false);
 
+	
+		
 		navigationBar.addButton(gobBackButton);
+		navigationBar.addButton(openMapButton);
 		navigationBar.addButton(openOriginButton);
+		
 
 	}
 
@@ -67,8 +72,7 @@ public class PersonView extends AbstractView {
 
 	}
 
-	public void setSidelineJobContainerDataSource(
-			BeanItemContainer<Nebentaetigkeit> container) {
+	public void setSidelineJobContainerDataSource(BeanItemContainer<Nebentaetigkeit> container) {
 
 		basicTable.setContainerDataSource(container);
 		updateTable();
@@ -77,8 +81,7 @@ public class PersonView extends AbstractView {
 
 	private void updateTable() {
 
-		basicTable
-				.setVisibleColumns(IConstants.NEBENTAETIGKEIT_VISIBLE_COLUMNS);
+		basicTable.setVisibleColumns(IConstants.NEBENTAETIGKEIT_VISIBLE_COLUMNS);
 		basicTable.setColumnHeaders(IConstants.NEBENTAETIGKEIT_COLUMN_HEADER);
 
 	}
@@ -86,5 +89,5 @@ public class PersonView extends AbstractView {
 	public void enableOpenOriginButton(boolean isEnabled) {
 		openOriginButton.setEnabled(isEnabled);
 	}
-
+	
 }

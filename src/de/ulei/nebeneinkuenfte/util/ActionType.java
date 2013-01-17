@@ -67,5 +67,10 @@ public enum ActionType {
 	 * click on origin occurred
 	 */
 
-	OPEN_PERSON_ORIGIN
+	OPEN_PERSON_ORIGIN, 
+	
+	/**
+	 * click on open map occured
+	 */
+	OPEN_MAP
 }

@@ -11,8 +11,10 @@ import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.FraktionAuftraggeber;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
+import de.ulei.nebeneinkuenfte.ui.view.AboutProjectView;
 import de.ulei.nebeneinkuenfte.ui.view.AbstractView;
 import de.ulei.nebeneinkuenfte.ui.view.BasicView;
+import de.ulei.nebeneinkuenfte.ui.view.ImpressumView;
 import de.ulei.nebeneinkuenfte.ui.view.OriginView;
 import de.ulei.nebeneinkuenfte.ui.view.PartyView;
 import de.ulei.nebeneinkuenfte.ui.view.PersonView;
@@ -65,8 +67,9 @@ public class MainController implements IActionListener {
 		originController.addListener(this);
 
 		// open basic view as app entry
-		mainFrame.addTab(basicView, "Person", new ThemeResource(
-				"icons/16/user.png"));
+		mainFrame.addTab(new AboutProjectView(), "Das Projekt", new ThemeResource("icons/16/about.png"));
+		mainFrame.addTab(basicView, "Abgeordnete", new ThemeResource("icons/16/user.png"));
+		mainFrame.addTab(new ImpressumView(), "Impressum", null);
 		actualPersonView = basicView;
 		openPersonBasicView();
 		basicController.refreshTableFooter();
@@ -109,15 +112,11 @@ public class MainController implements IActionListener {
 
 	private void openPersonBasicView() {
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext()
-				.getBaseDirectory()
-				+ "/abgeordnete";
+		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
 		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false, path);
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
 
-		BeanItemContainer<Abgeordneter> container = new BeanItemContainer<Abgeordneter>(
-				Abgeordneter.class);
+		BeanItemContainer<Abgeordneter> container = new BeanItemContainer<Abgeordneter>(Abgeordneter.class);
 
 		for (Abgeordneter mdb : conv.getAbgeordnete())
 			container.addItem(mdb);
@@ -151,8 +150,7 @@ public class MainController implements IActionListener {
 					openPersonOriginView(actualSideJob.getAuftraggeber());
 
 					// save state
-					goForward(IConstants.PERSON_ORIGIN_VIEW,
-							actualSideJob.getAuftraggeber());
+					goForward(IConstants.PERSON_ORIGIN_VIEW, actualSideJob.getAuftraggeber());
 				}
 			}
 
@@ -174,8 +172,7 @@ public class MainController implements IActionListener {
 					openPersonOriginView(actualSideJob.getAuftraggeber());
 
 					// save state
-					goForward(IConstants.PERSON_ORIGIN_VIEW,
-							actualSideJob.getAuftraggeber());
+					goForward(IConstants.PERSON_ORIGIN_VIEW, actualSideJob.getAuftraggeber());
 				}
 			}
 
@@ -187,17 +184,13 @@ public class MainController implements IActionListener {
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext()
-				.getBaseDirectory()
-				+ "/abgeordnete";
+		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
 		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false, path);
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
 
 		for (Abgeordneter mdb : conv.getAbgeordnete())
 			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-				if (nt.getAuftraggeber() != null
-						&& nt.getAuftraggeber().equals(origin))
+				if (nt.getAuftraggeber() != null && nt.getAuftraggeber().equals(origin))
 					container.addItem(new FraktionAuftraggeber(mdb, nt));
 			}
 
@@ -251,8 +244,7 @@ public class MainController implements IActionListener {
 
 	private void openPersonPersonView(Abgeordneter person) {
 
-		BeanItemContainer<Nebentaetigkeit> container = new BeanItemContainer<Nebentaetigkeit>(
-				Nebentaetigkeit.class);
+		BeanItemContainer<Nebentaetigkeit> container = new BeanItemContainer<Nebentaetigkeit>(Nebentaetigkeit.class);
 
 		for (Nebentaetigkeit nt : person.getNebentaetigkeiten())
 			container.addItem(nt);
@@ -289,8 +281,7 @@ public class MainController implements IActionListener {
 					openPersonPartyView(actualPerson.getFraktion());
 
 					// save state
-					goForward(IConstants.PERSON_PARTY_VIEW,
-							actualPerson.getFraktion());
+					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktion());
 				}
 			}
 
@@ -311,8 +302,7 @@ public class MainController implements IActionListener {
 					openPersonPartyView(actualPerson.getFraktion());
 
 					// save state
-					goForward(IConstants.PERSON_PARTY_VIEW,
-							actualPerson.getFraktion());
+					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktion());
 				}
 			}
 
@@ -325,12 +315,9 @@ public class MainController implements IActionListener {
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext()
-				.getBaseDirectory()
-				+ "/abgeordnete";
+		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
 		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false, path);
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
 
 		for (Abgeordneter mdb : conv.getAbgeordnete())
 			if (mdb.getFraktion().equals(party))
@@ -347,16 +334,14 @@ public class MainController implements IActionListener {
 		return actualPersonView;
 	}
 
-	private void setActualPersonView(AbstractView actualView,
-			AbstractController controller) {
+	private void setActualPersonView(AbstractView actualView, AbstractController controller) {
 
 		// remove actual view
 		int tabIndex = mainFrame.getTabIndex(getActualPersonView());
 		mainFrame.removeTab(getActualPersonView());
 
 		// add new view
-		mainFrame.addTab(actualView, "Person", new ThemeResource(
-				"icons/16/user.png"), tabIndex);
+		mainFrame.addTab(actualView, "Abgeordnete", new ThemeResource("icons/16/user.png"), tabIndex);
 
 		// select new view
 		mainFrame.selectTab(actualView);
@@ -405,6 +390,10 @@ public class MainController implements IActionListener {
 
 	private void goForward(int view, Object object) {
 		historyStack.push(new Object[] { view, object });
+	}
+
+	public Object[] getLastStackElement() {
+		return historyStack.lastElement();
 	}
 
 }

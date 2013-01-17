@@ -12,6 +12,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.TableFieldFactory;
 
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class BasicTable extends FilterTable {
 
@@ -32,8 +33,7 @@ public class BasicTable extends FilterTable {
 			private static final long serialVersionUID = -3519781089291834981L;
 
 			@Override
-			public Field createField(Container container, Object itemId,
-					Object propertyId, Component uiContext) {
+			public Field createField(Container container, Object itemId, Object propertyId, Component uiContext) {
 
 				return null;
 			}
@@ -47,8 +47,7 @@ public class BasicTable extends FilterTable {
 	}
 
 	@Override
-	protected Object getPropertyValue(Object rowId, Object colId,
-			Property property) {
+	protected Object getPropertyValue(Object rowId, Object colId, Property property) {
 
 		// handle homepage link
 		if (colId.equals("homepage")) {
@@ -78,6 +77,14 @@ public class BasicTable extends FilterTable {
 				return link;
 
 			}
+
+		}
+		// handle possible infinite income
+		else if (colId.equals("maxZusatzeinkommen")) {
+
+			Integer sum = (Integer) property.getValue();
+			if (sum == IConstants.INFINITE_VALUE)
+				return IConstants.INFINITE_SIGN;
 
 		}
 		// handle wahlkreis link

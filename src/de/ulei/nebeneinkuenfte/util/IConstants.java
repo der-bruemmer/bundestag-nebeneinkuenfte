@@ -3,6 +3,13 @@ package de.ulei.nebeneinkuenfte.util;
 public interface IConstants {
 	
 	/*
+	 *  placeholder integer value for infinite and character  
+	 */
+	
+	public static int INFINITE_VALUE = 2500000;
+	public static String INFINITE_SIGN = String.valueOf('\u221e');
+	
+	/*
 	 * IDs for different views
 	 */
 
@@ -63,5 +70,11 @@ public interface IConstants {
 
 	public static String[] AUFTRAGGEBER_COLUMN_HEADER = new String[] { "Vorname", "Nachname", "Fraktion", "Art", "Ort",
 			"Jahr", "Stufe" };
+	
+	/*
+	 * misc
+	 */
+	
+	public static String LINE_SEPARATOR = "<br>";
 
 }

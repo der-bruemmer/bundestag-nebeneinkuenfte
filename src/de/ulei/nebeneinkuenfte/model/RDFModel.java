@@ -75,6 +75,8 @@ public class RDFModel {
 	private DatatypeProperty propNebeneinkuenftJahr;
 	private DatatypeProperty propNebeneinkuenftTyp;
 	private DatatypeProperty propNebeneinkuenftOrt;
+	private DatatypeProperty propGeoLat;
+	private DatatypeProperty propGeoLong;
 
 	// ObjectProperties
 	private ObjectProperty propHomepage;
@@ -126,6 +128,8 @@ public class RDFModel {
 		propFirstName = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "firstName");
 		propGivenName = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "givenName");
 		propTitle = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "title");
+		propGeoLat = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.GEO) + "lat");
+		propGeoLong = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.GEO) + "long");
 
 		// self defined properties
 		propNebeneinkuenfteAnzahl = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
@@ -213,11 +217,12 @@ public class RDFModel {
 			politician.addProperty(propFirstName, model.createTypedLiteral(mdb.getForename()));
 			politician.addProperty(propGivenName, model.createTypedLiteral(mdb.getLastname()));
 			politician.addProperty(propMbox, model.createTypedLiteral(mdb.getEmail() != null ? mdb.getEmail() : ""));
-			politician.addProperty(propHomepage, model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
+			politician.addProperty(propHomepage,
+					model.createTypedLiteral(mdb.getHomepage() != null ? mdb.getHomepage() : ""));
 			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
 			politician.addProperty(propNebeneinkuenfteMinimum, model.createTypedLiteral(mdb.getMinZusatzeinkommen()));
-			
+
 			politician.addProperty(propHatWahlkreis, createWahlkreisResource(mdb));
 			politician.addProperty(propIsPartOf, createFraktionResource(mdb, politician));
 
@@ -239,8 +244,7 @@ public class RDFModel {
 						model.createTypedLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
 				sidelineJob.addProperty(propNebeneinkuenftTyp,
 						model.createTypedLiteral(nt.getType() != null ? nt.getType() : "unbekannt"));
-				sidelineJob.addProperty(propNebeneinkuenftOrt,
-						model.createTypedLiteral(nt.getPlace() != null ? nt.getPlace() : "unbekannt"));
+				sidelineJob.addProperty(propNebeneinkuenftOrt, createPlaceResource(nt));
 
 				// set origin and job in relation
 				sidelineJob.addProperty(propHatAuftraggeber, origin);
@@ -256,6 +260,7 @@ public class RDFModel {
 
 	private Resource createWahlkreisResource(Abgeordneter abgeordneter) {
 
+		// get URI or set default one
 		String wahlkreisURI = abgeordneter.getWahlkreisUri();
 		if (wahlkreisURI == null || wahlkreisURI.trim().isEmpty())
 			wahlkreisURI = "http://keinwahlkreis.de";
@@ -265,6 +270,7 @@ public class RDFModel {
 		Individual wahlkreisInstance;
 		ExtendedIterator<? extends OntResource> instances = classWahlkreis.listInstances();
 
+		// iterate over all instances and compare URIs
 		while (instances.hasNext()) {
 
 			wahlkreisInstance = (Individual) instances.next();
@@ -276,9 +282,11 @@ public class RDFModel {
 			}
 		}
 
+		// return found instance
 		if (wahlkreis != null)
 			return wahlkreis;
 
+		// create new Resource
 		wahlkreis = model.createResource(wahlkreisURI, classWahlkreis);
 		wahlkreis.addProperty(RDFS.label,
 				model.createTypedLiteral(abgeordneter.getWahlkreisName() != null ? abgeordneter.getWahlkreisName()
@@ -287,8 +295,47 @@ public class RDFModel {
 
 	}
 
+	private Resource createPlaceResource(Nebentaetigkeit nebentaetigkeit) {
+
+		// get URI or set default one
+		String placeURI = nebentaetigkeit.getPlaceUri();
+		if (placeURI == null || placeURI.trim().isEmpty())
+			placeURI = "http://keinOrt.de";
+
+		Resource place = null;
+
+		Individual placeInstance;
+		ExtendedIterator<? extends OntResource> instances = classPlace.listInstances();
+
+		// iterate over all instances and compare URIs
+		while (instances.hasNext()) {
+
+			placeInstance = (Individual) instances.next();
+			if (placeInstance.getURI() != null) {
+				if (placeInstance.getURI().equals(nebentaetigkeit.getPlaceUri())) {
+					place = placeInstance;
+					break;
+				}
+			}
+		}
+
+		// return found instance
+		if (place != null)
+			return place;
+
+		// create new Resource
+		place = model.createResource(placeURI, classPlace);
+		place.addProperty(RDFS.label,
+				model.createTypedLiteral(nebentaetigkeit.getPlace() != null ? nebentaetigkeit.getPlace() : "unbekannt"));
+		place.addProperty(propGeoLat, model.createTypedLiteral(nebentaetigkeit.getLatitude()));
+		place.addProperty(propGeoLat, model.createTypedLiteral(nebentaetigkeit.getLongitude()));
+
+		return place;
+	}
+
 	private Resource createFraktionResource(Abgeordneter abgeordneter, Resource politician) {
 
+		// get URI or set default one
 		String fraktionURI = abgeordneter.getWahlkreisUri();
 		if (fraktionURI == null || fraktionURI.trim().isEmpty())
 			fraktionURI = "http://keinefaraktion.de";
@@ -298,6 +345,7 @@ public class RDFModel {
 		Individual fraktionInstance;
 		ExtendedIterator<? extends OntResource> instances = classFraktion.listInstances();
 
+		// iterate over all instances and compare URIs
 		while (instances.hasNext()) {
 
 			fraktionInstance = (Individual) instances.next();
@@ -309,11 +357,13 @@ public class RDFModel {
 			}
 		}
 
+		// return found instance
 		if (fraktion != null) {
 			fraktion.addProperty(propMember, politician);
 			return fraktion;
 		}
 
+		// create new Resource
 		fraktion = model.createResource(fraktionURI, classFraktion);
 		fraktion.addProperty(RDFS.label,
 				model.createTypedLiteral(abgeordneter.getFraktion() != null ? abgeordneter.getFraktion() : "unbekannt"));
@@ -446,11 +496,11 @@ public class RDFModel {
 		String path = System.getProperty("user.home") + "/Desktop/nebeneinkunft";
 		model.fileExport(path, IRDFExport.N3);
 
-		try {
-			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		System.out.println("done");
 

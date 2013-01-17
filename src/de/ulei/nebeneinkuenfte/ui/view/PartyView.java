@@ -39,8 +39,7 @@ public class PartyView extends AbstractView {
 				if (event.isDoubleClick()) {
 					if (event.getPropertyId().equals("auftraggeber")) {
 						fireEvent(ActionType.OPEN_PERSON_ORIGIN);
-					} else if (event.getPropertyId().equals("forename")
-							|| event.getPropertyId().equals("lastname")) {
+					} else if (event.getPropertyId().equals("forename") || event.getPropertyId().equals("lastname")) {
 						fireEvent(ActionType.OPEN_PERSON_PERSON);
 					}
 				}
@@ -53,15 +52,12 @@ public class PartyView extends AbstractView {
 
 	private void buildNavigationSection() {
 
-		goBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON,
-				this);
+		goBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON, this);
 
-		openPersonButton = ButtonFactory.getButton(
-				ButtonFactory.OPEN_PERSON_BUTTON, this);
+		openPersonButton = ButtonFactory.getButton(ButtonFactory.OPEN_PERSON_BUTTON, this);
 		openPersonButton.setEnabled(false);
 
-		openOriginButton = ButtonFactory.getButton(
-				ButtonFactory.OPEN_ORIGIN_BUTTON, this);
+		openOriginButton = ButtonFactory.getButton(ButtonFactory.OPEN_ORIGIN_BUTTON, this);
 		openOriginButton.setEnabled(false);
 
 		navigationBar.addButton(goBackButton);
@@ -77,8 +73,7 @@ public class PartyView extends AbstractView {
 
 	}
 
-	public void setPartyContainerDataSource(
-			BeanItemContainer<FraktionAuftraggeber> container) {
+	public void setPartyContainerDataSource(BeanItemContainer<FraktionAuftraggeber> container) {
 
 		basicTable.setContainerDataSource(container);
 		updateTable();
