@@ -14,7 +14,8 @@ public class ButtonFactory {
 	public static final int OPEN_PARTY_BUTTON = 1;
 	public static final int OPEN_ORIGIN_BUTTON = 2;
 	public static final int OPEN_BASIC_BUTTON = 3;
-	public static final int GO_BACK_BUTTON = 4;
+	public static final int OPEN_MAP_BUTTON = 4;
+	public static final int GO_BACK_BUTTON = 5;
 
 	public static Button getButton(int buttonType, AbstractView view) {
 
@@ -27,6 +28,8 @@ public class ButtonFactory {
 			return getOpenOriginButton(view);
 		case OPEN_BASIC_BUTTON:
 			return getOpenBasicButton(view);
+		case OPEN_MAP_BUTTON:
+			return getOpenMapButton(view);
 		case GO_BACK_BUTTON:
 			return getGoBackButton(view);
 		default:
@@ -51,6 +54,25 @@ public class ButtonFactory {
 		});
 
 		return goBackButton;
+	}
+
+	private static Button getOpenMapButton(final AbstractView view) {
+
+		Button home = new Button("Show on map");
+		home.setImmediate(true);
+		home.setWidth(IConstants.BUTTON_WIDTH, Sizeable.UNITS_PIXELS);
+		home.setIcon(new ThemeResource("icons/16/globe.png"));
+		home.addListener(new Button.ClickListener() {
+
+			private static final long serialVersionUID = -6896210990876900350L;
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				view.fireEvent(ActionType.OPEN_MAP);
+			}
+		});
+
+		return home;
 	}
 
 	private static Button getOpenBasicButton(final AbstractView view) {
@@ -92,7 +114,7 @@ public class ButtonFactory {
 
 	private static Button getOpenPartyButton(final AbstractView view) {
 
-		Button openPartyButton = new Button("Open Party");
+		Button openPartyButton = new Button("Open Fraction");
 		openPartyButton.setIcon(new ThemeResource("icons/16/users.png"));
 		openPartyButton.setEnabled(false);
 		openPartyButton.addListener(new Button.ClickListener() {

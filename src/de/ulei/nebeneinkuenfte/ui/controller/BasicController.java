@@ -7,9 +7,9 @@ import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.view.BasicView;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class BasicController extends AbstractPersonController implements
-		IActionListener {
+public class BasicController extends AbstractPersonController implements IActionListener {
 
 	private static final long serialVersionUID = 3304961841215841349L;
 
@@ -24,7 +24,7 @@ public class BasicController extends AbstractPersonController implements
 	}
 
 	public void refreshTableFooter() {
-		
+
 		Collection<?> list = basicView.getBasicTable().getItemIds();
 
 		int min = 0;
@@ -34,19 +34,31 @@ public class BasicController extends AbstractPersonController implements
 		basicView.setTableFooter("lastname", String.valueOf(list.size()));
 
 		Abgeordneter a;
+		boolean infinite = false;
 		@SuppressWarnings("unchecked")
 		Iterator<Abgeordneter> it = (Iterator<Abgeordneter>) list.iterator();
 		while (it.hasNext()) {
 
 			a = it.next();
-
 			min += a.getMinZusatzeinkommen();
-			max += a.getMaxZusatzeinkommen();
+
+			// separate handling for infinite values
+			if (!infinite) {
+
+				max += a.getMaxZusatzeinkommen();
+				if (a.getMaxZusatzeinkommen() == IConstants.INFINITE_VALUE) {
+					infinite = true;
+				}
+
+			}
 
 		}
 
 		basicView.setTableFooter("minZusatzeinkommen", String.valueOf(min));
-		basicView.setTableFooter("maxZusatzeinkommen", String.valueOf(max));
+		if (!infinite)
+			basicView.setTableFooter("maxZusatzeinkommen", String.valueOf(max));
+		else
+			basicView.setTableFooter("maxZusatzeinkommen", IConstants.INFINITE_SIGN);
 
 	}
 

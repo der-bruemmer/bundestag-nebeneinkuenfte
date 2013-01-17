@@ -28,4 +28,8 @@
     
 
     <inherits name="org.tepi.filtertable.gwt.FilterTableWidgetset" />
+
+    
+
+    <inherits name="org.vaadin.hezamu.googlemapwidget.widgetset.GooglemapwidgetWidgetset" />
 </module>

@@ -16,11 +16,12 @@ public class FraktionAuftraggeber implements Serializable {
 	private String auftraggeber;
 	private String type;
 	private String place;
+	private float latitude;
+	private float longitude;
 	private String year;
 	private String stufe;
 
-	public FraktionAuftraggeber(Abgeordneter abgeordneter,
-			Nebentaetigkeit nebentaetigkeit) {
+	public FraktionAuftraggeber(Abgeordneter abgeordneter, Nebentaetigkeit nebentaetigkeit) {
 
 		this.abgeordneter = abgeordneter;
 		this.nebentaetigkeit = nebentaetigkeit;
@@ -100,6 +101,22 @@ public class FraktionAuftraggeber implements Serializable {
 
 	public void setPlace(String place) {
 		this.place = place;
+	}
+
+	public float getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(float latitude) {
+		this.latitude = latitude;
+	}
+
+	public float getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(float longitude) {
+		this.longitude = longitude;
 	}
 
 	public String getYear() {

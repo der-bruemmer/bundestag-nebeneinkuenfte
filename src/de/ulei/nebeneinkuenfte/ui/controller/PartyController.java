@@ -6,8 +6,7 @@ import de.ulei.nebeneinkuenfte.ui.view.PartyView;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 
-public class PartyController extends AbstractFraktionAuftraggeberController
-		implements IActionListener {
+public class PartyController extends AbstractFraktionAuftraggeberController implements IActionListener {
 
 	private static final long serialVersionUID = 8779244993116572692L;
 
@@ -36,8 +35,7 @@ public class PartyController extends AbstractFraktionAuftraggeberController
 			setActualPerson(null);
 			break;
 		case OPEN_PERSON_PERSON:
-			fraktion = (FraktionAuftraggeber) partyView.getBasicTable()
-					.getValue();
+			fraktion = (FraktionAuftraggeber) partyView.getBasicTable().getValue();
 
 			if (fraktion != null) {
 
@@ -48,8 +46,7 @@ public class PartyController extends AbstractFraktionAuftraggeberController
 			}
 			break;
 		case OPEN_PERSON_ORIGIN:
-			fraktion = (FraktionAuftraggeber) partyView.getBasicTable()
-					.getValue();
+			fraktion = (FraktionAuftraggeber) partyView.getBasicTable().getValue();
 
 			if (fraktion != null) {
 
@@ -60,8 +57,7 @@ public class PartyController extends AbstractFraktionAuftraggeberController
 			}
 			break;
 		case TABLE_SELECT:
-			fraktion = (FraktionAuftraggeber) partyView.getBasicTable()
-					.getValue();
+			fraktion = (FraktionAuftraggeber) partyView.getBasicTable().getValue();
 			if (fraktion != null)
 				setActualPerson(fraktion.getAbgeordneter());
 			break;
