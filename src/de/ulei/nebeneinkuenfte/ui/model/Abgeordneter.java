@@ -1,6 +1,8 @@
 package de.ulei.nebeneinkuenfte.ui.model;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,27 @@ public class Abgeordneter implements Serializable {
 
 	public String getURI() {
 		return uri;
+	}
+
+	public void setURI(String forename, String lastname) {
+
+		try {
+
+			String URI = "";
+			URI = URI.concat(IConstants.NAMESPACE);
+			URI = URI.concat("#");
+			URI = URI.concat(IConstants.PERSON_PERSON_VIEW_FRAG);
+			URI = URI.concat("/");
+			URI = URI.concat(URLEncoder.encode(forename.toLowerCase(), "UTF-8"));
+			URI = URI.concat("_");
+			URI = URI.concat(URLEncoder.encode(lastname.toLowerCase(), "UTF-8"));
+
+			setURI(URI);
+
+		} catch (UnsupportedEncodingException e) {
+			System.out.println("Charset UTF-8 not supported by System");
+		}
+
 	}
 
 	public void setURI(String uri) {
@@ -144,8 +167,11 @@ public class Abgeordneter implements Serializable {
 			setFraktionUri(IConstants.FDP_FRAKTION);
 		else if (fraktion.equals(IConstants.GRUENE_LABEL))
 			setFraktionUri(IConstants.GRUENE_FRAKTION);
+		else
+			setFraktionUri(IConstants.NO_FRAKTION);
 
 		this.fraktion = fraktion;
+
 	}
 
 	public int getAnzahlNebeneinkuenfte() {
@@ -176,20 +202,20 @@ public class Abgeordneter implements Serializable {
 		return nebentaetigkeiten;
 	}
 
-	//incorporate start and stop dates
-	//1 legislaturperiode = 4 years
+	// incorporate start and stop dates
+	// 1 legislaturperiode = 4 years
 	public void setNebentaetigkeiten(List<Nebentaetigkeit> nebentaetigkeiten) {
 		this.nebentaetigkeiten = nebentaetigkeiten;
 		boolean canMax = true;
 		for (Nebentaetigkeit nt : nebentaetigkeiten) {
 			if (nt.getStufe() != null) {
 				if (nt.getStufe().contains("1")) {
-					//48 months
-					if(nt.isMonthly()) {
+					// 48 months
+					if (nt.isMonthly()) {
 						this.minZusatzeinkommen += 48000;
 						this.maxZusatzeinkommen += 167952;
-					//4 years
-					} else if(nt.isYearly()) {
+						// 4 years
+					} else if (nt.isYearly()) {
 						this.minZusatzeinkommen += 4000;
 						this.maxZusatzeinkommen += 13996;
 					} else {
@@ -197,12 +223,12 @@ public class Abgeordneter implements Serializable {
 						this.maxZusatzeinkommen += 3499;
 					}
 				} else if (nt.getStufe().contains("2")) {
-					//48 months
-					if(nt.isMonthly()) {
+					// 48 months
+					if (nt.isMonthly()) {
 						this.minZusatzeinkommen += 168000;
 						this.maxZusatzeinkommen += 335952;
-					//4 years
-					} else if(nt.isYearly()) {
+						// 4 years
+					} else if (nt.isYearly()) {
 						this.minZusatzeinkommen += 14000;
 						this.maxZusatzeinkommen += 27996;
 					} else {
@@ -210,11 +236,11 @@ public class Abgeordneter implements Serializable {
 						this.maxZusatzeinkommen += 6999;
 					}
 				} else if (nt.getStufe().contains("3")) {
-					//48 months
-					if(nt.isMonthly()) {
+					// 48 months
+					if (nt.isMonthly()) {
 						this.minZusatzeinkommen += 336000;
-					//4 years
-					} else if(nt.isYearly()) {
+						// 4 years
+					} else if (nt.isYearly()) {
 						this.minZusatzeinkommen += 28000;
 					} else {
 						this.minZusatzeinkommen += 7000;
