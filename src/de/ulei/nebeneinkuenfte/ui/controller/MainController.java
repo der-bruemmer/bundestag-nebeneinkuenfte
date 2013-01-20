@@ -1,5 +1,8 @@
 package de.ulei.nebeneinkuenfte.ui.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
 import java.util.Stack;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -26,12 +29,16 @@ public class MainController implements IActionListener {
 
 	private static final long serialVersionUID = -2602673556758294975L;
 
+	private List<Abgeordneter> mdbList;
 	private Stack<Object[]> historyStack;
 
 	private BasicController basicController;
 	private PersonController personController;
 	private PartyController partyController;
 	private OriginController originController;
+
+	private ImpressumView impressumView;
+	private AboutProjectView aboutProjectView;
 
 	private BasicView basicView;
 	private PersonView personView;
@@ -45,10 +52,18 @@ public class MainController implements IActionListener {
 
 	public MainController(MainFrameWindow mainFrame) {
 
+		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
+		BundestagConverter conv = new BundestagConverter(
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
+		mdbList = conv.getAbgeordnete();
+
 		this.mainFrame = mainFrame;
 		this.historyStack = new Stack<Object[]>();
 
 		// creates views
+		impressumView = new ImpressumView();
+		aboutProjectView = new AboutProjectView();
+
 		basicView = new BasicView();
 		personView = new PersonView();
 		partyView = new PartyView();
@@ -67,11 +82,12 @@ public class MainController implements IActionListener {
 		originController.addListener(this);
 
 		// open basic view as app entry
-		mainFrame.addTab(new AboutProjectView(), "Das Projekt", new ThemeResource("icons/16/about.png"));
+		mainFrame.addTab(aboutProjectView, "Das Projekt", new ThemeResource("icons/16/about.png"));
 		mainFrame.addTab(basicView, "Abgeordnete", new ThemeResource("icons/16/user.png"));
-		mainFrame.addTab(new ImpressumView(), "Impressum", null);
+		mainFrame.addTab(impressumView, "Impressum", null);
+		mainFrame.selectTab(0);
 		actualPersonView = basicView;
-		openPersonBasicView();
+		// openPersonBasicView();
 		basicController.refreshTableFooter();
 
 	}
@@ -112,22 +128,17 @@ public class MainController implements IActionListener {
 
 	private void openPersonBasicView() {
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
-		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
-
 		BeanItemContainer<Abgeordneter> container = new BeanItemContainer<Abgeordneter>(Abgeordneter.class);
 
-		for (Abgeordneter mdb : conv.getAbgeordnete())
+		for (Abgeordneter mdb : mdbList)
 			container.addItem(mdb);
 
-		path = null;
-		conv = null;
-
 		basicView.setPersonContainerDataSource(container);
-
 		setActualPersonView(basicView, basicController);
 		goForward(IConstants.PERSON_BASIC_VIEW, null);
+
+		// set URI fragment
+		NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_BASIC_VIEW_FRAG);
 
 	}
 
@@ -184,11 +195,7 @@ public class MainController implements IActionListener {
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
-		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
-
-		for (Abgeordneter mdb : conv.getAbgeordnete())
+		for (Abgeordneter mdb : mdbList)
 			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
 				if (nt.getAuftraggeber() != null && nt.getAuftraggeber().equals(origin))
 					container.addItem(new FraktionAuftraggeber(mdb, nt));
@@ -197,6 +204,9 @@ public class MainController implements IActionListener {
 		originView.setOriginContainerDataSource(container);
 		originView.setPanelCaption(origin);
 		setActualPersonView(originView, originController);
+
+		// set URI fragment
+		NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_ORIGIN_VIEW_FRAG);
 
 	}
 
@@ -242,6 +252,14 @@ public class MainController implements IActionListener {
 		}
 	}
 
+	private void openPersonPersonView(String personURI) {
+
+		for (Abgeordneter mdb : mdbList)
+			if (mdb.getURI().equals(personURI))
+				openPersonPersonView(mdb);
+
+	}
+
 	private void openPersonPersonView(Abgeordneter person) {
 
 		BeanItemContainer<Nebentaetigkeit> container = new BeanItemContainer<Nebentaetigkeit>(Nebentaetigkeit.class);
@@ -260,6 +278,9 @@ public class MainController implements IActionListener {
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
 
+		NebeneinkuenfteApplication.getInstance().setURIFragment(
+				person.getURI().substring(person.getURI().indexOf("#") + 1));
+
 	}
 
 	private void openPersonPartyView() {
@@ -275,13 +296,13 @@ public class MainController implements IActionListener {
 			if (actualPerson != null) {
 
 				// null check for fraktion
-				if (actualPerson.getFraktion() != null) {
+				if (actualPerson.getFraktionUri() != null) {
 
 					// open PartyView
-					openPersonPartyView(actualPerson.getFraktion());
+					openPersonPartyView(actualPerson.getFraktionUri());
 
 					// save state
-					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktion());
+					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktionUri());
 				}
 			}
 
@@ -296,10 +317,10 @@ public class MainController implements IActionListener {
 			if (actualPerson != null) {
 
 				// null check for fraktion
-				if (actualPerson.getFraktion() != null) {
+				if (actualPerson.getFraktionUri() != null) {
 
 					// open PartyView
-					openPersonPartyView(actualPerson.getFraktion());
+					openPersonPartyView(actualPerson.getFraktionUri());
 
 					// save state
 					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktion());
@@ -310,23 +331,25 @@ public class MainController implements IActionListener {
 
 	}
 
-	private void openPersonPartyView(String party) {
+	private void openPersonPartyView(String fractionURI) {
 
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
-		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
+		String caption = "";
 
-		for (Abgeordneter mdb : conv.getAbgeordnete())
-			if (mdb.getFraktion().equals(party))
+		for (Abgeordneter mdb : mdbList)
+			if (mdb.getFraktionUri().equals(fractionURI)) {
+				caption = mdb.getFraktion();
 				for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten())
 					container.addItem(new FraktionAuftraggeber(mdb, nt));
-
+			}
 		partyView.setPartyContainerDataSource(container);
-		partyView.setPanelCaption(party);
+		partyView.setPanelCaption(caption);
 		setActualPersonView(partyView, partyController);
+
+		// set URI fragment
+		NebeneinkuenfteApplication.getInstance().setURIFragment(fractionURI.substring(fractionURI.indexOf("#") + 1));
 
 	}
 
@@ -336,6 +359,7 @@ public class MainController implements IActionListener {
 
 	private void setActualPersonView(AbstractView actualView, AbstractController controller) {
 
+		mainFrame.removeTabListener();
 		// remove actual view
 		int tabIndex = mainFrame.getTabIndex(getActualPersonView());
 		mainFrame.removeTab(getActualPersonView());
@@ -349,6 +373,7 @@ public class MainController implements IActionListener {
 		// set actual view and controller
 		this.actualPersonView = actualView;
 		this.setActualController(controller);
+		mainFrame.addTabListener();
 
 	}
 
@@ -396,4 +421,48 @@ public class MainController implements IActionListener {
 		return historyStack.lastElement();
 	}
 
+	public void handleURIFragment(String fragment) {
+
+		try {
+
+			// split fragment by '/'
+			String[] frag = fragment.split("/");
+			if (frag.length > 0) {
+
+				// first part targets tabSheet
+				String tabSheet = frag[0];
+
+				// member view
+				if (tabSheet.equals(IConstants.PERSON_BASIC_VIEW_FRAG)) {
+					openPersonBasicView();
+
+				}
+				// open fraction view
+				else if (tabSheet.equals(IConstants.PERSON_PARTY_VIEW_FRAG)) {
+					if (frag.length > 1)
+						openPersonPartyView(IConstants.NAMESPACE + "#" + fragment);
+				}
+
+				// open person view
+				else if (tabSheet.equals(IConstants.PERSON_PERSON_VIEW_FRAG)) {
+					if (frag.length > 1)
+						openPersonPersonView(IConstants.NAMESPACE.concat("#").concat(frag[0]).concat("/")
+								.concat(URLEncoder.encode(frag[1], "UTF-8")));
+				}
+
+				// open impressum view
+				else if (tabSheet.equals(IConstants.IMPRESSUM_VIEW_FRAG)) {
+					mainFrame.selectTab(impressumView);
+					// open about view
+				} else if (tabSheet.equals(IConstants.ABOUT_PROJECT_VIEW_FRAG)) {
+					mainFrame.selectTab(aboutProjectView);
+				}
+
+			}
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+	}
 }

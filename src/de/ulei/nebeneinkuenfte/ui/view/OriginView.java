@@ -19,6 +19,7 @@ public class OriginView extends AbstractView {
 
 	public OriginView() {
 
+		setCaption(String.valueOf(IConstants.PERSON_ORIGIN_VIEW));
 		createNavigationSection();
 		addTableListener();
 

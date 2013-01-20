@@ -19,6 +19,7 @@ public class BasicView extends AbstractView {
 	public BasicView() {
 
 		super();
+		setCaption(String.valueOf(IConstants.PERSON_BASIC_VIEW));
 		buildNavigationSection();
 		addTableListener();
 

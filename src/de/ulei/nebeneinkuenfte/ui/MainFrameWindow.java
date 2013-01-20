@@ -14,8 +14,11 @@ public class MainFrameWindow extends Window {
 	private Header header;
 	private Panel panel;
 	private TabSheet tabSheet;
+	private TabListener tabSheetListener;;
 
 	public MainFrameWindow(String caption) {
+
+		tabSheetListener = new TabListener();
 
 		setName(caption);
 		setSizeFull();
@@ -27,6 +30,7 @@ public class MainFrameWindow extends Window {
 
 		tabSheet = new TabSheet();
 		tabSheet.setSizeFull();
+		tabSheet.addListener(tabSheetListener);
 
 		VerticalLayout vl = new VerticalLayout();
 
@@ -46,8 +50,7 @@ public class MainFrameWindow extends Window {
 		tabSheet.addTab(component, caption, icon);
 	}
 
-	public void addTab(Component component, String caption, Resource icon,
-			int position) {
+	public void addTab(Component component, String caption, Resource icon, int position) {
 		tabSheet.addTab(component, caption, icon, position);
 	}
 
@@ -69,6 +72,14 @@ public class MainFrameWindow extends Window {
 
 	public void selectTab(Component component) {
 		tabSheet.setSelectedTab(component);
+	}
+
+	public void removeTabListener() {
+		tabSheet.removeListener(tabSheetListener);
+	}
+
+	public void addTabListener() {
+		tabSheet.addListener(tabSheetListener);
 	}
 
 }

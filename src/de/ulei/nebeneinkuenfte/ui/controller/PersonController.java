@@ -108,7 +108,6 @@ public class PersonController extends AbstractSidelineJobController implements I
 		w.setModal(true);
 		w.setResizable(false);
 		w.setWidth(1024, Sizeable.UNITS_PIXELS);
-		googleMap.setHeight(768, Sizeable.UNITS_PIXELS);
 		w.addComponent(verticalLayout);
 
 		NebeneinkuenfteApplication.getInstance().getMainWindow().addWindow(w);

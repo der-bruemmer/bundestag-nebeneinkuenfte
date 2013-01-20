@@ -20,13 +20,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,8 +36,6 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
 
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
@@ -75,31 +71,30 @@ public class BundestagConverter {
 
 	public BundestagConverter(String URI, boolean scrape, String path) {
 		this.startUri = URI;
-		
+
 		this.cities = this.readCityFile("./WebContent/external_data/staedte_osm");
-		
+
 		ArrayList<String> failed = new ArrayList<String>();
 		if (scrape) {
 			this.fillMdBList(URI);
 			int count = 0;
 			for (Abgeordneter mdb : this.mdbs) {
-				//if(mdb.getLastname().toLowerCase().contains("merkel")) {
+				// if(mdb.getLastname().toLowerCase().contains("merkel")) {
 				count++;
 				if (!this.parseMdB(mdb)) {
 					// parse failed
 					System.out.println("Trying again.");
 					wait(2000);
-					if(!this.parseMdB(mdb)) {
+					if (!this.parseMdB(mdb)) {
 						failed.add(mdb.getURI());
 					}
 				}
-
+				mdb.setURI(mdb.getForename(), mdb.getLastname());
 				this.writeMdBObjectToFile(path, mdb);
-				System.out.println("Parsed Mdb " + count + " of "
-						+ this.mdbs.size());
-				//if(count==50) break;
-				wait(500);
-				//}
+				System.out.println("Parsed Mdb " + count + " of " + this.mdbs.size());
+				// if(count==50) break;
+				wait(50);
+				// }
 			}
 		} else {
 			this.readMdbsFromFolder(path);
@@ -109,11 +104,8 @@ public class BundestagConverter {
 	private void fillMdBList(String URI) {
 
 		try {
-			Document doc = Jsoup
-					.connect(URI)
-					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
-					.timeout(20000)
-					.get();
+			Document doc = Jsoup.connect(URI)
+					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik").timeout(20000).get();
 			Elements abgeordnetenLinks = doc.getElementsByClass("linkIntern");
 			Iterator<Element> it = abgeordnetenLinks.iterator();
 			String baseUri = URI;
@@ -131,15 +123,13 @@ public class BundestagConverter {
 				mdb.setAttributesFromLinkText(mdbElement.text());
 				// this means the MdB isn't part of the Bundestag anymore (*) or
 				// died (+), only add valid members
-				if (!mdb.getFraktion().contains("*")
-						&& !mdb.getFraktion().contains("+")) {
+				if (!mdb.getFraktion().contains("*") && !mdb.getFraktion().contains("+")) {
 					mdbs.add(mdb);
 				}
 			}
 
 		} catch (IOException ioe) {
-			System.out.println("URL " + URI
-					+ " could not be retrieved. Skipping.");
+			System.out.println("URL " + URI + " could not be retrieved. Skipping.");
 
 		}
 
@@ -153,8 +143,7 @@ public class BundestagConverter {
 			URL full = new URL(base, relUri);
 			absUri = full.toString();
 		} catch (Exception e) {
-			System.out.println("ERROR: URL " + docUri + " " + relUri
-					+ "malformed!");
+			System.out.println("ERROR: URL " + docUri + " " + relUri + "malformed!");
 			return null;
 		}
 		return absUri;
@@ -165,34 +154,31 @@ public class BundestagConverter {
 		boolean success = false;
 
 		try {
-			Document doc = Jsoup
-					.connect(mdb.getURI())
-					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik")
-					.timeout(20000)
-					.get();
+			Document doc = Jsoup.connect(mdb.getURI())
+					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik").timeout(20000).get();
 			Elements externeLinks = doc.getElementsByClass("linkExtern");
 
 			if (externeLinks.first() != null) {
-				String homepage = externeLinks.first()
-						.child(0).attr("href");
+				String homepage = externeLinks.first().child(0).attr("href");
 				mdb.setHomepage(homepage);
 			}
-			
+
 			Elements mail = doc.getElementsByClass("linkEmail");
-			
-			if(mail.first() != null) {
+
+			if (mail.first() != null) {
 				String email = mail.first().attr("href");
 				mdb.setEmail(email);
 			}
-			
+
 			Elements wahlkreis = doc.getElementsByClass("linkIntern");
-			
-			if(wahlkreis != null) {
+
+			if (wahlkreis != null) {
 				Iterator<Element> wahlkreisIt = wahlkreis.iterator();
-				while(wahlkreisIt.hasNext()) {
+				while (wahlkreisIt.hasNext()) {
 					Element wahlkreisEl = wahlkreisIt.next();
-					if(wahlkreisEl.text().toLowerCase().contains("wahlkreis")) {
-						mdb.setWahlkreisUri(this.makeAbsoluteURI(wahlkreisEl.baseUri(), wahlkreisEl.child(0).attr("href")));
+					if (wahlkreisEl.text().toLowerCase().contains("wahlkreis")) {
+						mdb.setWahlkreisUri(this.makeAbsoluteURI(wahlkreisEl.baseUri(),
+								wahlkreisEl.child(0).attr("href")));
 						mdb.setWahlkreisName(wahlkreisEl.child(0).text());
 					}
 				}
@@ -203,9 +189,8 @@ public class BundestagConverter {
 			success = true;
 
 		} catch (IOException ioe) {
-			System.out.println("URL " + mdb.getURI()
-					+ " could not be retrieved. Skipping.");
-			
+			System.out.println("URL " + mdb.getURI() + " could not be retrieved. Skipping.");
+
 		}
 
 		return success;
@@ -218,8 +203,7 @@ public class BundestagConverter {
 		try {
 
 			// Construct the LineNumberReader object
-			FileOutputStream fileOut = new FileOutputStream(path
-					+ mdb.getLastname() + "_" + mdb.getForename());
+			FileOutputStream fileOut = new FileOutputStream(path + mdb.getLastname() + "_" + mdb.getForename());
 			outputStream = new ObjectOutputStream(fileOut);
 			outputStream.writeObject(mdb);
 			outputStream.flush();
@@ -288,133 +272,133 @@ public class BundestagConverter {
 		Elements children = voa.select(".standardBox .voa_tab1");
 		List<Nebentaetigkeit> nts = new ArrayList<Nebentaetigkeit>();
 
-		//System.out.println(mdb.getLastname());
-		
-		for(int i = 0; i< children.size(); i++) {
+		// System.out.println(mdb.getLastname());
+
+		for (int i = 0; i < children.size(); i++) {
 
 			Element el = children.get(i);
 			String elType = el.nodeName().trim();
-			
-					
-			if(el.hasClass("voa_abstand")) {
-				
+
+			if (el.hasClass("voa_abstand")) {
+
 				String taetigkeitText = "";
-				
+
 				for (int j = i; j < children.size(); j++) {
 
 					Element taetigkeitEl = children.get(j);
-					
-					//next taetigkeit begins || next type of taetigkeit || last taetigkeit parsed
+
+					// next taetigkeit begins || next type of taetigkeit || last
+					// taetigkeit parsed
 					if (taetigkeitEl.hasClass("voa_abstand")) {
 
-						if(j==i) {
+						if (j == i) {
 							taetigkeitText += taetigkeitEl.text();
-						} else if (j>i){
-							
+						} else if (j > i) {
+
 							nts.addAll(this.parseTaetigkeitenText(taetigkeitText));
-							i = j-1;
+							i = j - 1;
 							break;
 						}
-						
+
 					} else {
-						
-						taetigkeitText += "\n" + taetigkeitEl.text(); 	
-						if(j==children.size()-1) {
+
+						taetigkeitText += "\n" + taetigkeitEl.text();
+						if (j == children.size() - 1) {
 							nts.addAll(this.parseTaetigkeitenText(taetigkeitText));
 						}
-					}					
+					}
 				}
-			} 
+			}
 		}
-		
+
 		mdb.setNebentaetigkeiten(nts);
-//		System.out.println("Mdb " + mdb.getLastname() + " has " + nts.size()
-//		 + " entgeltliche Nebentaetigkeiten");
+		// System.out.println("Mdb " + mdb.getLastname() + " has " + nts.size()
+		// + " entgeltliche Nebentaetigkeiten");
 
 	}
-	
-	
-	
 
 	private List<Nebentaetigkeit> parseTaetigkeitenText(String taetigkeitText) {
 
 		List<Nebentaetigkeit> nts = new ArrayList<Nebentaetigkeit>();
-		
+
 		String[] lines = taetigkeitText.split("\n");
 		String auftragGeber = "";
-		
+
 		boolean semicolon = false;
-		
+
 		Pattern p = Pattern.compile("Stufe (1|2|3)");
 		Matcher m = p.matcher(taetigkeitText);
-		//these are unpaid or paid under 1000euro. it would be nice to have them, too?!
-		if(!m.find()) {
+		// these are unpaid or paid under 1000euro. it would be nice to have
+		// them, too?!
+		if (!m.find()) {
 			return nts;
 		}
 
 		Nebentaetigkeit nt = new Nebentaetigkeit();
 		boolean parsed = false;
-		for(int i = 0; i < lines.length; i++) {
-			
-			if(!lines[i].toLowerCase().contains("stufe 1") 
-				&& !lines[i].toLowerCase().contains("stufe 2") 
-				&& !lines[i].toLowerCase().contains("stufe 3")) {
-				
+		for (int i = 0; i < lines.length; i++) {
+
+			if (!lines[i].toLowerCase().contains("stufe 1") && !lines[i].toLowerCase().contains("stufe 2")
+					&& !lines[i].toLowerCase().contains("stufe 3")) {
+
 				auftragGeber += lines[i] + " ";
-				
-				if(parsed == true) {
+
+				if (parsed == true) {
 					System.out.println("Lines after stufe parsed: " + lines[i]);
 				}
-				
+
 			} else {
-				
+
 				nt = new Nebentaetigkeit();
-				if(lines.length==1) {
+				if (lines.length == 1) {
 					this.parseAuftraggeber(nt, taetigkeitText.trim());
 				} else {
 					this.parseAuftraggeber(nt, auftragGeber);
 				}
-				
-				
-				//possibility of multiple jobs in one line
-				if(lines[i].contains(";")) {
+
+				// possibility of multiple jobs in one line
+				if (lines[i].contains(";")) {
 
 					String[] semiSplit = lines[i].split(";");
-					for(int j = 0; j < semiSplit.length; j++) {
-	
+					for (int j = 0; j < semiSplit.length; j++) {
+
 						Nebentaetigkeit temp = this.parseInfoOfTaetigkeit(nt, semiSplit[j]);
-						
-						//if there is no type and the auftraggeber of both taetigkeiten are identical, use the type of the former taetigkeit
-						if(temp.getType() == null) {
-							if(nts.size()>0 ) {
-								if(nts.get(nts.size()-1).getAuftraggeber().equals(temp.getAuftraggeber())) {
-									temp.setType(nts.get(nts.size()-1).getType());
-								}	
+
+						// if there is no type and the auftraggeber of both
+						// taetigkeiten are identical, use the type of the
+						// former taetigkeit
+						if (temp.getType() == null) {
+							if (nts.size() > 0) {
+								if (nts.get(nts.size() - 1).getAuftraggeber().equals(temp.getAuftraggeber())) {
+									temp.setType(nts.get(nts.size() - 1).getType());
+								}
 							}
 						}
-						
+
 						nts.add(temp);
 					}
 				} else {
 					Nebentaetigkeit temp = this.parseInfoOfTaetigkeit(nt, lines[i]);
-					
-					//if there is no type and the auftraggeber of both taetigkeiten are identical, use the type of the former taetigkeit
-					if(temp.getType() == null) {
-						if(nts.size()>0 ) {
-							if(nts.get(nts.size()-1).getAuftraggeber().equals(temp.getAuftraggeber())) {
-								temp.setType(nts.get(nts.size()-1).getType());
-							}	
+
+					// if there is no type and the auftraggeber of both
+					// taetigkeiten are identical, use the type of the former
+					// taetigkeit
+					if (temp.getType() == null) {
+						if (nts.size() > 0) {
+							if (nts.get(nts.size() - 1).getAuftraggeber().equals(temp.getAuftraggeber())) {
+								temp.setType(nts.get(nts.size() - 1).getType());
+							}
 						}
 					}
-					
+
 					nts.add(temp);
 				}
-				
+
 				parsed = true;
-				
+
 			}
 		}
-		
+
 		return nts;
 	}
 
@@ -429,27 +413,24 @@ public class BundestagConverter {
 			int maxGesamt = 0;
 			int overMax = 0;
 			for (Abgeordneter mdb : mdbs) {
-				
-				if(mdb.getAnzahlNebeneinkuenfte()!=0) {
+
+				if (mdb.getAnzahlNebeneinkuenfte() != 0) {
 					out.write(mdb.getForename() + " " + mdb.getLastname() + " " + mdb.getFraktion());
 
-					out.write(" Anzahl Tätigkeiten: "
-							+ mdb.getAnzahlNebeneinkuenfte() + " min: "
-							+ mdb.getMinZusatzeinkommen() + " max "
-							+ mdb.getMaxZusatzeinkommen());
+					out.write(" Anzahl Tätigkeiten: " + mdb.getAnzahlNebeneinkuenfte() + " min: "
+							+ mdb.getMinZusatzeinkommen() + " max " + mdb.getMaxZusatzeinkommen());
 					out.newLine();
 					out.newLine();
 					out.write("______Nebentätigkeiten:______\n");
 					out.newLine();
 					out.flush();
 					for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
-						out.write("Auftraggeber: " + neben.getAuftraggeber()
-								+ "\nUri: " + neben.getAuftragUri() + "\nOrt: " + neben.getPlace() + "\nOrt Uri: " + neben.getPlaceUri());
+						out.write("Auftraggeber: " + neben.getAuftraggeber() + "\nUri: " + neben.getAuftragUri()
+								+ "\nOrt: " + neben.getPlace() + "\nOrt Uri: " + neben.getPlaceUri());
 						out.newLine();
 						out.write("Lat: " + neben.getLatitude() + " Long: " + neben.getLongitude());
 						out.newLine();
-						out.write("Typ: " + neben.getType() + "\nJahr: "
-								+ neben.getYear());
+						out.write("Typ: " + neben.getType() + "\nJahr: " + neben.getYear());
 						out.newLine();
 						out.write("Stufe: " + neben.getStufe());
 						out.newLine();
@@ -472,14 +453,12 @@ public class BundestagConverter {
 						overMax++;
 					}
 				}
-				
+
 			}
 
-			out.write(mdbs.size() + " Abgeordnete, Einkünfte min gesamt: "
-					+ minGesamt + " max gesamt: " + maxGesamt);
+			out.write(mdbs.size() + " Abgeordnete, Einkünfte min gesamt: " + minGesamt + " max gesamt: " + maxGesamt);
 			out.newLine();
-			out.write(overMax
-					+ " Abgeordnete haben mindestens eine Tätigkeit über 7000 Euro.");
+			out.write(overMax + " Abgeordnete haben mindestens eine Tätigkeit über 7000 Euro.");
 
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
@@ -500,19 +479,21 @@ public class BundestagConverter {
 	}
 
 	private Nebentaetigkeit parseInfoOfTaetigkeit(Nebentaetigkeit nt, String text) {
-		
-		//System.out.println("Parsing info of taetigkeit: " + text);
-		//copying values of Nebentaetigkeit in parameter, because there could be more than one with the same auftraggeber
+
+		// System.out.println("Parsing info of taetigkeit: " + text);
+		// copying values of Nebentaetigkeit in parameter, because there could
+		// be more than one with the same auftraggeber
 		Nebentaetigkeit taetigkeitFound = new Nebentaetigkeit(nt);
 		boolean intervalMonthly = false;
 		boolean intervalYearly = false;
 		String[] split = text.split(",");
 		for (int i = 0; i < split.length; i++) {
-			
+
 			String trimmed = split[i].replace(String.valueOf((char) 160), " ").trim();
 
-			if(trimmed == null) continue;
-			
+			if (trimmed == null)
+				continue;
+
 			if (trimmed.contains("Stufe")) {
 				taetigkeitFound.setStufe(trimmed);
 				// a year
@@ -527,233 +508,235 @@ public class BundestagConverter {
 				taetigkeitFound.setPlace(trimmed);
 			} else {
 				taetigkeitFound.appendType(trimmed);
-				if(!trimmed.toLowerCase().equals("gewinn")) {
+				if (!trimmed.toLowerCase().equals("gewinn")) {
 					nt.appendType(trimmed);
 				}
-				
+
 			}
 		}
-		
+
 		taetigkeitFound.setMonthly(intervalMonthly);
 		taetigkeitFound.setYearly(intervalYearly);
-		
+
 		return taetigkeitFound;
 
 	}
 
 	private void parseAuftraggeber(Nebentaetigkeit nt, String text) {
 
-		//get rid of "," at the end of the string
-		if(text.trim().lastIndexOf(",") == text.length()-2) {
-			text = text.substring(0, text.length()-2);
+		// get rid of "," at the end of the string
+		if (text.trim().lastIndexOf(",") == text.length() - 2) {
+			text = text.substring(0, text.length() - 2);
 		}
 		String[] split = text.split(",");
-			
+
 		boolean cityFound = false;
-		
-		for(int i = 0; i < split.length; i++) {
-			
+
+		for (int i = 0; i < split.length; i++) {
+
 			String trimmed = split[i].trim();
-			if(cityFound) {
-				if(!trimmed.toLowerCase().contains("monatlich") &&
-						!trimmed.toLowerCase().contains("jährlich") &&
-						!trimmed.toLowerCase().contains("stufe")) {
+			if (cityFound) {
+				if (!trimmed.toLowerCase().contains("monatlich") && !trimmed.toLowerCase().contains("jährlich")
+						&& !trimmed.toLowerCase().contains("stufe")) {
 					nt.appendType(trimmed);
 				}
 				continue;
-					
+
 			}
-			
-			if(!isCity(trimmed)) {
+
+			if (!isCity(trimmed)) {
 				nt.appendAuftraggeber(trimmed);
 			} else {
 				nt.setPlace(trimmed);
 				cityFound = true;
 				continue;
 			}
-			
+
 		}
 
 	}
-	
+
 	public boolean isCity(String cityname) {
 
 		return this.cities.contains(cityname);
 	}
-	
-	//fix this!
-	
+
+	// fix this!
+
 	public List<String[]> getGermanCityNames() {
-		
+
 		List<String[]> places = new ArrayList<String[]>();
-		
+
 		String queryString = "";
 		String endpoint = "http://dbpedia.org/sparql";
 
-		queryString += "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> PREFIX dbprop: <http://dbpedia.org/property/> PREFIX dbowl: <http://dbpedia.org/ontology/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-				"SELECT *  WHERE {?s a dbowl:PopulatedPlace; dbowl:country <http://dbpedia.org/resource/Germany>; rdfs:label ?o; geo:lat ?lat; geo:long ?long. FILTER(langMatches(lang(?o),'DE')).}";
-		
+		queryString += "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> PREFIX dbprop: <http://dbpedia.org/property/> PREFIX dbowl: <http://dbpedia.org/ontology/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
+				+ "SELECT *  WHERE {?s a dbowl:PopulatedPlace; dbowl:country <http://dbpedia.org/resource/Germany>; rdfs:label ?o; geo:lat ?lat; geo:long ?long. FILTER(langMatches(lang(?o),'DE')).}";
+
 		Query query = QueryFactory.create(queryString);
-	    QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, query);     
-	    
-	    System.out.println("Querying DBPedia for German cities.");
-	    try{
-	    	ResultSet rs = qe.execSelect();
-	        while(rs.hasNext()) {
-	        	QuerySolution sol = rs.next();
-	        	String[] placeValues = new String[4];
-	        	//name
-	        	placeValues[0] = sol.get("o").asLiteral().getString();
-	        	//uri
-	        	placeValues[1] = sol.get("s").toString();
-	        	placeValues[2] = sol.get("lat").asLiteral().getString();
-	        	placeValues[3] = sol.get("long").asLiteral().getString();
-	        	places.add(placeValues);
-	        }
-	    	
-	    }catch(Exception e){
-	        e.printStackTrace();
-	    }
+		QueryExecution qe = QueryExecutionFactory.sparqlService(endpoint, query);
+
+		System.out.println("Querying DBPedia for German cities.");
+		try {
+			ResultSet rs = qe.execSelect();
+			while (rs.hasNext()) {
+				QuerySolution sol = rs.next();
+				String[] placeValues = new String[4];
+				// name
+				placeValues[0] = sol.get("o").asLiteral().getString();
+				// uri
+				placeValues[1] = sol.get("s").toString();
+				placeValues[2] = sol.get("lat").asLiteral().getString();
+				placeValues[3] = sol.get("long").asLiteral().getString();
+				places.add(placeValues);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		System.out.println("Done.");
-	    return places;
-	    
+		return places;
+
 	}
-	
+
 	public void setSinglePlaceUri(List<String[]> places, Nebentaetigkeit nt) {
 		String place = nt.getPlace();
 
-		if(place != null) {
+		if (place != null) {
 
-			//standard case: german city, place string matches city name
-			for(String[] dbpPlace : places) {
-					
-					if(place.trim().equals(dbpPlace[0].trim())) {
-						nt.setPlaceUri(dbpPlace[1]);
-						nt.setLatitude(Float.parseFloat(dbpPlace[2]));
-						nt.setLongitude(Float.parseFloat(dbpPlace[3]));
-						return;
-					}
-			}
-			//irregular case: place string may be contained in on of the city names 
-			for(String[] dbpPlace : places) {
-				if(dbpPlace[0].trim().contains(place)) {
+			// standard case: german city, place string matches city name
+			for (String[] dbpPlace : places) {
+
+				if (place.trim().equals(dbpPlace[0].trim())) {
 					nt.setPlaceUri(dbpPlace[1]);
 					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
 					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
 					return;
 				}
 			}
-			//irregular case 2: place string contains non word chars like "/". 
-			//place string is splittet at this char and all parts are compared to city name
-			for(String[] dbpPlace : places) {
+			// irregular case: place string may be contained in on of the city
+			// names
+			for (String[] dbpPlace : places) {
+				if (dbpPlace[0].trim().contains(place)) {
+					nt.setPlaceUri(dbpPlace[1]);
+					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
+					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					return;
+				}
+			}
+			// irregular case 2: place string contains non word chars like "/".
+			// place string is splittet at this char and all parts are compared
+			// to city name
+			for (String[] dbpPlace : places) {
 				String[] placeparts = place.split("\\W");
 				boolean fits = true;
-				for(int i=0;i<placeparts.length;i++){
-					if(!dbpPlace[0].trim().contains(placeparts[i].trim())) {
+				for (int i = 0; i < placeparts.length; i++) {
+					if (!dbpPlace[0].trim().contains(placeparts[i].trim())) {
 						fits = false;
 					}
 				}
-				if(fits) {
+				if (fits) {
 					nt.setPlaceUri(dbpPlace[1]);
 					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
 					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
 					return;
-				} 
-			}	
+				}
+			}
 		}
-		
+
 		System.out.println("place not found: " + place);
 	}
-	
+
 	public List<Abgeordneter> setAllPlaceUris(List<Abgeordneter> mdbs, List<String[]> places) {
-		
+
 		for (Abgeordneter mdb : mdbs) {
-			
-			if(mdb.getNebentaetigkeiten().size()>0) {
-				System.out.println("Matching places for: " + mdb.getForename()+" "+mdb.getLastname());
-				for(Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
+
+			if (mdb.getNebentaetigkeiten().size() > 0) {
+				System.out.println("Matching places for: " + mdb.getForename() + " " + mdb.getLastname());
+				for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
 					setSinglePlaceUri(places, neben);
 				}
 			}
 		}
-		
+
 		return mdbs;
 	}
-	
-//	private String formatStringForUnicode(String city) {
-//		
-//		city = city.replaceAll("ü", "\u00FC");
-//		city = city.replaceAll("Ü", "\u00DC");
-//		city = city.replaceAll("ä", "\u00E4");
-//		city = city.replaceAll("Ä", "\u00C4");
-//		city = city.replaceAll("ö", "\u00F6");
-//		city = city.replaceAll("Ö", "\u00D6");
-//		city = city.replaceAll("ß", "\u00df");
-//		city = city.replaceAll(" ", "_");
-//		return city;
-//	}
-//	
-//	private String formatStringForUTF8(String city) {
-//		
-//		city = city.replaceAll("ü", "%C3%BC");
-//		city = city.replaceAll("Ü", "%C3%9C");
-//		city = city.replaceAll("ä", "%C3%A4");
-//		city = city.replaceAll("Ä", "%C3%84");
-//		city = city.replaceAll("ö", "%C3%B6");
-//		city = city.replaceAll("Ö", "%C3%96");
-//		city = city.replaceAll("ß", "%C3%9F");
-//		city = city.replaceAll(" ", "_");
-//		return city;
-//	}
-	
+
+	// private String formatStringForUnicode(String city) {
+	//
+	// city = city.replaceAll("ü", "\u00FC");
+	// city = city.replaceAll("Ü", "\u00DC");
+	// city = city.replaceAll("ä", "\u00E4");
+	// city = city.replaceAll("Ä", "\u00C4");
+	// city = city.replaceAll("ö", "\u00F6");
+	// city = city.replaceAll("Ö", "\u00D6");
+	// city = city.replaceAll("ß", "\u00df");
+	// city = city.replaceAll(" ", "_");
+	// return city;
+	// }
+	//
+	// private String formatStringForUTF8(String city) {
+	//
+	// city = city.replaceAll("ü", "%C3%BC");
+	// city = city.replaceAll("Ü", "%C3%9C");
+	// city = city.replaceAll("ä", "%C3%A4");
+	// city = city.replaceAll("Ä", "%C3%84");
+	// city = city.replaceAll("ö", "%C3%B6");
+	// city = city.replaceAll("Ö", "%C3%96");
+	// city = city.replaceAll("ß", "%C3%9F");
+	// city = city.replaceAll(" ", "_");
+	// return city;
+	// }
+
 	public String matchSingleAuftraggeber(String auftrag, String ort, Abgeordneter mdb) {
-		
+
 		String auftraggeber = "";
-		
+
 		try {
-			
-			String encodedAuftrag = URLEncoder.encode(auftrag,"UTF-8");
+
+			String encodedAuftrag = URLEncoder.encode(auftrag, "UTF-8");
 			String encodedOrt = "";
-			if(ort != null) {
-				encodedOrt = URLEncoder.encode(ort,"UTF-8");
+			if (ort != null) {
+				encodedOrt = URLEncoder.encode(ort, "UTF-8");
 			} else {
 				encodedOrt = "";
 			}
-			
-//			Document doc = Jsoup
-//					.connect("http://www.bing.com/search?q="+encodedAuftrag+"+"+encodedOrt)
-//					.userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:17.0) Gecko/20100101 Firefox/17.0")
-//					.timeout(20000)
-//					.get();
+
+			// Document doc = Jsoup
+			// .connect("http://www.bing.com/search?q="+encodedAuftrag+"+"+encodedOrt)
+			// .userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:17.0) Gecko/20100101 Firefox/17.0")
+			// .timeout(20000)
+			// .get();
 			URL url = null;
-			if(auftrag.toLowerCase().contains("selbständig") || auftrag.toLowerCase().contains("rechtsanw") || auftrag.toLowerCase().contains("landwirt") ) {
-				url = new URL("http://www.bing.com/search?q="+encodedAuftrag+"+"+encodedOrt+"+"+
-						URLEncoder.encode(mdb.getForename(),"UTF-8")+"+"+
-						URLEncoder.encode(mdb.getLastname(),"UTF-8"));
+			if (auftrag.toLowerCase().contains("selbständig") || auftrag.toLowerCase().contains("rechtsanw")
+					|| auftrag.toLowerCase().contains("landwirt")) {
+				url = new URL("http://www.bing.com/search?q=" + encodedAuftrag + "+" + encodedOrt + "+"
+						+ URLEncoder.encode(mdb.getForename(), "UTF-8") + "+"
+						+ URLEncoder.encode(mdb.getLastname(), "UTF-8"));
 			} else {
-				url = new URL("http://www.bing.com/search?q="+encodedAuftrag+"+"+encodedOrt);
+				url = new URL("http://www.bing.com/search?q=" + encodedAuftrag + "+" + encodedOrt);
 			}
-			
-			
-			//connecting via proxy, saving the html to a string, parsing it with jsoup
+
+			// connecting via proxy, saving the html to a string, parsing it
+			// with jsoup
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("91.187.132.13", 8080));
-			HttpURLConnection uc = (HttpURLConnection)url.openConnection(proxy);
+			HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
 			uc.setConnectTimeout(60000);
 			uc.connect();
 			String line = null;
 			StringBuffer tmp = new StringBuffer();
 			BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
-			
+
 			while ((line = in.readLine()) != null) {
 				tmp.append(line);
 			}
-		
+
 			Document doc = Jsoup.parse(String.valueOf(tmp));
-			
+
 			Element searchResults = doc.getElementById("results");
 			Element firstHit = searchResults.select("div.sb_tlst h3 a").first();
-			//System.out.println(firstHit.html());
-			if(firstHit != null) {
+			// System.out.println(firstHit.html());
+			if (firstHit != null) {
 				return firstHit.attr("href");
 			} else {
 				System.out.println(url);
@@ -762,111 +745,107 @@ public class BundestagConverter {
 		} catch (IOException ioe) {
 			System.out.println("Failed to match " + auftrag);
 			ioe.printStackTrace();
-			
+
 		} catch (UnsupportedCharsetException uce) {
 			System.out.println("Charset UTF-8 not supported by System");
 		}
 
 		return auftraggeber;
 	}
-	
+
 	public List<Abgeordneter> matchAllAuftraggeber(List<Abgeordneter> mdbs) {
-		
+
 		int count = 0;
 		for (Abgeordneter mdb : mdbs) {
-			
-			if(mdb.getNebentaetigkeiten().size()>0) {
+
+			if (mdb.getNebentaetigkeiten().size() > 0) {
 				count++;
-//				if(count>50) {
-					System.out.println("Matching Auftraggeber " + count + " of 209 " + mdb.getLastname());
-					String tempAuftrag = "";
-					String tempUri = "";
-					for(Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
-	
-						String auftragUri = "";
-						
-						if(!tempAuftrag.equals(neben.getAuftraggeber())) {
-							
-							auftragUri = matchSingleAuftraggeber(neben.getAuftraggeber(), neben.getPlace(), mdb);
-							tempAuftrag = neben.getAuftraggeber();
-							tempUri = auftragUri;
-							wait(500);
-						} else {
-							auftragUri = tempUri;
-						}
-						
-						
-						if(auftragUri.length()!=0) neben.setAuftragUri(auftragUri);
+				// if(count>50) {
+				System.out.println("Matching Auftraggeber " + count + " of 209 " + mdb.getLastname());
+				String tempAuftrag = "";
+				String tempUri = "";
+				for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
+
+					String auftragUri = "";
+
+					if (!tempAuftrag.equals(neben.getAuftraggeber())) {
+
+						auftragUri = matchSingleAuftraggeber(neben.getAuftraggeber(), neben.getPlace(), mdb);
+						tempAuftrag = neben.getAuftraggeber();
+						tempUri = auftragUri;
+						wait(500);
+					} else {
+						auftragUri = tempUri;
 					}
-//				}
-			}	
+
+					if (auftragUri.length() != 0)
+						neben.setAuftragUri(auftragUri);
+				}
+				// }
+			}
 		}
-		
+
 		return mdbs;
-		
+
 	}
 
 	public List<Abgeordneter> getAbgeordnete() {
 		return this.mdbs;
 	}
-	
+
 	private List<String> readCityFile(String path) {
 		List<String> cities = new ArrayList<String>();
-		try{
+		try {
 
-			  FileInputStream fstream = new FileInputStream(path);
+			FileInputStream fstream = new FileInputStream(path);
 
-			  DataInputStream in = new DataInputStream(fstream);
-			  BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			  String strLine;
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String strLine;
 
-			  while ((strLine = br.readLine()) != null)   {
-				  cities.add(strLine.trim());
-			  }
-			  //Close the input stream
-			  in.close();
-			    }catch (Exception e){//Catch exception if any
-			  System.err.println("Error: " + e.getMessage());
-			  }
+			while ((strLine = br.readLine()) != null) {
+				cities.add(strLine.trim());
+			}
+			// Close the input stream
+			in.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
 		return cities;
 	}
-	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedEncodingException {
 		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-				false);
-		
-		int count = 0;
-		
-		List<Abgeordneter> mdbs = conv.getAbgeordnete();
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
+
+//		// int count = 0;
+//		List<Abgeordneter> mdbs = conv.getAbgeordnete();
 //		List<String[]> places = conv.getGermanCityNames();
 //		mdbs = conv.setAllPlaceUris(mdbs, places);
-//		for(Abgeordneter mdb : mdbs) {
+//		for (Abgeordneter mdb : mdbs) {
 //			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 //		}
 //		mdbs = conv.matchAllAuftraggeber(mdbs);
-//		
-//		for(Abgeordneter mdb : mdbs) {
+//
+//		for (Abgeordneter mdb : mdbs) {
 //			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 //		}
-		
-		conv.writeNebentaetigkeitenToFile(mdbs);
-		
-//		for (Abgeordneter mdb : conv.getAbgeordnete()) {
-//			
-//			if(mdb.getNebentaetigkeiten().size()>0) {
-//				System.out.println(mdb.getForename()+" "+mdb.getLastname());
-//				for(Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
-//					System.out.println(neben.getAuftraggeber());
-//					System.out.println(neben.getPlace());
-//					System.out.println(neben.getType());
-//					System.out.println(neben.getPlaceUri());
-//					System.out.println(neben.getLatitude());
-//				}
-//			}
-//		}	
+//
+//		conv.writeNebentaetigkeitenToFile(mdbs);
 
+		// for (Abgeordneter mdb : conv.getAbgeordnete()) {
+		//
+		// if(mdb.getNebentaetigkeiten().size()>0) {
+		// System.out.println(mdb.getForename()+" "+mdb.getLastname());
+		// for(Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
+		// System.out.println(neben.getAuftraggeber());
+		// System.out.println(neben.getPlace());
+		// System.out.println(neben.getType());
+		// System.out.println(neben.getPlaceUri());
+		// System.out.println(neben.getLatitude());
+		// }
+		// }
+		// }
 
 		// SpendenParser spend = new SpendenParser();
 		// spend.parseSpenden("spenden.csv");
@@ -878,6 +857,8 @@ public class BundestagConverter {
 		// }
 		// }
 		// System.out.println("CDU spenden: " + CDU);
+
+		System.out.println(URLEncoder.encode("Perfor".toLowerCase(), "UTF-8"));
 
 	}
 

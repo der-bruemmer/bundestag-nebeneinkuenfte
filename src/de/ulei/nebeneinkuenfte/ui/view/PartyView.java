@@ -20,6 +20,7 @@ public class PartyView extends AbstractView {
 	public PartyView() {
 
 		super();
+		setCaption(String.valueOf(IConstants.PERSON_PARTY_VIEW));
 		buildNavigationSection();
 		addTableListener();
 
