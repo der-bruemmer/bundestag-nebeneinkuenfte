@@ -47,9 +47,6 @@ public class RDFModel {
 	private final String GRUENE_FRAKTION = "http://www.gruene-bundestag.de/";
 	private final String GRUENE_LABEL = "Bündnis 90/Die Grünen";
 
-	// prefix
-	private final String PREFIX = "";
-
 	// model
 	private OntModel model;
 
@@ -328,7 +325,7 @@ public class RDFModel {
 		place.addProperty(RDFS.label,
 				model.createTypedLiteral(nebentaetigkeit.getPlace() != null ? nebentaetigkeit.getPlace() : "unbekannt"));
 		place.addProperty(propGeoLat, model.createTypedLiteral(nebentaetigkeit.getLatitude()));
-		place.addProperty(propGeoLat, model.createTypedLiteral(nebentaetigkeit.getLongitude()));
+		place.addProperty(propGeoLong, model.createTypedLiteral(nebentaetigkeit.getLongitude()));
 
 		return place;
 	}

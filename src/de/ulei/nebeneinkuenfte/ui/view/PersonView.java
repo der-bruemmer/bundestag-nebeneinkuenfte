@@ -13,13 +13,11 @@ public class PersonView extends AbstractView {
 
 	private static final long serialVersionUID = 7516205383090694072L;
 
-	private Button gobBackButton;
 	private Button openOriginButton;
 	private Button openMapButton;
-
+	
 	public PersonView() {
 
-		setCaption(String.valueOf(IConstants.PERSON_PERSON_VIEW));
 		createNavigationSection();
 		addTableListener();
 
@@ -50,19 +48,13 @@ public class PersonView extends AbstractView {
 
 	private void createNavigationSection() {
 
-		gobBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON, this);
-		
 		openMapButton = ButtonFactory.getButton(ButtonFactory.OPEN_MAP_BUTTON, this);
-		
+
 		openOriginButton = ButtonFactory.getButton(ButtonFactory.OPEN_ORIGIN_BUTTON, this);
 		openOriginButton.setEnabled(false);
 
-	
-		
-		navigationBar.addButton(gobBackButton);
 		navigationBar.addButton(openMapButton);
 		navigationBar.addButton(openOriginButton);
-		
 
 	}
 
@@ -90,5 +82,5 @@ public class PersonView extends AbstractView {
 	public void enableOpenOriginButton(boolean isEnabled) {
 		openOriginButton.setEnabled(isEnabled);
 	}
-	
+
 }

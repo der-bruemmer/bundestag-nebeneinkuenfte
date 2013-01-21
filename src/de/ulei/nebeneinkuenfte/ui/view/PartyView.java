@@ -13,7 +13,6 @@ public class PartyView extends AbstractView {
 
 	private static final long serialVersionUID = -2940244509197959534L;
 
-	private Button goBackButton;
 	private Button openPersonButton;
 	private Button openOriginButton;
 
@@ -53,15 +52,12 @@ public class PartyView extends AbstractView {
 
 	private void buildNavigationSection() {
 
-		goBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON, this);
-
 		openPersonButton = ButtonFactory.getButton(ButtonFactory.OPEN_PERSON_BUTTON, this);
 		openPersonButton.setEnabled(false);
 
 		openOriginButton = ButtonFactory.getButton(ButtonFactory.OPEN_ORIGIN_BUTTON, this);
 		openOriginButton.setEnabled(false);
 
-		navigationBar.addButton(goBackButton);
 		navigationBar.addButton(openPersonButton);
 		navigationBar.addButton(openOriginButton);
 

@@ -3,7 +3,6 @@ package de.ulei.nebeneinkuenfte.ui.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.Stack;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
@@ -30,7 +29,7 @@ public class MainController implements IActionListener {
 	private static final long serialVersionUID = -2602673556758294975L;
 
 	private List<Abgeordneter> mdbList;
-	private Stack<Object[]> historyStack;
+	private String actualObjectURI;
 
 	private BasicController basicController;
 	private PersonController personController;
@@ -58,7 +57,6 @@ public class MainController implements IActionListener {
 		mdbList = conv.getAbgeordnete();
 
 		this.mainFrame = mainFrame;
-		this.historyStack = new Stack<Object[]>();
 
 		// creates views
 		impressumView = new ImpressumView();
@@ -96,9 +94,7 @@ public class MainController implements IActionListener {
 	public void handleAction(ActionEvent event) {
 
 		switch (event.getActionType()) {
-		case GO_BACK:
-			handleBack();
-			break;
+
 		case OPEN_PERSON_BASIC:
 			openPersonBasicView();
 			break;
@@ -117,15 +113,6 @@ public class MainController implements IActionListener {
 
 	}
 
-	private void handleBack() {
-
-		if (historyStack.size() >= 2) {
-			historyStack.pop();
-			goBack(historyStack.peek());
-		}
-
-	}
-
 	private void openPersonBasicView() {
 
 		BeanItemContainer<Abgeordneter> container = new BeanItemContainer<Abgeordneter>(Abgeordneter.class);
@@ -135,7 +122,6 @@ public class MainController implements IActionListener {
 
 		basicView.setPersonContainerDataSource(container);
 		setActualPersonView(basicView, basicController);
-		goForward(IConstants.PERSON_BASIC_VIEW, null);
 
 		// set URI fragment
 		NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_BASIC_VIEW_FRAG);
@@ -155,14 +141,11 @@ public class MainController implements IActionListener {
 			if (actualSideJob != null) {
 
 				// null check for origin
-				if (actualSideJob.getAuftraggeber() != null) {
+				if (actualSideJob.getAuftraggeber() != null)
 
 					// open PartyView
 					openPersonOriginView(actualSideJob.getAuftraggeber());
 
-					// save state
-					goForward(IConstants.PERSON_ORIGIN_VIEW, actualSideJob.getAuftraggeber());
-				}
 			}
 
 		}
@@ -177,14 +160,11 @@ public class MainController implements IActionListener {
 			if (actualSideJob != null) {
 
 				// null check for origin
-				if (actualSideJob.getAuftraggeber() != null) {
+				if (actualSideJob.getAuftraggeber() != null)
 
 					// open PartyView
 					openPersonOriginView(actualSideJob.getAuftraggeber());
 
-					// save state
-					goForward(IConstants.PERSON_ORIGIN_VIEW, actualSideJob.getAuftraggeber());
-				}
 			}
 
 		}
@@ -220,15 +200,10 @@ public class MainController implements IActionListener {
 			AbstractPersonController controller = (AbstractPersonController) getActualController();
 			actualPerson = controller.getActualPerson();
 
-			if (actualPerson != null) {
+			if (actualPerson != null)
 
 				// open PersonView
 				openPersonPersonView(actualPerson);
-
-				// save state
-				goForward(IConstants.PERSON_PERSON_VIEW, actualPerson);
-
-			}
 
 		} else
 
@@ -239,15 +214,10 @@ public class MainController implements IActionListener {
 			AbstractFraktionAuftraggeberController controller = (AbstractFraktionAuftraggeberController) getActualController();
 			actualPerson = controller.getActualPerson();
 
-			if (actualPerson != null) {
+			if (actualPerson != null)
 
 				// open PersonView
 				openPersonPersonView(actualPerson);
-
-				// save state
-				goForward(IConstants.PERSON_PERSON_VIEW, actualPerson);
-
-			}
 
 		}
 	}
@@ -278,8 +248,8 @@ public class MainController implements IActionListener {
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
 
-		NebeneinkuenfteApplication.getInstance().setURIFragment(
-				person.getURI().substring(person.getURI().indexOf("#") + 1));
+		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("#") + 1));
+		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
 
@@ -296,14 +266,11 @@ public class MainController implements IActionListener {
 			if (actualPerson != null) {
 
 				// null check for fraktion
-				if (actualPerson.getFraktionUri() != null) {
+				if (actualPerson.getFraktionUri() != null)
 
 					// open PartyView
 					openPersonPartyView(actualPerson.getFraktionUri());
 
-					// save state
-					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktionUri());
-				}
 			}
 
 		} else
@@ -317,14 +284,11 @@ public class MainController implements IActionListener {
 			if (actualPerson != null) {
 
 				// null check for fraktion
-				if (actualPerson.getFraktionUri() != null) {
+				if (actualPerson.getFraktionUri() != null)
 
 					// open PartyView
 					openPersonPartyView(actualPerson.getFraktionUri());
 
-					// save state
-					goForward(IConstants.PERSON_PARTY_VIEW, actualPerson.getFraktion());
-				}
 			}
 
 		}
@@ -349,7 +313,9 @@ public class MainController implements IActionListener {
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
-		NebeneinkuenfteApplication.getInstance().setURIFragment(fractionURI.substring(fractionURI.indexOf("#") + 1));
+		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("#") + 1));
+		System.out.println(fractionURI.substring(fractionURI.indexOf("#") + 1));
+		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
 
@@ -383,42 +349,6 @@ public class MainController implements IActionListener {
 
 	public void setActualController(AbstractController actualController) {
 		this.actualController = actualController;
-	}
-
-	private void goBack(Object[] state) {
-
-		if (state != null) {
-
-			int view = (Integer) state[0];
-
-			switch (view) {
-			case IConstants.PERSON_BASIC_VIEW:
-				openPersonBasicView();
-				break;
-			case IConstants.PERSON_PERSON_VIEW:
-				openPersonPersonView((Abgeordneter) state[1]);
-				break;
-			case IConstants.PERSON_PARTY_VIEW:
-				openPersonPartyView((String) state[1]);
-				break;
-			case IConstants.PERSON_ORIGIN_VIEW:
-				openPersonOriginView((String) state[1]);
-				break;
-
-			default:
-				break;
-			}
-
-		}
-
-	}
-
-	private void goForward(int view, Object object) {
-		historyStack.push(new Object[] { view, object });
-	}
-
-	public Object[] getLastStackElement() {
-		return historyStack.lastElement();
 	}
 
 	public void handleURIFragment(String fragment) {
@@ -458,11 +388,21 @@ public class MainController implements IActionListener {
 					mainFrame.selectTab(aboutProjectView);
 				}
 
+			} else {
+				mainFrame.selectTab(aboutProjectView);
 			}
 
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	public String getActualObjectURI() {
+		return actualObjectURI;
+	}
+
+	public void setActualObjectURI(String actualObjectURI) {
+		this.actualObjectURI = actualObjectURI;
 	}
 }

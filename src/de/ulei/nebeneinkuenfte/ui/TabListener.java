@@ -21,10 +21,12 @@ public class TabListener implements SelectedTabChangeListener {
 				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_BASIC_VIEW_FRAG);
 				break;
 			case IConstants.PERSON_PERSON_VIEW:
-				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_PERSON_VIEW_FRAG);
+				NebeneinkuenfteApplication.getInstance().setURIFragment(
+						NebeneinkuenfteApplication.getInstance().getMainController().getActualObjectURI());
 				break;
 			case IConstants.PERSON_PARTY_VIEW:
-				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_PARTY_VIEW_FRAG);
+				NebeneinkuenfteApplication.getInstance().setURIFragment(
+						NebeneinkuenfteApplication.getInstance().getMainController().getActualObjectURI());
 				break;
 			case IConstants.PERSON_ORIGIN_VIEW:
 				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_ORIGIN_VIEW_FRAG);

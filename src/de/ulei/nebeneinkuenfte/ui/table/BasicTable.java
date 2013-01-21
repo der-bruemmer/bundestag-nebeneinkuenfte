@@ -50,7 +50,7 @@ public class BasicTable extends FilterTable {
 	protected Object getPropertyValue(Object rowId, Object colId, Property property) {
 
 		// handle homepage link
-		if (colId.equals("homepage")) {
+		if (colId.equals("homepage") ||colId.equals("auftraggeberHomepage")) {
 
 			Link link;
 			String url = (String) property.getValue();

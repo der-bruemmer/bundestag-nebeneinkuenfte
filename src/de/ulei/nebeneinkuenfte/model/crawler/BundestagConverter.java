@@ -22,6 +22,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.google.gwt.dev.util.collect.HashMap;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -39,6 +41,7 @@ import com.hp.hpl.jena.query.ResultSet;
 
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class BundestagConverter {
 
@@ -89,7 +92,7 @@ public class BundestagConverter {
 						failed.add(mdb.getURI());
 					}
 				}
-				mdb.setURI(mdb.getForename(), mdb.getLastname());
+				mdb.setFinalURI();
 				this.writeMdBObjectToFile(path, mdb);
 				System.out.println("Parsed Mdb " + count + " of " + this.mdbs.size());
 				// if(count==50) break;
@@ -662,6 +665,76 @@ public class BundestagConverter {
 		return mdbs;
 	}
 
+	public List<Abgeordneter> setAllSourceUris(List<Abgeordneter> mdbs) {
+
+		/*
+		 * merge all different captions for one URI and put result to map
+		 */
+		Map<String, String> captionMap = new HashMap<String, String>();
+
+		for (Abgeordneter mdb : mdbs) {
+			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+				captionMap.put(nt.getAuftragUri(), nt.getAuftraggeber());
+			}
+		}
+
+		/*
+		 * set new URI, homepage and caption for each sideline job
+		 */
+
+		String actualURI;
+		Map<String, Integer> indexMap = new HashMap<String, Integer>();
+
+		// indexID for resources without an URI for the source
+		// index count is higher than captionMapsize to avoid conflicts
+		int unKnownIndexID = captionMap.size() + 1;
+		int knownIndexID = 0;
+
+		for (Abgeordneter mdb : mdbs) {
+			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+
+				actualURI = "";
+				actualURI = actualURI.concat(IConstants.NAMESPACE);
+				actualURI = actualURI.concat("#");
+				actualURI = actualURI.concat(IConstants.PERSON_ORIGIN_VIEW_FRAG);
+				actualURI = actualURI.concat("/");
+
+				// no URI was found for source URI
+				if (nt.getAuftragUri() == null) {
+
+					actualURI = actualURI.concat(String.valueOf(unKnownIndexID++));
+					nt.setAuftragUri(actualURI);
+					nt.setAuftraggeber("unbekannt");
+					continue;
+
+				}
+
+				// source URI is not in the map so use indexID and increment it
+				if (indexMap.get(nt.getAuftragUri()) == null) {
+
+					indexMap.put(nt.getAuftragUri(), knownIndexID);
+					actualURI = actualURI.concat(String.valueOf(knownIndexID++));
+
+				}
+
+				// source URI is already in the map so get and set the according
+				// indexID
+				else {
+					actualURI = actualURI.concat(String.valueOf(indexMap.get(nt.getAuftragUri())));
+				}
+
+				// set values
+				nt.setAuftraggeberHomepage(nt.getAuftragUri());
+				nt.setAuftraggeber(captionMap.get(nt.getAuftragUri()));
+				nt.setAuftragUri(actualURI);
+
+			}
+		}
+
+		return mdbs;
+
+	}
+
 	// private String formatStringForUnicode(String city) {
 	//
 	// city = city.replaceAll("ü", "\u00FC");
@@ -815,37 +888,45 @@ public class BundestagConverter {
 	}
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
+
+		/*
+		 * crawl all parliament members
+		 */
+
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
+		List<Abgeordneter> mdbs = conv.getAbgeordnete();
 
-//		// int count = 0;
-//		List<Abgeordneter> mdbs = conv.getAbgeordnete();
-//		List<String[]> places = conv.getGermanCityNames();
-//		mdbs = conv.setAllPlaceUris(mdbs, places);
-//		for (Abgeordneter mdb : mdbs) {
-//			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-//		}
-//		mdbs = conv.matchAllAuftraggeber(mdbs);
-//
-//		for (Abgeordneter mdb : mdbs) {
-//			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-//		}
-//
-//		conv.writeNebentaetigkeitenToFile(mdbs);
+		/*
+		 * try to find latitude and longitude data for given citys
+		 */
 
-		// for (Abgeordneter mdb : conv.getAbgeordnete()) {
-		//
-		// if(mdb.getNebentaetigkeiten().size()>0) {
-		// System.out.println(mdb.getForename()+" "+mdb.getLastname());
-		// for(Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
-		// System.out.println(neben.getAuftraggeber());
-		// System.out.println(neben.getPlace());
-		// System.out.println(neben.getType());
-		// System.out.println(neben.getPlaceUri());
-		// System.out.println(neben.getLatitude());
+		// List<String[]> places = conv.getGermanCityNames();
+		// mdbs = conv.setAllPlaceUris(mdbs, places);
+		// for (Abgeordneter mdb : mdbs) {
+		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 		// }
+
+		/*
+		 * try to match sources
+		 */
+
+		// mdbs = conv.matchAllAuftraggeber(mdbs);
+		// for (Abgeordneter mdb : mdbs) {
+		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 		// }
-		// }
+
+		/*
+		 * try to set source URIs
+		 */
+
+		mdbs = conv.setAllSourceUris(mdbs);
+
+		for (Abgeordneter mdb : mdbs) {
+			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+		}
+
+		// conv.writeNebentaetigkeitenToFile(mdbs);
 
 		// SpendenParser spend = new SpendenParser();
 		// spend.parseSpenden("spenden.csv");
@@ -858,8 +939,5 @@ public class BundestagConverter {
 		// }
 		// System.out.println("CDU spenden: " + CDU);
 
-		System.out.println(URLEncoder.encode("Perfor".toLowerCase(), "UTF-8"));
-
 	}
-
 }

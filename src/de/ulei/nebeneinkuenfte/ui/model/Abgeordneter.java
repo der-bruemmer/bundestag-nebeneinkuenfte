@@ -1,8 +1,6 @@
 package de.ulei.nebeneinkuenfte.ui.model;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,24 +52,16 @@ public class Abgeordneter implements Serializable {
 		return uri;
 	}
 
-	public void setURI(String forename, String lastname) {
+	public void setFinalURI() {
 
-		try {
+		String finalURI = "";
 
-			String URI = "";
-			URI = URI.concat(IConstants.NAMESPACE);
-			URI = URI.concat("#");
-			URI = URI.concat(IConstants.PERSON_PERSON_VIEW_FRAG);
-			URI = URI.concat("/");
-			URI = URI.concat(URLEncoder.encode(forename.toLowerCase(), "UTF-8"));
-			URI = URI.concat("_");
-			URI = URI.concat(URLEncoder.encode(lastname.toLowerCase(), "UTF-8"));
+		finalURI = finalURI.concat(IConstants.NAMESPACE);
+		finalURI = finalURI.concat("#");
+		finalURI = finalURI.concat(IConstants.PERSON_PERSON_VIEW_FRAG);
+		finalURI = finalURI.concat(getURI().substring(getURI().lastIndexOf("/"), getURI().lastIndexOf(".")));
 
-			setURI(URI);
-
-		} catch (UnsupportedEncodingException e) {
-			System.out.println("Charset UTF-8 not supported by System");
-		}
+		setURI(finalURI);
 
 	}
 
