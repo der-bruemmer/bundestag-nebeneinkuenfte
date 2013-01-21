@@ -21,10 +21,6 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 	private MainController mainController;
 	private UriFragmentUtility urifu = new UriFragmentUtility();
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	/*
 	 * thread local creates a static NebeneinkuenfteApplication instance of the
 	 * current session which is accessible with
@@ -55,11 +51,18 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 
 				String fragment = source.getUriFragmentUtility().getFragment();
 				if (fragment != null) {
+					if (fragment.equals("lala"))
+						openFile();
 					mainController.handleURIFragment(fragment);
 				}
 			}
+
 		});
 
+	}
+
+	private void openFile() {
+		String url = getContext().getBaseDirectory() + "/lala";
 	}
 
 	public static NebeneinkuenfteApplication getInstance() {
@@ -88,7 +91,7 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 		// setting this instance of NebeneinkuenfteApplication as ThreadLocal
 		NebeneinkuenfteApplication.setInstance(this);
 		// get initial URI fragment at app init
-		urifu.setFragment(request.getParameter("fr"), true);
+		setURIFragment(request.getParameter("fr"));
 
 	}
 
@@ -100,16 +103,31 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 
 	}
 
+	public void setURIFragment(String newFragment, boolean fireEvent) {
+		urifu.setFragment(newFragment.toLowerCase(), fireEvent);
+	}
+
 	public void setURIFragment(String newFragment) {
-		urifu.setFragment(newFragment.toLowerCase());
+
+		if (newFragment == null || newFragment.trim().isEmpty())
+			return;
+
+		if (newFragment.toLowerCase().equals(getURIFragment()))
+			urifu.setFragment(newFragment.toLowerCase(), false);
+
+		urifu.setFragment(newFragment.toLowerCase(), true);
 	}
 
 	public String getURIFragment() {
-		return urifu.getFragment().toLowerCase();
+		return urifu.getFragment() != null ? urifu.getFragment().toLowerCase() : "";
 	}
 
 	public URL getURL() {
 		return super.getURL();
+	}
+
+	public MainController getMainController() {
+		return mainController;
 	}
 
 }

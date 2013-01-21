@@ -15,7 +15,6 @@ public class ButtonFactory {
 	public static final int OPEN_ORIGIN_BUTTON = 2;
 	public static final int OPEN_BASIC_BUTTON = 3;
 	public static final int OPEN_MAP_BUTTON = 4;
-	public static final int GO_BACK_BUTTON = 5;
 
 	public static Button getButton(int buttonType, AbstractView view) {
 
@@ -30,30 +29,10 @@ public class ButtonFactory {
 			return getOpenBasicButton(view);
 		case OPEN_MAP_BUTTON:
 			return getOpenMapButton(view);
-		case GO_BACK_BUTTON:
-			return getGoBackButton(view);
 		default:
 			return null;
 		}
 
-	}
-
-	private static Button getGoBackButton(final AbstractView view) {
-
-		Button goBackButton = new Button("Return");
-		goBackButton.setIcon(new ThemeResource("icons/16/edit-undo.png"));
-		goBackButton.addListener(new Button.ClickListener() {
-
-			private static final long serialVersionUID = -6745818656464476271L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				view.fireEvent(ActionType.GO_BACK);
-
-			}
-		});
-
-		return goBackButton;
 	}
 
 	private static Button getOpenMapButton(final AbstractView view) {

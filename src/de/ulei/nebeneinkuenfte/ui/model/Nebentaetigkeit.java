@@ -3,11 +3,13 @@ package de.ulei.nebeneinkuenfte.ui.model;
 import java.io.Serializable;
 
 public class Nebentaetigkeit implements Serializable {
-	
+
 	private static final long serialVersionUID = -2834030362807009074L;
-	
+
 	private String auftraggeber;
+	private String auftraggeberHomepage;
 	private String auftragUri;
+
 	private String type;
 	private String place;
 	private String placeUri;
@@ -18,11 +20,11 @@ public class Nebentaetigkeit implements Serializable {
 	private boolean isYearly = false;
 	private String stufe;
 	private String sourceString;
-	
+
 	public Nebentaetigkeit() {
-		
+
 	}
-	
+
 	public Nebentaetigkeit(Nebentaetigkeit nt) {
 		this.auftraggeber = nt.getAuftraggeber();
 		this.auftragUri = nt.getAuftragUri();
@@ -34,9 +36,7 @@ public class Nebentaetigkeit implements Serializable {
 		this.stufe = nt.getStufe();
 		this.sourceString = nt.getSourceString();
 	}
-	
-	
-	
+
 	public boolean isYearly() {
 		return isYearly;
 	}
@@ -77,6 +77,14 @@ public class Nebentaetigkeit implements Serializable {
 		this.auftragUri = auftragUri;
 	}
 
+	public String getAuftraggeberHomepage() {
+		return auftraggeberHomepage;
+	}
+
+	public void setAuftraggeberHomepage(String auftraggeberHomepage) {
+		this.auftraggeberHomepage = auftraggeberHomepage;
+	}
+
 	public boolean isMonthly() {
 		return isMonthly;
 	}
@@ -88,11 +96,11 @@ public class Nebentaetigkeit implements Serializable {
 	public String getSourceString() {
 		return sourceString;
 	}
-	
+
 	public void setSourceString(String source) {
 		this.sourceString = source;
 	}
-	
+
 	public String getPlace() {
 		return place;
 	}
@@ -108,9 +116,9 @@ public class Nebentaetigkeit implements Serializable {
 	public void setAuftraggeber(String auftraggeber) {
 		this.auftraggeber = auftraggeber;
 	}
-	
+
 	public void appendAuftraggeber(String auftraggeber) {
-		if(this.auftraggeber == null) {
+		if (this.auftraggeber == null) {
 			this.auftraggeber = auftraggeber;
 		} else {
 			this.auftraggeber += ", " + auftraggeber;
@@ -124,10 +132,10 @@ public class Nebentaetigkeit implements Serializable {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public void appendType(String type) {
-		if(type != null) {
-			if(this.type == null) {
+		if (type != null) {
+			if (this.type == null) {
 				this.type = type;
 			} else {
 				this.type += ", " + type;
@@ -150,5 +158,5 @@ public class Nebentaetigkeit implements Serializable {
 	public void setStufe(String stufe) {
 		this.stufe = stufe;
 	}
-	
+
 }

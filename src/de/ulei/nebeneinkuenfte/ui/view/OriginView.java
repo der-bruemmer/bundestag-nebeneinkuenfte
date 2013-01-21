@@ -13,7 +13,6 @@ public class OriginView extends AbstractView {
 
 	private static final long serialVersionUID = -1127511264494383725L;
 
-	private Button gobBackButton;
 	private Button openPersonButton;
 	private Button openPartyButton;
 
@@ -39,8 +38,7 @@ public class OriginView extends AbstractView {
 				if (event.isDoubleClick()) {
 					if (event.getPropertyId().equals("fraktion")) {
 						fireEvent(ActionType.OPEN_PERSON_PARTY);
-					} else if (event.getPropertyId().equals("forename")
-							|| event.getPropertyId().equals("lastname")) {
+					} else if (event.getPropertyId().equals("forename") || event.getPropertyId().equals("lastname")) {
 						fireEvent(ActionType.OPEN_PERSON_PERSON);
 					}
 				}
@@ -53,18 +51,12 @@ public class OriginView extends AbstractView {
 
 	private void createNavigationSection() {
 
-		gobBackButton = ButtonFactory.getButton(ButtonFactory.GO_BACK_BUTTON,
-				this);
-
-		openPersonButton = ButtonFactory.getButton(
-				ButtonFactory.OPEN_PERSON_BUTTON, this);
+		openPersonButton = ButtonFactory.getButton(ButtonFactory.OPEN_PERSON_BUTTON, this);
 		openPersonButton.setEnabled(false);
 
-		openPartyButton = ButtonFactory.getButton(
-				ButtonFactory.OPEN_PARTY_BUTTON, this);
+		openPartyButton = ButtonFactory.getButton(ButtonFactory.OPEN_PARTY_BUTTON, this);
 		openPartyButton.setEnabled(false);
 
-		navigationBar.addButton(gobBackButton);
 		navigationBar.addButton(openPersonButton);
 		navigationBar.addButton(openPartyButton);
 
@@ -77,8 +69,7 @@ public class OriginView extends AbstractView {
 
 	}
 
-	public void setOriginContainerDataSource(
-			BeanItemContainer<FraktionAuftraggeber> container) {
+	public void setOriginContainerDataSource(BeanItemContainer<FraktionAuftraggeber> container) {
 
 		basicTable.setContainerDataSource(container);
 		updateTable();

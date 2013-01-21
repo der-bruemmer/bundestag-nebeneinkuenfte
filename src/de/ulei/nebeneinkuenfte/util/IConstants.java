@@ -74,10 +74,10 @@ public interface IConstants {
 	public static String[] ABGEORDNETER_COLUMN_HEADER = new String[] { "Vorname", "Nachname", "Homepage", "Email",
 			"Fraktion", "Wahlkreis", "Zusatzeinkommen (min)", "Zusatzeinkommen (max)" };
 
-	public static String[] NEBENTAETIGKEIT_VISIBLE_COLUMNS = new String[] { "auftraggeber", "type", "place", "year",
+	public static String[] NEBENTAETIGKEIT_VISIBLE_COLUMNS = new String[] { "auftraggeber", "auftraggeberHomepage","type", "place", "year",
 			"stufe" };
 
-	public static String[] NEBENTAETIGKEIT_COLUMN_HEADER = new String[] { "Auftraggeber", "Art", "Ort", "Jahr", "Stufe" };
+	public static String[] NEBENTAETIGKEIT_COLUMN_HEADER = new String[] { "Auftraggeber", "Weiterführendes", "Art", "Ort", "Jahr", "Stufe" };
 
 	public static String[] FRAKTION_VISIBLE_COLUMNS = new String[] { "forename", "lastname", "auftraggeber", "type",
 			"place", "year", "stufe" };
