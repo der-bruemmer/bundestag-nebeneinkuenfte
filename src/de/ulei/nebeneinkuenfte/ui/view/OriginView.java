@@ -80,6 +80,8 @@ public class OriginView extends AbstractView {
 
 		basicTable.setVisibleColumns(IConstants.AUFTRAGGEBER_VISIBLE_COLUMNS);
 		basicTable.setColumnHeaders(IConstants.AUFTRAGGEBER_COLUMN_HEADER);
+		enableOpenPersonButton(false);
+		enableOpenPartyButton(false);
 
 	}
 

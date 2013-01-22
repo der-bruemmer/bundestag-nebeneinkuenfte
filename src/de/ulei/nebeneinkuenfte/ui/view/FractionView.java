@@ -9,17 +9,17 @@ import de.ulei.nebeneinkuenfte.ui.model.FraktionAuftraggeber;
 import de.ulei.nebeneinkuenfte.util.ActionType;
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class PartyView extends AbstractView {
+public class FractionView extends AbstractView {
 
 	private static final long serialVersionUID = -2940244509197959534L;
 
 	private Button openPersonButton;
 	private Button openOriginButton;
 
-	public PartyView() {
+	public FractionView() {
 
 		super();
-		setCaption(String.valueOf(IConstants.PERSON_PARTY_VIEW));
+		setCaption(String.valueOf(IConstants.PERSON_FRACTION_VIEW));
 		buildNavigationSection();
 		addTableListener();
 
@@ -81,7 +81,11 @@ public class PartyView extends AbstractView {
 
 		basicTable.setVisibleColumns(IConstants.FRAKTION_VISIBLE_COLUMNS);
 		basicTable.setColumnHeaders(IConstants.FRAKTION_COLUMN_HEADER);
+		basicTable.setSortContainerPropertyId("lastname");
+		basicTable.setSortAscending(true);
+		basicTable.setColumnCollapsed("auftraggeberHomepage", true);
 		enableOpenPersonButton(false);
+		enableOpenOriginButton(false);
 
 	}
 

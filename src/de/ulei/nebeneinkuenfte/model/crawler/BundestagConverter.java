@@ -920,12 +920,19 @@ public class BundestagConverter {
 		 * try to set source URIs
 		 */
 
-		mdbs = conv.setAllSourceUris(mdbs);
+		// mdbs = conv.setAllSourceUris(mdbs);
+
+		// for (Abgeordneter mdb : mdbs) {
+		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+		// }
 
 		for (Abgeordneter mdb : mdbs) {
-			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+				if (nt.getPlaceUri() == null)
+					System.out.println("found");
+			}
 		}
-
+		System.out.println("exit");
 		// conv.writeNebentaetigkeitenToFile(mdbs);
 
 		// SpendenParser spend = new SpendenParser();
