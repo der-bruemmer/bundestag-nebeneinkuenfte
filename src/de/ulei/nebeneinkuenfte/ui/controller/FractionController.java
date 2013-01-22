@@ -2,17 +2,17 @@ package de.ulei.nebeneinkuenfte.ui.controller;
 
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.FraktionAuftraggeber;
-import de.ulei.nebeneinkuenfte.ui.view.PartyView;
+import de.ulei.nebeneinkuenfte.ui.view.FractionView;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
 
-public class PartyController extends AbstractFraktionAuftraggeberController implements IActionListener {
+public class FractionController extends AbstractFraktionAuftraggeberController implements IActionListener {
 
 	private static final long serialVersionUID = 8779244993116572692L;
 
-	private PartyView partyView;
+	private FractionView partyView;
 
-	public PartyController(PartyView partyView) {
+	public FractionController(FractionView partyView) {
 
 		this.partyView = partyView;
 		this.partyView.addListener(this);

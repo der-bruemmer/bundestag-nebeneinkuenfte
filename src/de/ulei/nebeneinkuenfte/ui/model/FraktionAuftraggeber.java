@@ -14,6 +14,9 @@ public class FraktionAuftraggeber implements Serializable {
 	private String lastname;
 
 	private String auftraggeber;
+	private String auftraggeberHomepage;
+	private String auftragUri;
+
 	private String type;
 	private String place;
 	private float latitude;
@@ -29,6 +32,8 @@ public class FraktionAuftraggeber implements Serializable {
 		this.forename = abgeordneter.getForename();
 		this.lastname = abgeordneter.getLastname();
 		this.auftraggeber = nebentaetigkeit.getAuftraggeber();
+		this.auftraggeberHomepage = nebentaetigkeit.getAuftraggeberHomepage();
+		this.auftragUri = nebentaetigkeit.getAuftragUri();
 		this.type = nebentaetigkeit.getType();
 		this.place = nebentaetigkeit.getPlace();
 		this.year = nebentaetigkeit.getYear();
@@ -137,6 +142,22 @@ public class FraktionAuftraggeber implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getAuftraggeberHomepage() {
+		return auftraggeberHomepage;
+	}
+
+	public void setAuftraggeberHomepage(String auftraggeberHomepage) {
+		this.auftraggeberHomepage = auftraggeberHomepage;
+	}
+
+	public String getAuftragUri() {
+		return auftragUri;
+	}
+
+	public void setAuftragUri(String auftragUri) {
+		this.auftragUri = auftragUri;
 	}
 
 }

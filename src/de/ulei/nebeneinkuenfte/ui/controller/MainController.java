@@ -18,7 +18,7 @@ import de.ulei.nebeneinkuenfte.ui.view.AbstractView;
 import de.ulei.nebeneinkuenfte.ui.view.BasicView;
 import de.ulei.nebeneinkuenfte.ui.view.ImpressumView;
 import de.ulei.nebeneinkuenfte.ui.view.OriginView;
-import de.ulei.nebeneinkuenfte.ui.view.PartyView;
+import de.ulei.nebeneinkuenfte.ui.view.FractionView;
 import de.ulei.nebeneinkuenfte.ui.view.PersonView;
 import de.ulei.nebeneinkuenfte.util.ActionEvent;
 import de.ulei.nebeneinkuenfte.util.IActionListener;
@@ -33,7 +33,7 @@ public class MainController implements IActionListener {
 
 	private BasicController basicController;
 	private PersonController personController;
-	private PartyController partyController;
+	private FractionController partyController;
 	private OriginController originController;
 
 	private ImpressumView impressumView;
@@ -41,7 +41,7 @@ public class MainController implements IActionListener {
 
 	private BasicView basicView;
 	private PersonView personView;
-	private PartyView partyView;
+	private FractionView partyView;
 	private OriginView originView;
 
 	private AbstractView actualPersonView;
@@ -64,13 +64,13 @@ public class MainController implements IActionListener {
 
 		basicView = new BasicView();
 		personView = new PersonView();
-		partyView = new PartyView();
+		partyView = new FractionView();
 		originView = new OriginView();
 
 		// create locale view controllers
 		basicController = new BasicController(basicView);
 		personController = new PersonController(personView);
-		partyController = new PartyController(partyView);
+		partyController = new FractionController(partyView);
 		originController = new OriginController(originView);
 
 		// add this controller as listener
@@ -99,7 +99,7 @@ public class MainController implements IActionListener {
 			openPersonBasicView();
 			break;
 		case OPEN_PERSON_PARTY:
-			openPersonPartyView();
+			openPersonFractionView();
 			break;
 		case OPEN_PERSON_PERSON:
 			openPersonPersonView();
@@ -142,9 +142,8 @@ public class MainController implements IActionListener {
 
 				// null check for origin
 				if (actualSideJob.getAuftraggeber() != null)
-
 					// open PartyView
-					openPersonOriginView(actualSideJob.getAuftraggeber());
+					openPersonOriginView(actualSideJob.getAuftragUri());
 
 			}
 
@@ -161,32 +160,35 @@ public class MainController implements IActionListener {
 
 				// null check for origin
 				if (actualSideJob.getAuftraggeber() != null)
-
 					// open PartyView
-					openPersonOriginView(actualSideJob.getAuftraggeber());
+					openPersonOriginView(actualSideJob.getAuftragUri());
 
 			}
 
 		}
 	}
 
-	private void openPersonOriginView(String origin) {
+	private void openPersonOriginView(String originURI) {
 
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
+		String caption = "";
 		for (Abgeordneter mdb : mdbList)
 			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-				if (nt.getAuftraggeber() != null && nt.getAuftraggeber().equals(origin))
+				if (nt.getAuftragUri() != null && nt.getAuftragUri().equals(originURI)){
+					caption = nt.getAuftraggeber();
 					container.addItem(new FraktionAuftraggeber(mdb, nt));
+				}
 			}
 
 		originView.setOriginContainerDataSource(container);
-		originView.setPanelCaption(origin);
+		originView.setPanelCaption(caption);
 		setActualPersonView(originView, originController);
 
 		// set URI fragment
-		NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_ORIGIN_VIEW_FRAG);
+		setActualObjectURI(originURI.substring(originURI.indexOf("#") + 1));
+		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
 
@@ -201,7 +203,6 @@ public class MainController implements IActionListener {
 			actualPerson = controller.getActualPerson();
 
 			if (actualPerson != null)
-
 				// open PersonView
 				openPersonPersonView(actualPerson);
 
@@ -215,7 +216,6 @@ public class MainController implements IActionListener {
 			actualPerson = controller.getActualPerson();
 
 			if (actualPerson != null)
-
 				// open PersonView
 				openPersonPersonView(actualPerson);
 
@@ -237,6 +237,7 @@ public class MainController implements IActionListener {
 		for (Nebentaetigkeit nt : person.getNebentaetigkeiten())
 			container.addItem(nt);
 
+		// create caption for view
 		String caption = "";
 		caption = caption.concat(person.getForename());
 		caption = caption.concat(" ");
@@ -244,6 +245,7 @@ public class MainController implements IActionListener {
 		caption = caption.concat(", ");
 		caption = caption.concat(person.getFraktion());
 
+		// update container for table and caption
 		personView.setSidelineJobContainerDataSource(container);
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
@@ -253,7 +255,7 @@ public class MainController implements IActionListener {
 
 	}
 
-	private void openPersonPartyView() {
+	private void openPersonFractionView() {
 
 		Abgeordneter actualPerson = null;
 
@@ -269,7 +271,7 @@ public class MainController implements IActionListener {
 				if (actualPerson.getFraktionUri() != null)
 
 					// open PartyView
-					openPersonPartyView(actualPerson.getFraktionUri());
+					openPersonFractionView(actualPerson.getFraktionUri());
 
 			}
 
@@ -287,7 +289,7 @@ public class MainController implements IActionListener {
 				if (actualPerson.getFraktionUri() != null)
 
 					// open PartyView
-					openPersonPartyView(actualPerson.getFraktionUri());
+					openPersonFractionView(actualPerson.getFraktionUri());
 
 			}
 
@@ -295,7 +297,7 @@ public class MainController implements IActionListener {
 
 	}
 
-	private void openPersonPartyView(String fractionURI) {
+	private void openPersonFractionView(String fractionURI) {
 
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
@@ -314,7 +316,6 @@ public class MainController implements IActionListener {
 
 		// set URI fragment
 		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("#") + 1));
-		System.out.println(fractionURI.substring(fractionURI.indexOf("#") + 1));
 		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
@@ -368,15 +369,22 @@ public class MainController implements IActionListener {
 
 				}
 				// open fraction view
-				else if (tabSheet.equals(IConstants.PERSON_PARTY_VIEW_FRAG)) {
+				else if (tabSheet.equals(IConstants.PERSON_FRACTION_VIEW_FRAG)) {
 					if (frag.length > 1)
-						openPersonPartyView(IConstants.NAMESPACE + "#" + fragment);
+						openPersonFractionView(IConstants.NAMESPACE + "#" + fragment);
 				}
 
 				// open person view
 				else if (tabSheet.equals(IConstants.PERSON_PERSON_VIEW_FRAG)) {
 					if (frag.length > 1)
 						openPersonPersonView(IConstants.NAMESPACE.concat("#").concat(frag[0]).concat("/")
+								.concat(URLEncoder.encode(frag[1], "UTF-8")));
+				}
+
+				// open source view
+				else if (tabSheet.equals(IConstants.PERSON_ORIGIN_VIEW_FRAG)) {
+					if (frag.length > 1)
+						openPersonOriginView(IConstants.NAMESPACE.concat("#").concat(frag[0]).concat("/")
 								.concat(URLEncoder.encode(frag[1], "UTF-8")));
 				}
 

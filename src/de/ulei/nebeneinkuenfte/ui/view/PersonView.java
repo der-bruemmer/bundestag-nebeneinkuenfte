@@ -49,7 +49,6 @@ public class PersonView extends AbstractView {
 	private void createNavigationSection() {
 
 		openMapButton = ButtonFactory.getButton(ButtonFactory.OPEN_MAP_BUTTON, this);
-
 		openOriginButton = ButtonFactory.getButton(ButtonFactory.OPEN_ORIGIN_BUTTON, this);
 		openOriginButton.setEnabled(false);
 

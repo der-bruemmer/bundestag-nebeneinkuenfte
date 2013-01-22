@@ -90,7 +90,7 @@ public class BasicView extends AbstractView {
 		basicTable.setSortContainerPropertyId("minZusatzeinkommen");
 		basicTable.setSortAscending(false);
 		basicTable.setColumnCollapsed("wahlkreisUri", true);
-		basicTable.setColumnCollapsed("email", true);
+//		basicTable.setColumnCollapsed("email", true);
 		enableOpenPersonButton(false);
 		enableOpenPartyButton(false);
 
