@@ -1,8 +1,11 @@
 package de.ulei.nebeneinkuenfte.model;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.DatatypeProperty;
@@ -247,6 +250,8 @@ public class RDFModel {
 
 				// set origin and job in relation
 				sidelineJob.addProperty(propHatAuftraggeber, origin);
+				// set politican and sideline job in relation
+				politician.addProperty(propHatNebeneinkunft, sidelineJob);
 				// set politician and origin in relation
 				origin.addProperty(propBezahlt, politician);
 				index++;
@@ -258,6 +263,21 @@ public class RDFModel {
 	}
 
 	private Resource createDocumentResource(String homepageURI) {
+
+		int cutIndex = homepageURI.lastIndexOf("&receiver=") + 10;
+
+		String urlEncoded;
+		try {
+			urlEncoded = URLEncoder.encode(homepageURI.substring(cutIndex), "UTF-8");
+			homepageURI = homepageURI.substring(0, cutIndex).concat(urlEncoded);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		homepageURI = homepageURI.replaceAll("\\u000A", "");
+		homepageURI = homepageURI.replaceAll("%2F", "/");
+		homepageURI = homepageURI.replace("\u00E4", "%C3%A4");
 
 		Resource homepageDocument = null;
 
@@ -558,6 +578,9 @@ public class RDFModel {
 			statementModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 			statementModel.add(statement);
 
+			String a = "INSERT DATA IN GRAPH '" + graph + "'" + " {";
+			String b = " }";
+
 			writer = new StringWriter();
 			writer.append("INSERT DATA IN GRAPH '" + graph + "'" + " {");
 			statementModel.write(writer, "N-TRIPLE");
@@ -580,17 +603,15 @@ public class RDFModel {
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 
 		RDFModel model = new RDFModel();
+
+		// RDFModel model = new RDFModel();
 		model.createModel(conv.getAbgeordnete());
 
-		String path = System.getProperty("user.home") + "/Desktop/nebeneinkunft";
-		model.fileExport(path, IRDFExport.RDF_XML_ABBREV);
-
-		// try {
-		// model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD),
-		// "http://127.0.0.1:8890/sparql");
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
+		try {
+			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		System.out.println("done");
 

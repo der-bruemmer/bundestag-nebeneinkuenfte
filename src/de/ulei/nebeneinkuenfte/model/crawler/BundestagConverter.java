@@ -892,10 +892,14 @@ public class BundestagConverter {
 		/*
 		 * crawl all parliament members
 		 */
-
+//
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 		List<Abgeordneter> mdbs = conv.getAbgeordnete();
+		 for (Abgeordneter mdb : mdbs) {
+				System.out.println(mdb.getEmail());
+				 }
+		
 
 		/*
 		 * try to find latitude and longitude data for given citys
@@ -926,12 +930,12 @@ public class BundestagConverter {
 		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 		// }
 
-		for (Abgeordneter mdb : mdbs) {
-			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-				if (nt.getPlaceUri() == null)
-					System.out.println("found");
-			}
-		}
+//		for (Abgeordneter mdb : mdbs) {
+//			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+//				if (nt.getPlaceUri() == null)
+//					System.out.println("found");
+//			}
+//		}
 		System.out.println("exit");
 		// conv.writeNebentaetigkeitenToFile(mdbs);
 
