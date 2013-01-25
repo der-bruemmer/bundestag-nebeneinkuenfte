@@ -40,27 +40,27 @@ public interface IConstants {
 	 * label and URI for political partys
 	 */
 
-	public final String SPD_FRAKTION = IConstants.NAMESPACE.concat("#").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
+	public final String SPD_FRAKTION = IConstants.NAMESPACE.concat("/").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
 			.concat("/").concat("spd");
 	public final String SPD_LABEL = "SPD";
 
-	public final String CDU_CSU_FRAKTION = IConstants.NAMESPACE.concat("#")
+	public final String CDU_CSU_FRAKTION = IConstants.NAMESPACE.concat("/")
 			.concat(IConstants.PERSON_FRACTION_VIEW_FRAG).concat("/").concat("cducsu");
 	public final String CDU_CSU_LABEL = "CDU/CSU";
 
-	public final String DIE_LINKE_FRAKTION = IConstants.NAMESPACE.concat("#")
+	public final String DIE_LINKE_FRAKTION = IConstants.NAMESPACE.concat("/")
 			.concat(IConstants.PERSON_FRACTION_VIEW_FRAG).concat("/").concat("dielinke");
 	public final String DIE_LINKE_LABEL = "Die Linke";
 
-	public final String FDP_FRAKTION = IConstants.NAMESPACE.concat("#").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
+	public final String FDP_FRAKTION = IConstants.NAMESPACE.concat("/").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
 			.concat("/").concat("fdp");
 	public final String FDP_LABEL = "FDP";
 
-	public final String GRUENE_FRAKTION = IConstants.NAMESPACE.concat("#").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
+	public final String GRUENE_FRAKTION = IConstants.NAMESPACE.concat("/").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
 			.concat("/").concat("diegruenen");
 	public final String GRUENE_LABEL = "Bündnis 90/Die Grünen";
 
-	public final String NO_FRAKTION = IConstants.NAMESPACE.concat("#").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
+	public final String NO_FRAKTION = IConstants.NAMESPACE.concat("/").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
 			.concat("/").concat("keinefraktion");
 	public final String NO_LABEL = "keine Fraktion";
 
@@ -97,6 +97,6 @@ public interface IConstants {
 	 */
 
 	public static String LINE_SEPARATOR = "<br>";
-	public static String NAMESPACE = "http://localhost:8080/nebeneinkuenfte";
+	public static String NAMESPACE = "http://localhost:8080/Nebeneinkuenfte/b09";
 
 }

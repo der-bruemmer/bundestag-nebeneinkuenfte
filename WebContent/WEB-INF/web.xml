@@ -7,32 +7,45 @@
 		<param-name>productionMode</param-name>
 		<param-value>false</param-value>
 	</context-param>
+	
+	<servlet>
+		<servlet-name>NebeneinkuenfteData Application</servlet-name>
+		<servlet-class>de.ulei.nebeneinkuenfte.request.RDFRequestHaendler</servlet-class>
+	</servlet>
+	
 	<servlet>
 		<servlet-name>Nebeneinkuenfte Application</servlet-name>
-		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+		<servlet-class>de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplicationServlet</servlet-class>
 		<init-param>
 			<description>
 			Vaadin application class to start</description>
 			<param-name>application</param-name>
 			<param-value>de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication</param-value>
 		</init-param>
-		<init-param>
+		 <init-param>
 			<description>
 			Application widgetset</description>
 			<param-name>widgetset</param-name>
 			<param-value>de.ulei.nebeneinkuenfte.widgetset.NebeneinkuenfteWidgetset</param-value>
 		</init-param>
-	</servlet>
+	</servlet> 
+
 	<servlet-mapping>
 		<servlet-name>Nebeneinkuenfte Application</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/b09/*</url-pattern>
 	</servlet-mapping>
-	<welcome-file-list>
+	<servlet-mapping>
+        <servlet-name>Nebeneinkuenfte Application</servlet-name>
+        <url-pattern>/VAADIN/*</url-pattern>
+    </servlet-mapping>
+	
+	
+<!--	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>
 		<welcome-file>index.jsp</welcome-file>
 		<welcome-file>default.html</welcome-file>
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
-	</welcome-file-list>
+	</welcome-file-list> -->
 </web-app>

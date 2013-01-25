@@ -20,6 +20,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.google.gwt.dev.util.collect.HashMap;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -695,7 +695,7 @@ public class BundestagConverter {
 
 				actualURI = "";
 				actualURI = actualURI.concat(IConstants.NAMESPACE);
-				actualURI = actualURI.concat("#");
+				actualURI = actualURI.concat("/");
 				actualURI = actualURI.concat(IConstants.PERSON_ORIGIN_VIEW_FRAG);
 				actualURI = actualURI.concat("/");
 
@@ -892,14 +892,23 @@ public class BundestagConverter {
 		/*
 		 * crawl all parliament members
 		 */
-//
+		//
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 		List<Abgeordneter> mdbs = conv.getAbgeordnete();
-		 for (Abgeordneter mdb : mdbs) {
-				System.out.println(mdb.getEmail());
-				 }
-		
+		// for (Abgeordneter mdb : mdbs) {
+		// mdb.setFraktionUri(mdb.getFraktionUri().replace(IConstants.NAMESPACE,
+		// IConstants.NAMESPACE_NEW));
+		// mdb.setURI(mdb.getURI().replace(IConstants.NAMESPACE,
+		// IConstants.NAMESPACE_NEW));
+		//
+		// for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+		// nt.setAuftragUri(nt.getAuftragUri().replace(IConstants.NAMESPACE,
+		// IConstants.NAMESPACE_NEW));
+		// }
+		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+		//
+		// }
 
 		/*
 		 * try to find latitude and longitude data for given citys
@@ -926,16 +935,20 @@ public class BundestagConverter {
 
 		// mdbs = conv.setAllSourceUris(mdbs);
 
-		// for (Abgeordneter mdb : mdbs) {
-		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		// }
-
-//		for (Abgeordneter mdb : mdbs) {
+		for (Abgeordneter mdb : mdbs) {
 //			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-//				if (nt.getPlaceUri() == null)
-//					System.out.println("found");
+				mdb.setFraktionUri(mdb.getFraktionUri().replace("nebeneinkuenfte", "Nebeneinkuenfte"));
+				 conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+				System.out.println(mdb.getFraktionUri());
 //			}
-//		}
+		}
+
+		// for (Abgeordneter mdb : mdbs) {
+		// for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+		// if (nt.getPlaceUri() == null)
+		// System.out.println("found");
+		// }
+		// }
 		System.out.println("exit");
 		// conv.writeNebentaetigkeitenToFile(mdbs);
 
@@ -949,6 +962,7 @@ public class BundestagConverter {
 		// }
 		// }
 		// System.out.println("CDU spenden: " + CDU);
+		// SELECT * WHERE {<xyz> ?p ?o}
 
 	}
 }

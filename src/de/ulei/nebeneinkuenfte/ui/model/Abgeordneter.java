@@ -57,7 +57,7 @@ public class Abgeordneter implements Serializable {
 		String finalURI = "";
 
 		finalURI = finalURI.concat(IConstants.NAMESPACE);
-		finalURI = finalURI.concat("#");
+		finalURI = finalURI.concat("/");
 		finalURI = finalURI.concat(IConstants.PERSON_PERSON_VIEW_FRAG);
 		finalURI = finalURI.concat(getURI().substring(getURI().lastIndexOf("/"), getURI().lastIndexOf(".")));
 

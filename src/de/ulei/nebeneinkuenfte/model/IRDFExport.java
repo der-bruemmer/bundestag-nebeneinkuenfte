@@ -38,4 +38,23 @@ public class IRDFExport {
 		}
 	};
 
+	/**
+	 * Map contains file extension as key and the corresponding RDF
+	 * serialization form as value
+	 */
+
+	public final static Map<String, String> FILETYPE = new HashMap<String, String>() {
+
+		private static final long serialVersionUID = -2912473482257575131L;
+
+		{
+			put("rdf", RDF_XML);
+			put("owl", RDF_XML_ABBREV);
+			put("n3", N3);
+			put("ttl", TURTLE);
+			put("nt", N_TRIPLE);
+
+		}
+	};
+
 }

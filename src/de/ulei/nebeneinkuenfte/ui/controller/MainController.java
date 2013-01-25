@@ -187,7 +187,7 @@ public class MainController implements IActionListener {
 		setActualPersonView(originView, originController);
 
 		// set URI fragment
-		setActualObjectURI(originURI.substring(originURI.indexOf("#") + 1));
+		setActualObjectURI(originURI.substring(originURI.indexOf("/b09/") + 5));
 		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
@@ -250,7 +250,7 @@ public class MainController implements IActionListener {
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
 
-		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("#") + 1));
+		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("/b09/") + 5));
 		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
@@ -298,7 +298,6 @@ public class MainController implements IActionListener {
 	}
 
 	private void openPersonFractionView(String fractionURI) {
-
 		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
 				FraktionAuftraggeber.class);
 
@@ -315,7 +314,7 @@ public class MainController implements IActionListener {
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
-		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("#") + 1));
+		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("/b09/") + 5));
 		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
 
 	}
@@ -371,20 +370,20 @@ public class MainController implements IActionListener {
 				// open fraction view
 				else if (tabSheet.equals(IConstants.PERSON_FRACTION_VIEW_FRAG)) {
 					if (frag.length > 1)
-						openPersonFractionView(IConstants.NAMESPACE + "#" + fragment);
+						openPersonFractionView(IConstants.NAMESPACE + "/" + fragment);
 				}
 
 				// open person view
 				else if (tabSheet.equals(IConstants.PERSON_PERSON_VIEW_FRAG)) {
 					if (frag.length > 1)
-						openPersonPersonView(IConstants.NAMESPACE.concat("#").concat(frag[0]).concat("/")
+						openPersonPersonView(IConstants.NAMESPACE.concat("/").concat(frag[0]).concat("/")
 								.concat(URLEncoder.encode(frag[1], "UTF-8")));
 				}
 
 				// open source view
 				else if (tabSheet.equals(IConstants.PERSON_ORIGIN_VIEW_FRAG)) {
 					if (frag.length > 1)
-						openPersonOriginView(IConstants.NAMESPACE.concat("#").concat(frag[0]).concat("/")
+						openPersonOriginView(IConstants.NAMESPACE.concat("/").concat(frag[0]).concat("/")
 								.concat(URLEncoder.encode(frag[1], "UTF-8")));
 				}
 
