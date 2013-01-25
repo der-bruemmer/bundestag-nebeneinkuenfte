@@ -64,22 +64,25 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 			}
 
 		});
-
+		
 	}
 
-	private void handleFragment(String fragment) {
-		
+	private void handleFragment(String newFragment) {
+
+		String fragment = newFragment;
 		String fileFormat = fragment.substring(fragment.lastIndexOf(".") + 1);
 
 		if (IRDFExport.FILETYPE.get(fileFormat) != null) {
 
 			// build URI
-			System.out.println(fileFormat);
 			fragment = IConstants.NAMESPACE.concat("/").concat(fragment);
 			fragment = fragment.replaceAll(".".concat(fileFormat), "");
+			// remove file ending from original fragment
+			newFragment = newFragment.replaceAll(".".concat(fileFormat), "");
 
 			// create tmp file
-			File file = new File(System.getProperty("java.io.tmpdir").concat("/serialization.").concat(fileFormat));
+			String fileName = fragment.substring(fragment.lastIndexOf("/"));
+			File file = new File(System.getProperty("java.io.tmpdir").concat(fileName).concat(".").concat(fileFormat));
 			fileFormat = IRDFExport.FILETYPE.get(fileFormat);
 
 			// execute query
@@ -98,9 +101,11 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 			}
 
 			getMainWindow().open(new FileResource(file, NebeneinkuenfteApplication.getInstance()));
+			// set fragment without firing change event
+			setURIFragment(newFragment, false);
 
-		} else
-			mainController.handleURIFragment(fragment);
+		}
+		mainController.handleURIFragment(newFragment);
 	}
 
 	public static NebeneinkuenfteApplication getInstance() {

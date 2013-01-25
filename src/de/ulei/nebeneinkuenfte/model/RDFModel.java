@@ -1,12 +1,16 @@
 package de.ulei.nebeneinkuenfte.model;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Properties;
 
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
@@ -32,6 +36,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import de.ulei.nebeneinkuenfte.model.crawler.BundestagConverter;
+import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.util.IConstants;
@@ -52,6 +57,9 @@ public class RDFModel {
 
 	private final String GRUENE_FRAKTION = "http://www.gruene-bundestag.de/";
 	private final String GRUENE_LABEL = "Bündnis 90/Die Grünen";
+
+	// triplestore param
+	private String triplestoreURL;
 
 	// model
 	private OntModel model;
@@ -94,18 +102,26 @@ public class RDFModel {
 
 	public RDFModel() {
 
-		// create model and set namespaceMap
-		this.model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		this.model.setNsPrefixes(INamespace.NAMSESPACE_MAP);
+		Properties properties = new Properties();
+		BufferedInputStream stream;
+		try {
+			stream = new BufferedInputStream(new FileInputStream(NebeneinkuenfteApplication.getInstance().getContext()
+					.getBaseDirectory()
+					+ "/external_data/config.properties"));
+			properties.load(stream);
+			stream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		// create classes and properties
-		createClasses();
-		createDatatypeProperties();
-		createObjectProperties();
+		this.triplestoreURL = properties.getProperty("triplestoreURL");
 
-		// create Resources for all known factions
-		createFraktionResources();
+	}
 
+	public RDFModel(String triplestoreURL) {
+		this.triplestoreURL = triplestoreURL;
 	}
 
 	private void createClasses() {
@@ -118,6 +134,7 @@ public class RDFModel {
 
 		// self defined classes
 		classWahlkreis = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Wahlkreis");
+		classWahlkreis.addProperty(RDF.type, classPlace);
 		classFraktion = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Fraktion");
 		classFraktion.addProperty(RDF.type, classOrganization);
 		classNebeneinkunft = model.createClass(model.getNsPrefixURI(INamespace.BTD) + "Nebeneinkunft");
@@ -201,6 +218,19 @@ public class RDFModel {
 	}
 
 	public void createModel(List<Abgeordneter> personList) {
+
+		// create model and set namespaceMap
+		this.model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		this.model.setNsPrefixes(INamespace.NAMSESPACE_MAP);
+
+		// create classes and properties
+		createClasses();
+		createDatatypeProperties();
+		createObjectProperties();
+
+		// create Resources for all known factions
+		createFraktionResources();
+
 		createPersonResources(personList);
 	}
 
@@ -509,23 +539,21 @@ public class RDFModel {
 	 * 
 	 * @param graph
 	 *            Name of the graph
-	 * @param url
-	 *            SPARQL endpoint adress
 	 * 
 	 * @return true if everything was correct, else false
 	 * 
 	 */
 
-	public int tripleStoreExport(String graph, String url) throws Exception {
+	public int tripleStoreExport(String graph) throws Exception {
 
 		boolean graphExists = false;
 
 		// graph = "http://mygraph.com";
-		// url = "http://127.0.0.1:8890/sparql";
+		// url = triplestoreURL;
 		String q = "select  distinct ?g  where { GRAPH ?g { ?s ?p ?o } }";
 
 		Query query = QueryFactory.create(q);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(url, query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query);
 
 		// graph already exists?
 		ResultSet results = qexec.execSelect();
@@ -544,7 +572,7 @@ public class RDFModel {
 		if (!graphExists) {
 
 			q = "CREATE GRAPH '" + graph + "'";
-			QueryEngineHTTP qeh = new QueryEngineHTTP(url, q);
+			QueryEngineHTTP qeh = new QueryEngineHTTP(triplestoreURL, q);
 			qeh.execSelect();
 			qeh.close();
 
@@ -553,7 +581,7 @@ public class RDFModel {
 		else {
 
 			q = "CLEAR GRAPH '" + graph + "'";
-			QueryEngineHTTP qeh = new QueryEngineHTTP(url, q);
+			QueryEngineHTTP qeh = new QueryEngineHTTP(triplestoreURL, q);
 			qeh.execSelect();
 			qeh.close();
 
@@ -587,7 +615,7 @@ public class RDFModel {
 			writer.flush();
 
 			// open connection and run statement
-			qeh = new QueryEngineHTTP(url, writer.toString());
+			qeh = new QueryEngineHTTP(triplestoreURL, writer.toString());
 			qeh.execSelect();
 			qeh.close();
 
@@ -597,12 +625,11 @@ public class RDFModel {
 	}
 
 	public ByteArrayOutputStream runSubjectQuery(String resourceURI, String rdfType) {
-	
-		System.out.println("queryURI: " +resourceURI);
+
 		String queryString = "SELECT * WHERE {<".concat(resourceURI).concat("> ?p ?o}");
 		Query query = QueryFactory.create(queryString);
 
-		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://127.0.0.1:8890/sparql", query,
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query,
 				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 		qexec.close();
@@ -634,21 +661,17 @@ public class RDFModel {
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 
-		RDFModel model = new RDFModel();
+		RDFModel model = new RDFModel("http://127.0.0.1:8890/sparql");
 		model.createModel(conv.getAbgeordnete());
 
-		// // RDFModel model = new RDFModel();
-		// model.createModel(conv.getAbgeordnete());
 		model.fileExport(System.getProperty("user.home") + "/Desktop/nb", IRDFExport.N3);
 		//
 		try {
-			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
+			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-//		ByteArrayOutputStream out = model
-//				.runSubjectQuery("http://localhost:8080/nebeneinkuenfte/b09#mdb/merkel_angela", );
 		System.out.println("done");
 
 	}
