@@ -32,7 +32,6 @@ public class NebeneinkuenfteApplicationServlet extends ApplicationServlet {
 				doGet(request, response);
 				return true;
 			} catch (ServletException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -54,9 +53,11 @@ public class NebeneinkuenfteApplicationServlet extends ApplicationServlet {
 			// transform fileFormat into serialization constant
 			fileFormat = IRDFExport.FILETYPE.get(fileFormat);
 
+			// create requested graph
 			RDFModel model = new RDFModel();
 			ByteArrayOutputStream out = model.runSubjectQuery(requestURL, fileFormat);
 
+			// write graph
 			PrintWriter writer = response.getWriter();
 			writer.println(out.toString());
 			writer.close();

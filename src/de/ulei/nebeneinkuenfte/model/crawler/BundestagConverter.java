@@ -665,7 +665,23 @@ public class BundestagConverter {
 		return mdbs;
 	}
 
-	public List<Abgeordneter> setAllSourceUris(List<Abgeordneter> mdbs) {
+	/*
+	 * here be dragons
+	 */
+
+	private void changeIngosHomepage() {
+
+		out: {
+			for (Abgeordneter mdb : mdbs)
+				if (mdb.getURI().equals(IConstants.NAMESPACE.concat("/mdb/gaedechens_ingo"))) {
+					mdb.setHomepage("http://www.xn--ingo-gdechens-gfb.de/");
+					writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+					break out;
+				}
+		}
+	}
+
+	private List<Abgeordneter> setAllSourceUris(List<Abgeordneter> mdbs) {
 
 		/*
 		 * merge all different captions for one URI and put result to map
@@ -892,77 +908,42 @@ public class BundestagConverter {
 		/*
 		 * crawl all parliament members
 		 */
-		//
+
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 		List<Abgeordneter> mdbs = conv.getAbgeordnete();
-		// for (Abgeordneter mdb : mdbs) {
-		// mdb.setFraktionUri(mdb.getFraktionUri().replace(IConstants.NAMESPACE,
-		// IConstants.NAMESPACE_NEW));
-		// mdb.setURI(mdb.getURI().replace(IConstants.NAMESPACE,
-		// IConstants.NAMESPACE_NEW));
-		//
-		// for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-		// nt.setAuftragUri(nt.getAuftragUri().replace(IConstants.NAMESPACE,
-		// IConstants.NAMESPACE_NEW));
-		// }
-		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		//
-		// }
 
 		/*
 		 * try to find latitude and longitude data for given citys
 		 */
 
-		// List<String[]> places = conv.getGermanCityNames();
-		// mdbs = conv.setAllPlaceUris(mdbs, places);
-		// for (Abgeordneter mdb : mdbs) {
-		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		// }
+		List<String[]> places = conv.getGermanCityNames();
+		mdbs = conv.setAllPlaceUris(mdbs, places);
+		for (Abgeordneter mdb : mdbs) {
+			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+		}
 
 		/*
 		 * try to match sources
 		 */
 
-		// mdbs = conv.matchAllAuftraggeber(mdbs);
-		// for (Abgeordneter mdb : mdbs) {
-		// conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		// }
+		mdbs = conv.matchAllAuftraggeber(mdbs);
+		for (Abgeordneter mdb : mdbs) {
+			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+		}
 
 		/*
 		 * try to set source URIs
 		 */
 
-		// mdbs = conv.setAllSourceUris(mdbs);
+		mdbs = conv.setAllSourceUris(mdbs);
 
-		for (Abgeordneter mdb : mdbs) {
-//			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-				mdb.setFraktionUri(mdb.getFraktionUri().replace("nebeneinkuenfte", "Nebeneinkuenfte"));
-				 conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-				System.out.println(mdb.getFraktionUri());
-//			}
-		}
+		/*
+		 * try to change homepage of Ingo Gädechens
+		 */
 
-		// for (Abgeordneter mdb : mdbs) {
-		// for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-		// if (nt.getPlaceUri() == null)
-		// System.out.println("found");
-		// }
-		// }
-		System.out.println("exit");
-		// conv.writeNebentaetigkeitenToFile(mdbs);
-
-		// SpendenParser spend = new SpendenParser();
-		// spend.parseSpenden("spenden.csv");
-		// double CDU = 0;
-		// for(ParteiSpende spende : spend.getSpenden()) {
-		// System.out.println(spende.getPartei());
-		// if(spende.getPartei().equals("CDU")) {
-		// CDU+=spende.getValue();
-		// }
-		// }
-		// System.out.println("CDU spenden: " + CDU);
-		// SELECT * WHERE {<xyz> ?p ?o}
-
+		conv.changeIngosHomepage();
+		
+		System.out.println("Finished data crawling");
 	}
 }

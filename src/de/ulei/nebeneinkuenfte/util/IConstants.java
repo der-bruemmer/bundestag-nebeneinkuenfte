@@ -96,7 +96,6 @@ public interface IConstants {
 	 * misc
 	 */
 
-	public static String LINE_SEPARATOR = "<br>";
 	public static String NAMESPACE = "http://localhost:8080/Nebeneinkuenfte/b09";
 
 }
