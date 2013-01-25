@@ -3,6 +3,8 @@ package de.ulei.nebeneinkuenfte.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.ulei.nebeneinkuenfte.util.IConstants;
+
 /**
  * 
  * Used namespaces and corresponding prefixes.
@@ -51,7 +53,7 @@ public interface INamespace {
 		{
 
 			put(FOAF, "http://xmlns.com/foaf/0.1/");
-			put(BTD, "http://nebeneinkuenfte.asv.uni-leipzig.de/");
+			put(BTD, IConstants.NAMESPACE.concat("/"));
 			put(DBPR, "http://dbpedia.org/resource/");
 			put(DBPO, "http://dbpedia.org/ontology/");
 			put(DC, "http://purl.org/dc/elements/1.1/");

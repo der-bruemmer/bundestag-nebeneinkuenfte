@@ -19,8 +19,10 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -238,7 +240,7 @@ public class RDFModel {
 				origin = createOriginResource(nt, index);
 
 				// create resource for the job itself
-				sidelineJob = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "nebeneinkunft_" + index,
+				sidelineJob = model.createResource(model.getNsPrefixURI(INamespace.BTD) + "sideline/" + index,
 						classNebeneinkunft);
 				sidelineJob.addProperty(propNebeneinkuenftStufe,
 						model.createTypedLiteral(nt.getStufe() != null ? nt.getStufe() : "unbekannt"));
@@ -578,9 +580,6 @@ public class RDFModel {
 			statementModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 			statementModel.add(statement);
 
-			String a = "INSERT DATA IN GRAPH '" + graph + "'" + " {";
-			String b = " }";
-
 			writer = new StringWriter();
 			writer.append("INSERT DATA IN GRAPH '" + graph + "'" + " {");
 			statementModel.write(writer, "N-TRIPLE");
@@ -597,22 +596,59 @@ public class RDFModel {
 		return result;
 	}
 
+	public ByteArrayOutputStream runSubjectQuery(String resourceURI, String rdfType) {
+	
+		System.out.println("queryURI: " +resourceURI);
+		String queryString = "SELECT * WHERE {<".concat(resourceURI).concat("> ?p ?o}");
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qexec = QueryExecutionFactory.sparqlService("http://127.0.0.1:8890/sparql", query,
+				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+		ResultSet rs = qexec.execSelect();
+		qexec.close();
+
+		// create OntModel to serialize graph
+		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		model.setNsPrefixes(INamespace.NAMSESPACE_MAP);
+		Resource subject = model.createResource(resourceURI);
+		RDFNode predicate;
+		RDFNode object;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		// iterate over ResultSet and fill graph
+		while (rs.hasNext()) {
+
+			QuerySolution qs = rs.next();
+			predicate = qs.get("p");
+			object = qs.get("o");
+			subject.addProperty(model.createProperty(predicate.toString()), object);
+
+		}
+		model.write(out, rdfType);
+
+		return out;
+	}
+
 	public static void main(String[] args) {
 
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 
 		RDFModel model = new RDFModel();
-
-		// RDFModel model = new RDFModel();
 		model.createModel(conv.getAbgeordnete());
 
+		// // RDFModel model = new RDFModel();
+		// model.createModel(conv.getAbgeordnete());
+		model.fileExport(System.getProperty("user.home") + "/Desktop/nb", IRDFExport.N3);
+		//
 		try {
 			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD), "http://127.0.0.1:8890/sparql");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+//		ByteArrayOutputStream out = model
+//				.runSubjectQuery("http://localhost:8080/nebeneinkuenfte/b09#mdb/merkel_angela", );
 		System.out.println("done");
 
 	}

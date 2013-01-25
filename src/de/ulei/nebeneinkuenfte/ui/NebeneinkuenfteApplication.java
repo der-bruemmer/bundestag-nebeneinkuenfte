@@ -1,5 +1,9 @@
 package de.ulei.nebeneinkuenfte.ui;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 
@@ -7,12 +11,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
 
+import de.ulei.nebeneinkuenfte.model.IRDFExport;
+import de.ulei.nebeneinkuenfte.model.RDFModel;
 import de.ulei.nebeneinkuenfte.ui.controller.MainController;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class NebeneinkuenfteApplication extends Application implements HttpServletRequestListener {
 
@@ -51,9 +59,7 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 
 				String fragment = source.getUriFragmentUtility().getFragment();
 				if (fragment != null) {
-					if (fragment.equals("lala"))
-						openFile();
-					mainController.handleURIFragment(fragment);
+					handleFragment(fragment);
 				}
 			}
 
@@ -61,8 +67,40 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 
 	}
 
-	private void openFile() {
-		String url = getContext().getBaseDirectory() + "/lala";
+	private void handleFragment(String fragment) {
+		
+		String fileFormat = fragment.substring(fragment.lastIndexOf(".") + 1);
+
+		if (IRDFExport.FILETYPE.get(fileFormat) != null) {
+
+			// build URI
+			System.out.println(fileFormat);
+			fragment = IConstants.NAMESPACE.concat("/").concat(fragment);
+			fragment = fragment.replaceAll(".".concat(fileFormat), "");
+
+			// create tmp file
+			File file = new File(System.getProperty("java.io.tmpdir").concat("/serialization.").concat(fileFormat));
+			fileFormat = IRDFExport.FILETYPE.get(fileFormat);
+
+			// execute query
+			RDFModel model = new RDFModel();
+			ByteArrayOutputStream out = model.runSubjectQuery(fragment, fileFormat);
+
+			// write file
+			FileWriter fileWriter;
+			try {
+				fileWriter = new FileWriter(file);
+				fileWriter.write(out.toString());
+				fileWriter.flush();
+				fileWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			getMainWindow().open(new FileResource(file, NebeneinkuenfteApplication.getInstance()));
+
+		} else
+			mainController.handleURIFragment(fragment);
 	}
 
 	public static NebeneinkuenfteApplication getInstance() {
