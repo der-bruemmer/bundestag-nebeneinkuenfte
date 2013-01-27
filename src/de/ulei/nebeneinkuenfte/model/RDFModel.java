@@ -632,7 +632,6 @@ public class RDFModel {
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query,
 				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
-		qexec.close();
 
 		// create OntModel to serialize graph
 		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -651,8 +650,10 @@ public class RDFModel {
 			subject.addProperty(model.createProperty(predicate.toString()), object);
 
 		}
-		model.write(out, rdfType);
 
+		model.write(out, rdfType);
+		qexec.close();
+		
 		return out;
 	}
 

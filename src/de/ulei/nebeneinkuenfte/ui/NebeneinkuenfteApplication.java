@@ -94,6 +94,11 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 			try {
 				fileWriter = new FileWriter(file);
 				fileWriter.write(out.toString());
+				
+				out.flush();
+				out.close();
+				out = null;
+				
 				fileWriter.flush();
 				fileWriter.close();
 			} catch (IOException e) {
@@ -101,6 +106,7 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 			}
 
 			getMainWindow().open(new FileResource(file, NebeneinkuenfteApplication.getInstance()));
+			file = null;
 			// set fragment without firing change event
 			setURIFragment(newFragment, false);
 
