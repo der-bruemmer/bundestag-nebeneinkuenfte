@@ -7,6 +7,7 @@ import java.util.List;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
 
+import de.ulei.nebeneinkuenfte.model.RDFImport;
 import de.ulei.nebeneinkuenfte.model.crawler.BundestagConverter;
 import de.ulei.nebeneinkuenfte.ui.MainFrameWindow;
 import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
@@ -28,6 +29,7 @@ public class MainController implements IActionListener {
 
 	private static final long serialVersionUID = -2602673556758294975L;
 
+	private BeanItemContainer<Abgeordneter> abgeordnetenContainer;
 	private List<Abgeordneter> mdbList;
 	private String actualObjectURI;
 
@@ -49,7 +51,12 @@ public class MainController implements IActionListener {
 
 	private MainFrameWindow mainFrame;
 
+	private RDFImport rdfImport;
+
 	public MainController(MainFrameWindow mainFrame) {
+
+		this.rdfImport = new RDFImport();
+		this.abgeordnetenContainer = rdfImport.getPersonBasicContainer();
 
 		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
 		BundestagConverter conv = new BundestagConverter(
@@ -115,16 +122,11 @@ public class MainController implements IActionListener {
 
 	private void openPersonBasicView() {
 
-		BeanItemContainer<Abgeordneter> container = new BeanItemContainer<Abgeordneter>(Abgeordneter.class);
-
-		for (Abgeordneter mdb : mdbList)
-			container.addItem(mdb);
-
-		basicView.setPersonContainerDataSource(container);
+		basicView.setPersonContainerDataSource(abgeordnetenContainer);
 		setActualPersonView(basicView, basicController);
 
 		// set URI fragment
-		NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.PERSON_BASIC_VIEW_FRAG);
+		setURIFragment(IConstants.PERSON_BASIC_VIEW_FRAG);
 
 	}
 
@@ -169,26 +171,16 @@ public class MainController implements IActionListener {
 	}
 
 	private void openPersonOriginView(String originURI) {
-
-		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
-				FraktionAuftraggeber.class);
-
-		String caption = "";
-		for (Abgeordneter mdb : mdbList)
-			for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
-				if (nt.getAuftragUri() != null && nt.getAuftragUri().equals(originURI)){
-					caption = nt.getAuftraggeber();
-					container.addItem(new FraktionAuftraggeber(mdb, nt));
-				}
-			}
-
+		
+		BeanItemContainer<FraktionAuftraggeber> container = rdfImport.getPersonOriginContainer(originURI);
 		originView.setOriginContainerDataSource(container);
-		originView.setPanelCaption(caption);
+
+		originView.setPanelCaption(container.getIdByIndex(0).getAuftraggeber());
 		setActualPersonView(originView, originController);
 
 		// set URI fragment
 		setActualObjectURI(originURI.substring(originURI.indexOf("/b09/") + 5));
-		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
+		setURIFragment(getActualObjectURI());
 
 	}
 
@@ -224,18 +216,13 @@ public class MainController implements IActionListener {
 
 	private void openPersonPersonView(String personURI) {
 
-		for (Abgeordneter mdb : mdbList)
+		for (Abgeordneter mdb : abgeordnetenContainer.getItemIds())
 			if (mdb.getURI().equals(personURI))
 				openPersonPersonView(mdb);
 
 	}
 
 	private void openPersonPersonView(Abgeordneter person) {
-
-		BeanItemContainer<Nebentaetigkeit> container = new BeanItemContainer<Nebentaetigkeit>(Nebentaetigkeit.class);
-
-		for (Nebentaetigkeit nt : person.getNebentaetigkeiten())
-			container.addItem(nt);
 
 		// create caption for view
 		String caption = "";
@@ -246,12 +233,12 @@ public class MainController implements IActionListener {
 		caption = caption.concat(person.getFraktion());
 
 		// update container for table and caption
-		personView.setSidelineJobContainerDataSource(container);
+		personView.setSidelineJobContainerDataSource(rdfImport.getPersonPersonContainer(person.getURI()));
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
 
 		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("/b09/") + 5));
-		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
+		setURIFragment(getActualObjectURI());
 
 	}
 
@@ -298,24 +285,23 @@ public class MainController implements IActionListener {
 	}
 
 	private void openPersonFractionView(String fractionURI) {
-		BeanItemContainer<FraktionAuftraggeber> container = new BeanItemContainer<FraktionAuftraggeber>(
-				FraktionAuftraggeber.class);
+		BeanItemContainer<FraktionAuftraggeber> container = rdfImport.getPersonFractionContainer(fractionURI);
 
 		String caption = "";
 
-		for (Abgeordneter mdb : mdbList)
-			if (mdb.getFraktionUri().equals(fractionURI)) {
-				caption = mdb.getFraktion();
-				for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten())
-					container.addItem(new FraktionAuftraggeber(mdb, nt));
-			}
+//		for (Abgeordneter mdb : mdbList)
+//			if (mdb.getFraktionUri().equals(fractionURI)) {
+//				caption = mdb.getFraktion();
+//				for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten())
+//					container.addItem(new FraktionAuftraggeber(mdb, nt));
+//			}
 		partyView.setPartyContainerDataSource(container);
-		partyView.setPanelCaption(caption);
+//		partyView.setPanelCaption(container.getIdByIndex(0).getFraktion());
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
 		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("/b09/") + 5));
-		NebeneinkuenfteApplication.getInstance().setURIFragment(getActualObjectURI());
+		setURIFragment(getActualObjectURI());
 
 	}
 
@@ -411,5 +397,13 @@ public class MainController implements IActionListener {
 
 	public void setActualObjectURI(String actualObjectURI) {
 		this.actualObjectURI = actualObjectURI;
+	}
+	
+	private void setURIFragment(String fragment) {
+
+		NebeneinkuenfteApplication.getInstance().removeURIFragmentListener();
+		NebeneinkuenfteApplication.getInstance().setURIFragment(fragment);
+		NebeneinkuenfteApplication.getInstance().addURIFragmentListener();
+
 	}
 }

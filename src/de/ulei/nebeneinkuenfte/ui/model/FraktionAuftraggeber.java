@@ -19,6 +19,7 @@ public class FraktionAuftraggeber implements Serializable {
 
 	private String type;
 	private String place;
+	private String placeURI;
 	private float latitude;
 	private float longitude;
 	private String year;
@@ -36,6 +37,7 @@ public class FraktionAuftraggeber implements Serializable {
 		this.auftragUri = nebentaetigkeit.getAuftragUri();
 		this.type = nebentaetigkeit.getType();
 		this.place = nebentaetigkeit.getPlace();
+		this.placeURI = nebentaetigkeit.getPlaceUri();
 		this.year = nebentaetigkeit.getYear();
 		this.stufe = nebentaetigkeit.getStufe();
 	}
@@ -106,6 +108,14 @@ public class FraktionAuftraggeber implements Serializable {
 
 	public void setPlace(String place) {
 		this.place = place;
+	}
+
+	public String getPlaceURI() {
+		return placeURI;
+	}
+
+	public void setPlaceURI(String placeURI) {
+		this.placeURI = placeURI;
 	}
 
 	public float getLatitude() {

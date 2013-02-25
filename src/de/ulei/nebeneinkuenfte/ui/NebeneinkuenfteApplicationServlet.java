@@ -13,7 +13,7 @@ import com.vaadin.terminal.gwt.server.CommunicationManager;
 import com.vaadin.ui.Window;
 
 import de.ulei.nebeneinkuenfte.model.IRDFExport;
-import de.ulei.nebeneinkuenfte.model.RDFModel;
+import de.ulei.nebeneinkuenfte.model.RDFImport;
 
 public class NebeneinkuenfteApplicationServlet extends ApplicationServlet {
 
@@ -54,8 +54,7 @@ public class NebeneinkuenfteApplicationServlet extends ApplicationServlet {
 			fileFormat = IRDFExport.FILETYPE.get(fileFormat);
 
 			// create requested graph
-			RDFModel model = new RDFModel();
-			ByteArrayOutputStream out = model.runSubjectQuery(requestURL, fileFormat);
+			ByteArrayOutputStream out = new RDFImport().querySubject(requestURL, fileFormat);
 
 			// write graph
 			PrintWriter writer = response.getWriter();
