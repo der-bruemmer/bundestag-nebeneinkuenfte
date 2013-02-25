@@ -18,16 +18,29 @@ import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
 
 import de.ulei.nebeneinkuenfte.model.IRDFExport;
-import de.ulei.nebeneinkuenfte.model.RDFModel;
+import de.ulei.nebeneinkuenfte.model.RDFImport;
 import de.ulei.nebeneinkuenfte.ui.controller.MainController;
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public class NebeneinkuenfteApplication extends Application implements HttpServletRequestListener {
 
+	private final class MyFragmentChangeListener implements FragmentChangedListener {
+		private static final long serialVersionUID = 1951376846032472745L;
+
+		public void fragmentChanged(FragmentChangedEvent source) {
+
+			String fragment = source.getUriFragmentUtility().getFragment();
+			if (fragment != null) {
+				handleFragment(fragment);
+			}
+		}
+	}
+
 	private static final long serialVersionUID = 8818244775327742466L;
 
 	private MainController mainController;
 	private UriFragmentUtility urifu = new UriFragmentUtility();
+	private MyFragmentChangeListener fragmentChangeListener = new MyFragmentChangeListener();
 
 	/*
 	 * thread local creates a static NebeneinkuenfteApplication instance of the
@@ -51,20 +64,8 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 		super.addWindow(mainFrame);
 		setMainWindow(mainFrame);
 
-		urifu.addListener(new FragmentChangedListener() {
+		urifu.addListener(fragmentChangeListener);
 
-			private static final long serialVersionUID = 1951376846032472745L;
-
-			public void fragmentChanged(FragmentChangedEvent source) {
-
-				String fragment = source.getUriFragmentUtility().getFragment();
-				if (fragment != null) {
-					handleFragment(fragment);
-				}
-			}
-
-		});
-		
 	}
 
 	private void handleFragment(String newFragment) {
@@ -86,19 +87,18 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 			fileFormat = IRDFExport.FILETYPE.get(fileFormat);
 
 			// execute query
-			RDFModel model = new RDFModel();
-			ByteArrayOutputStream out = model.runSubjectQuery(fragment, fileFormat);
+			ByteArrayOutputStream out = new RDFImport().querySubject(fragment, fileFormat);
 
 			// write file
 			FileWriter fileWriter;
 			try {
 				fileWriter = new FileWriter(file);
 				fileWriter.write(out.toString());
-				
+
 				out.flush();
 				out.close();
 				out = null;
-				
+
 				fileWriter.flush();
 				fileWriter.close();
 			} catch (IOException e) {
@@ -177,6 +177,14 @@ public class NebeneinkuenfteApplication extends Application implements HttpServl
 
 	public MainController getMainController() {
 		return mainController;
+	}
+
+	public void removeURIFragmentListener() {
+		urifu.removeListener(fragmentChangeListener);
+	}
+
+	public void addURIFragmentListener() {
+		urifu.addListener(fragmentChangeListener);
 	}
 
 }
