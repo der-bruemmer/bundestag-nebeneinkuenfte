@@ -61,8 +61,8 @@ public interface IConstants {
 	public final String GRUENE_LABEL = "Bündnis 90/Die Grünen";
 
 	public final String NO_FRAKTION = IConstants.NAMESPACE.concat("/").concat(IConstants.PERSON_FRACTION_VIEW_FRAG)
-			.concat("/").concat("keinefraktion");
-	public final String NO_LABEL = "keine Fraktion";
+			.concat("/").concat("fraktionslos");
+	public final String NO_LABEL = "fraktionslos";
 
 	/*
 	 * column order and headers for tables in according views
@@ -96,6 +96,6 @@ public interface IConstants {
 	 * misc
 	 */
 
-	public static String NAMESPACE = "http://localhost:8080/Nebeneinkuenfte/b09";
+	public static String NAMESPACE = "http://www.opendata-bundestag.de/Nebeneinkuenfte/b17";
 
 }

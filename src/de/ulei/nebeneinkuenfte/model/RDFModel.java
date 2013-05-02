@@ -4,19 +4,29 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
 import java.util.Properties;
 
 import com.hp.hpl.jena.ontology.DatatypeProperty;
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import de.ulei.nebeneinkuenfte.model.crawler.BundestagConverter;
 import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
+import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
+import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
+import de.ulei.nebeneinkuenfte.util.IConstants;
 
 public abstract class RDFModel {
 
@@ -62,10 +72,17 @@ public abstract class RDFModel {
 	protected DatatypeProperty propNebeneinkuenfteMaximum;
 	protected DatatypeProperty propNebeneinkuenftStufe;
 	protected DatatypeProperty propNebeneinkuenftJahr;
+	protected DatatypeProperty propNebeneinkuenftFrom;
+	protected DatatypeProperty propNebeneinkuenftTo;
+	protected DatatypeProperty propCreator;
+	protected DatatypeProperty propProvenance;
+	protected DatatypeProperty propLicence;
+	protected DatatypeProperty propNebeneinkuenftSourceString;
 	protected DatatypeProperty propNebeneinkuenftTyp;
 	protected DatatypeProperty propNebeneinkuenftOrt;
 	protected DatatypeProperty propGeoLat;
 	protected DatatypeProperty propGeoLong;
+	
 
 	// ObjectProperties
 	protected ObjectProperty propHomepage;
@@ -82,9 +99,7 @@ public abstract class RDFModel {
 		Properties properties = new Properties();
 		BufferedInputStream stream;
 		try {
-			stream = new BufferedInputStream(new FileInputStream(NebeneinkuenfteApplication.getInstance().getContext()
-					.getBaseDirectory()
-					+ "/external_data/config.properties"));
+			stream = new BufferedInputStream(new FileInputStream("./WebContent/external_data/config.properties"));
 			properties.load(stream);
 			stream.close();
 		} catch (FileNotFoundException e) {
@@ -113,7 +128,7 @@ public abstract class RDFModel {
 		createClasses();
 		createDatatypeProperties();
 		createObjectProperties();
-		createFraktionResources();
+		//createFraktionResources();
 	}
 
 	private void createClasses() {
@@ -137,14 +152,16 @@ public abstract class RDFModel {
 	}
 
 	private void createDatatypeProperties() {
-
+		
 		// existing properties
 		propFirstName = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "firstName");
 		propGivenName = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "givenName");
 		propTitle = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.FOAF) + "title");
 		propGeoLat = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.GEO) + "lat");
 		propGeoLong = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.GEO) + "long");
-
+		propProvenance = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.DC) + "provenance");
+		propCreator = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.DC) + "creator");
+		propLicence = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.DC) + "licence");
 		// self defined properties
 		propNebeneinkuenfteAnzahl = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
 				+ "anzahlNebeneinkuenfte");
@@ -158,6 +175,9 @@ public abstract class RDFModel {
 				+ "jahrNebeneinkunft");
 		propNebeneinkuenftTyp = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "typNebeneinkunft");
 		propNebeneinkuenftOrt = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "ortNebeneinkunft");
+		propNebeneinkuenftFrom = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "startsAt"); 
+		propNebeneinkuenftTo = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "endsAt"); 
+		propNebeneinkuenftSourceString = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "sourceString"); 
 	}
 
 	private void createObjectProperties() {
@@ -188,25 +208,5 @@ public abstract class RDFModel {
 
 	}
 
-	private void createFraktionResources() {
-
-		Resource partei = null;
-
-		partei = model.createResource(SPD_FRAKTION, classFraktion);
-		partei.addProperty(RDFS.label, SPD_LABEL);
-
-		partei = model.createResource(CDU_CSU_FRAKTION, classFraktion);
-		partei.addProperty(RDFS.label, CDU_CSU_LABEL);
-
-		partei = model.createResource(DIE_LINKE_FRAKTION, classFraktion);
-		partei.addProperty(RDFS.label, DIE_LINKE_LABEL);
-
-		partei = model.createResource(FDP_FRAKTION, classFraktion);
-		partei.addProperty(RDFS.label, FDP_LABEL);
-
-		partei = model.createResource(GRUENE_FRAKTION, classFraktion);
-		partei.addProperty(RDFS.label, GRUENE_LABEL);
-
-	}
-
+	
 }
