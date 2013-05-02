@@ -30,7 +30,7 @@ public class MainController implements IActionListener {
 	private static final long serialVersionUID = -2602673556758294975L;
 
 	private BeanItemContainer<Abgeordneter> abgeordnetenContainer;
-	private List<Abgeordneter> mdbList;
+//	private List<Abgeordneter> mdbList;
 	private String actualObjectURI;
 
 	private BasicController basicController;
@@ -58,11 +58,11 @@ public class MainController implements IActionListener {
 		this.rdfImport = new RDFImport();
 		this.abgeordnetenContainer = rdfImport.getPersonBasicContainer();
 
-		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
+//		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
 	
-		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
-		mdbList = conv.getAbgeordnete();
+//		BundestagConverter conv = new BundestagConverter(
+//				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
+//		mdbList = conv.getAbgeordnete();
 
 		this.mainFrame = mainFrame;
 

@@ -146,7 +146,6 @@ public class Abgeordneter implements Serializable {
 			this.fraktion = "unbekannt";
 			return;
 		}
-		System.out.println(fraktion);
 		if (fraktion.equals(IConstants.SPD_LABEL))
 			setFraktionUri(IConstants.SPD_FRAKTION);
 		else if (fraktion.equals(IConstants.CDU_CSU_LABEL))
