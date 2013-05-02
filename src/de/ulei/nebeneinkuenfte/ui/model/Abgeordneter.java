@@ -59,7 +59,7 @@ public class Abgeordneter implements Serializable {
 		finalURI = finalURI.concat(IConstants.NAMESPACE);
 		finalURI = finalURI.concat("/");
 		finalURI = finalURI.concat(IConstants.PERSON_PERSON_VIEW_FRAG);
-		finalURI = finalURI.concat(getURI().substring(getURI().lastIndexOf("/"), getURI().lastIndexOf(".")));
+		finalURI = finalURI.concat(getURI().substring(getURI().lastIndexOf("/")));
 
 		setURI(finalURI);
 
@@ -146,7 +146,7 @@ public class Abgeordneter implements Serializable {
 			this.fraktion = "unbekannt";
 			return;
 		}
-
+		System.out.println(fraktion);
 		if (fraktion.equals(IConstants.SPD_LABEL))
 			setFraktionUri(IConstants.SPD_FRAKTION);
 		else if (fraktion.equals(IConstants.CDU_CSU_LABEL))
@@ -191,6 +191,24 @@ public class Abgeordneter implements Serializable {
 	public List<Nebentaetigkeit> getNebentaetigkeiten() {
 		return nebentaetigkeiten;
 	}
+	
+	private int getMonthsOnJobNumber(Nebentaetigkeit nt) {
+		int months = 0;
+		int startYear = nt.getJobStart()[1];
+		int endYear = nt.getJobEnd()[1];
+		int startMonth = nt.getJobStart()[0];
+		int endMonth = nt.getJobEnd()[0];
+		months = (endYear-startYear)*12 + (endMonth - startMonth) + 1;
+		return months;
+	}
+	
+	private int getYearsOnJobNumber(Nebentaetigkeit nt) {
+		int years = 0;
+		int startYear = nt.getJobStart()[1];
+		int endYear = nt.getJobEnd()[1];
+		years = endYear-startYear;
+		return years;
+	}
 
 	// incorporate start and stop dates
 	// 1 legislaturperiode = 4 years
@@ -200,49 +218,43 @@ public class Abgeordneter implements Serializable {
 		for (Nebentaetigkeit nt : nebentaetigkeiten) {
 			if (nt.getStufe() != null) {
 				if (nt.getStufe().contains("1")) {
-					// 48 months
 					if (nt.isMonthly()) {
-						this.minZusatzeinkommen += 48000;
-						this.maxZusatzeinkommen += 167952;
-						// 4 years
+						this.minZusatzeinkommen += this.getMonthsOnJobNumber(nt)*1000;
+						this.maxZusatzeinkommen += this.getMonthsOnJobNumber(nt)*3500;
 					} else if (nt.isYearly()) {
-						this.minZusatzeinkommen += 4000;
-						this.maxZusatzeinkommen += 13996;
+						this.minZusatzeinkommen += this.getYearsOnJobNumber(nt)*1000;
+						this.maxZusatzeinkommen += this.getYearsOnJobNumber(nt)*3500;
 					} else {
 						this.minZusatzeinkommen += 1000;
-						this.maxZusatzeinkommen += 3499;
+						this.maxZusatzeinkommen += 3500;
 					}
 				} else if (nt.getStufe().contains("2")) {
-					// 48 months
 					if (nt.isMonthly()) {
-						this.minZusatzeinkommen += 168000;
-						this.maxZusatzeinkommen += 335952;
-						// 4 years
+						this.minZusatzeinkommen += this.getMonthsOnJobNumber(nt)*3501;
+						this.maxZusatzeinkommen += this.getMonthsOnJobNumber(nt)*7000;
 					} else if (nt.isYearly()) {
-						this.minZusatzeinkommen += 14000;
-						this.maxZusatzeinkommen += 27996;
+						this.minZusatzeinkommen += this.getYearsOnJobNumber(nt)*3501;
+						this.maxZusatzeinkommen += this.getYearsOnJobNumber(nt)*7000;
 					} else {
-						this.minZusatzeinkommen += 3500;
-						this.maxZusatzeinkommen += 6999;
+						this.minZusatzeinkommen += 3501;
+						this.maxZusatzeinkommen += 7000;
 					}
 				} else if (nt.getStufe().contains("3")) {
-					// 48 months
 					if (nt.isMonthly()) {
-						this.minZusatzeinkommen += 336000;
-						// 4 years
+						this.minZusatzeinkommen += this.getMonthsOnJobNumber(nt)*7001;
 					} else if (nt.isYearly()) {
-						this.minZusatzeinkommen += 28000;
+						this.minZusatzeinkommen += this.getYearsOnJobNumber(nt)*7001;
 					} else {
-						this.minZusatzeinkommen += 7000;
+						this.minZusatzeinkommen += 7001;
 					}
 					canMax = false;
 				}
 			} else {
-				this.maxZusatzeinkommen += 1000;
+				this.maxZusatzeinkommen += 999;
 			}
 		}
 		if (!canMax) {
-			this.maxZusatzeinkommen = 2500000;
+			this.maxZusatzeinkommen = 2000000;
 		}
 		this.setAnzahlNebeneinkuenfte(nebentaetigkeiten.size());
 	}

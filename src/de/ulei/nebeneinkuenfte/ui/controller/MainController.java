@@ -59,6 +59,7 @@ public class MainController implements IActionListener {
 		this.abgeordnetenContainer = rdfImport.getPersonBasicContainer();
 
 		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
+	
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
 		mdbList = conv.getAbgeordnete();
@@ -179,7 +180,7 @@ public class MainController implements IActionListener {
 		setActualPersonView(originView, originController);
 
 		// set URI fragment
-		setActualObjectURI(originURI.substring(originURI.indexOf("/b09/") + 5));
+		setActualObjectURI(originURI.substring(originURI.indexOf("/b17/") + 5));
 		setURIFragment(getActualObjectURI());
 
 	}
@@ -237,7 +238,7 @@ public class MainController implements IActionListener {
 		personView.setPanelCaption(caption);
 		setActualPersonView(personView, personController);
 
-		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("/b09/") + 5));
+		setActualObjectURI(person.getURI().substring(person.getURI().indexOf("/b17/") + 5));
 		setURIFragment(getActualObjectURI());
 
 	}
@@ -300,7 +301,7 @@ public class MainController implements IActionListener {
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
-		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("/b09/") + 5));
+		setActualObjectURI(fractionURI.substring(fractionURI.indexOf("/b17/") + 5));
 		setURIFragment(getActualObjectURI());
 
 	}

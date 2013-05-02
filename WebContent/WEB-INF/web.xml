@@ -32,7 +32,7 @@
 
 	<servlet-mapping>
 		<servlet-name>Nebeneinkuenfte Application</servlet-name>
-		<url-pattern>/b09/*</url-pattern>
+		<url-pattern>/b17/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
         <servlet-name>Nebeneinkuenfte Application</servlet-name>

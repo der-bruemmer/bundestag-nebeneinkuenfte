@@ -1,5 +1,6 @@
 package de.ulei.nebeneinkuenfte.model.crawler;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -13,17 +14,21 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +44,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
+import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.util.IConstants;
@@ -46,10 +52,12 @@ import de.ulei.nebeneinkuenfte.util.IConstants;
 public class BundestagConverter {
 
 	String startUri = null;
-	String from = "10/2009";
+	int[] from = new int[2];
+	int[] to = new int[2];
 	List<String> cities = new ArrayList<String>();
 	List<Abgeordneter> mdbs = new ArrayList<Abgeordneter>();
-
+	private Properties properties;
+	
 	/**
 	 * Konstruktor
 	 * 
@@ -73,8 +81,18 @@ public class BundestagConverter {
 	 */
 
 	public BundestagConverter(String URI, boolean scrape, String path) {
-		this.startUri = URI;
+		
+		this.loadProperties();
+		
+		String[] tempFrom = properties.getProperty("from").split("\\.");
+		String[] tempTo = properties.getProperty("to").split("\\.");
 
+		this.from[0] = Integer.parseInt(tempFrom[0]);
+		this.from[1] = Integer.parseInt(tempFrom[1]);
+		this.to[0] = Integer.parseInt(tempTo[0]);
+		this.to[1] = Integer.parseInt(tempTo[1]);
+		
+		this.startUri = URI;
 		this.cities = this.readCityFile("./WebContent/external_data/staedte_osm");
 
 		ArrayList<String> failed = new ArrayList<String>();
@@ -82,7 +100,7 @@ public class BundestagConverter {
 			this.fillMdBList(URI);
 			int count = 0;
 			for (Abgeordneter mdb : this.mdbs) {
-				// if(mdb.getLastname().toLowerCase().contains("merkel")) {
+//				if(mdb.getLastname().toLowerCase().contains("leutheusser")) {
 				count++;
 				if (!this.parseMdB(mdb)) {
 					// parse failed
@@ -96,11 +114,25 @@ public class BundestagConverter {
 				this.writeMdBObjectToFile(path, mdb);
 				System.out.println("Parsed Mdb " + count + " of " + this.mdbs.size());
 				// if(count==50) break;
-				wait(50);
-				// }
+				wait(500);
+//				}
 			}
 		} else {
 			this.readMdbsFromFolder(path);
+		}
+	}
+	
+	private void loadProperties() {
+		this.properties = new Properties();
+		BufferedInputStream stream;
+		try {
+			stream = new BufferedInputStream(new FileInputStream("./WebContent/external_data/config.properties"));
+			this.properties.load(stream);
+			stream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -321,7 +353,7 @@ public class BundestagConverter {
 	}
 
 	private List<Nebentaetigkeit> parseTaetigkeitenText(String taetigkeitText) {
-
+		
 		List<Nebentaetigkeit> nts = new ArrayList<Nebentaetigkeit>();
 
 		String[] lines = taetigkeitText.split("\n");
@@ -331,34 +363,66 @@ public class BundestagConverter {
 
 		Pattern p = Pattern.compile("Stufe (1|2|3)");
 		Matcher m = p.matcher(taetigkeitText);
-		// these are unpaid or paid under 1000euro. it would be nice to have
-		// them, too?!
+
 		if (!m.find()) {
 			return nts;
 		}
 
 		Nebentaetigkeit nt = new Nebentaetigkeit();
+		nt.setJobStart(this.from);
+		nt.setJobEnd(this.to);
+		String source = "";
 		boolean parsed = false;
 		for (int i = 0; i < lines.length; i++) {
-
+			
 			if (!lines[i].toLowerCase().contains("stufe 1") && !lines[i].toLowerCase().contains("stufe 2")
 					&& !lines[i].toLowerCase().contains("stufe 3")) {
 
 				auftragGeber += lines[i] + " ";
-
+				source += lines[i] + " ";
 				if (parsed == true) {
 					System.out.println("Lines after stufe parsed: " + lines[i]);
+					int[] end = this.findEndOfJob(lines[i]);
+					if(end != null) {
+						if(end[0]!=-1 && end[1]!=-1) {
+							nt.setJobEnd(end);
+						}
+					}
+					int[] start = this.findStartOfJob(lines[i]);
+					if(start != null) {
+						if(start[0]!=-1 && start[1]!=-1) {
+							nt.setJobStart(start);
+						}
+					}
+//					System.out.println(nt.getJobStart()[0]+" "+nt.getJobStart()[1]+" bis "+nt.getJobEnd()[0]+" "+nt.getJobEnd()[1]);
+//					System.out.println();
 				}
 
 			} else {
-
+				source += lines[i] + " ";
 				nt = new Nebentaetigkeit();
+				nt.setJobStart(this.from);
+				nt.setJobEnd(this.to);
 				if (lines.length == 1) {
 					this.parseAuftraggeber(nt, taetigkeitText.trim());
 				} else {
 					this.parseAuftraggeber(nt, auftragGeber);
 				}
-
+				
+				//find start and end dates
+				int[] end = this.findEndOfJob(lines[i]);
+				if(end != null) {
+					if(end[0]!=-1 && end[1]!=-1) {
+						nt.setJobEnd(end);
+					}
+				}
+				int[] start = this.findStartOfJob(lines[i]);
+				if(start != null) {
+					if(start[0]!=-1 && start[1]!=-1) {
+						nt.setJobStart(start);
+					}
+				}
+				
 				// possibility of multiple jobs in one line
 				if (lines[i].contains(";")) {
 
@@ -366,7 +430,9 @@ public class BundestagConverter {
 					for (int j = 0; j < semiSplit.length; j++) {
 
 						Nebentaetigkeit temp = this.parseInfoOfTaetigkeit(nt, semiSplit[j]);
-
+						if(temp == null) {
+							continue;
+						}
 						// if there is no type and the auftraggeber of both
 						// taetigkeiten are identical, use the type of the
 						// former taetigkeit
@@ -382,7 +448,9 @@ public class BundestagConverter {
 					}
 				} else {
 					Nebentaetigkeit temp = this.parseInfoOfTaetigkeit(nt, lines[i]);
-
+					if(temp == null) {
+						continue;
+					}
 					// if there is no type and the auftraggeber of both
 					// taetigkeiten are identical, use the type of the former
 					// taetigkeit
@@ -415,19 +483,57 @@ public class BundestagConverter {
 			int minGesamt = 0;
 			int maxGesamt = 0;
 			int overMax = 0;
+			int totalNoJobCount = 0;
+			int totalJobCount = 0;
+			int cdu = 0;
+			int fdp = 0;
+			int grün = 0;
+			int links = 0;
+			int spd = 0;
 			for (Abgeordneter mdb : mdbs) {
-
+				if(mdb.getFraktion().toLowerCase().contains("cdu")) {
+					cdu+=mdb.getMinZusatzeinkommen();
+				} else if(mdb.getFraktion().toLowerCase().contains("fdp")) {
+					fdp+=mdb.getMinZusatzeinkommen();
+				} else if(mdb.getFraktion().toLowerCase().contains("grün")) {
+					grün+=mdb.getMinZusatzeinkommen();
+				} else if(mdb.getFraktion().toLowerCase().contains("link")) {
+					links+=mdb.getMinZusatzeinkommen();
+				} else if(mdb.getFraktion().toLowerCase().contains("spd")) {
+					spd+=mdb.getMinZusatzeinkommen();
+				}
 				if (mdb.getAnzahlNebeneinkuenfte() != 0) {
-					out.write(mdb.getForename() + " " + mdb.getLastname() + " " + mdb.getFraktion());
+					totalJobCount++;
+					out.write(mdb.getForename() + " " + mdb.getLastname() + " Partei:" + mdb.getFraktion());
 
 					out.write(" Anzahl Tätigkeiten: " + mdb.getAnzahlNebeneinkuenfte() + " min: "
 							+ mdb.getMinZusatzeinkommen() + " max " + mdb.getMaxZusatzeinkommen());
+					out.newLine();
+					out.write("URI: "+mdb.getURI());
+					out.newLine();
+					out.write("FraktionURI: "+mdb.getFraktionUri());
+					out.newLine();
+					out.write("Wahlkreis: "+mdb.getWahlkreisName());
 					out.newLine();
 					out.newLine();
 					out.write("______Nebentätigkeiten:______\n");
 					out.newLine();
 					out.flush();
 					for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
+						int months = -1;
+						
+						if(neben.getJobStart()!=null && neben.getJobEnd()!=null) {
+							int startYear = neben.getJobStart()[1];
+							int endYear = neben.getJobEnd()[1];
+							int startMonth = neben.getJobStart()[0];
+							int endMonth = neben.getJobEnd()[0];
+							out.write("startmonth:"+startMonth+" startyear:"+startYear+" endmonth:"+endMonth+" endYear:"+endYear);
+							out.newLine();
+							months = (endYear-startYear)*12 + (endMonth - startMonth) + 1;
+						} else {
+							out.write("HULLABULLA");
+						}
+						
 						out.write("Auftraggeber: " + neben.getAuftraggeber() + "\nUri: " + neben.getAuftragUri()
 								+ "\nOrt: " + neben.getPlace() + "\nOrt Uri: " + neben.getPlaceUri());
 						out.newLine();
@@ -439,6 +545,7 @@ public class BundestagConverter {
 						out.newLine();
 						out.write("Jährlich: " + neben.isYearly() + "\nMonatlich: " + neben.isMonthly());
 						out.newLine();
+						out.write("Dauer: " + months);
 						if (neben.getSourceString() != null) {
 							out.write(neben.getSourceString());
 							out.newLine();
@@ -455,13 +562,20 @@ public class BundestagConverter {
 					} else {
 						overMax++;
 					}
+				} else {
+					totalNoJobCount++;
 				}
 
 			}
-
+			out.write("cdu: " + cdu +" fdp: "+fdp+" spd: "+spd+" grüne: "+grün+" linke: "+links);
+			out.newLine();
 			out.write(mdbs.size() + " Abgeordnete, Einkünfte min gesamt: " + minGesamt + " max gesamt: " + maxGesamt);
 			out.newLine();
 			out.write(overMax + " Abgeordnete haben mindestens eine Tätigkeit über 7000 Euro.");
+			out.newLine();
+			out.write(totalJobCount + " Abgeordnete haben mindestens eine Nebentätigkeit.");
+			out.newLine();
+			out.write(totalNoJobCount + " Abgeordnete haben keine Nebentätigkeit.");
 
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
@@ -480,15 +594,178 @@ public class BundestagConverter {
 		}
 
 	}
+	
+//	private int getMonthsOnJobNumber(Nebentaetigkeit nt) {
+//		int months = 0;
+//		int startYear = nt.getJobStart()[1];
+//		int endYear = nt.getJobEnd()[1];
+//		int startMonth = nt.getJobStart()[0];
+//		int endMonth = nt.getJobEnd()[0];
+//		months = (endYear-startYear)*12 + (endMonth - startMonth) + 1;
+//		return months;
+//	}
+//	
+//	private int getYearsOnJobNumber(Nebentaetigkeit nt) {
+//		int years = 0;
+//		int startYear = nt.getJobStart()[1];
+//		int endYear = nt.getJobEnd()[1];
+//		years = endYear-startYear;
+//		return years;
+//	}
+//	
+//	private void writeAsCSV(List<Abgeordneter> mdbs) {
+//		BufferedWriter out = null;
+//
+//		try {
+//
+//			FileWriter fileOut = new FileWriter("nebentaetigkeiten.csv");
+//			out = new BufferedWriter(fileOut);
+//
+//			out.write("Name,Fraktion,monatlichStufe0,monatlichStufe1,monatlichStufe2,monatlichStufe3," +
+//					"jährlichStufe0,jährlichStufe1,jährlichStufe2,jährlichStufe3," +
+//					"einmaligStufe0,einmaligStufe1,einmaligStufe2,einmaligStufe3," +
+//					"monatlichBundStufe0,monatlichBundStufe1,monatlichBundStufe2,monatlichBundStufe3," +
+//					"jährlichBundStufe0,jährlichBundStufe1,jährlichBundStufe2,jährlichBundStufe3,minimumGesamt,minimumBund\n");
+//			for (Abgeordneter mdb : mdbs) {
+//
+//					out.write(mdb.getForename() + " " + mdb.getLastname() + "," + mdb.getFraktion()+",");
+//					int[] monatlich = new int[4];
+//					monatlich[0] = 0;
+//					monatlich[1] = 0;
+//					monatlich[2] = 0;
+//					monatlich[3] = 0;
+//					int[] jaehrlich = new int[4];
+//					jaehrlich[0] = 0;
+//					jaehrlich[1] = 0;
+//					jaehrlich[2] = 0;
+//					jaehrlich[3] = 0;
+//					int[] onetime = new int[4];
+//					onetime[0] = 0;
+//					onetime[1] = 0;
+//					onetime[2] = 0;
+//					onetime[3] = 0;
+//					int[] monatlichBund = new int[4];
+//					monatlichBund[0] = 0;
+//					monatlichBund[1] = 0;
+//					monatlichBund[2] = 0;
+//					monatlichBund[3] = 0;
+//					int[] jaehrlichBund = new int[4];
+//					jaehrlichBund[0] = 0;
+//					jaehrlichBund[1] = 0;
+//					jaehrlichBund[2] = 0;
+//					jaehrlichBund[3] = 0;
+//					
+//					for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
+//						if(neben.isMonthly()) {
+//							int stufe = 0;
+//							if(neben.getStufe()!=null) {
+//								stufe = Integer.parseInt(neben.getStufe().split(" ")[1]);
+//							}
+//							if(neben.isGouvernmentJob()) {
+//								monatlichBund[stufe]++;
+//							} else {
+//								monatlich[stufe]++;
+//							}
+//						} else if(neben.isYearly()) {
+//							int stufe = 0;
+//							if(neben.getStufe()!=null) {
+//								stufe = Integer.parseInt(neben.getStufe().split(" ")[1]);
+//							}
+//							if(neben.isGouvernmentJob()) {
+//								jaehrlichBund[stufe]++;
+//							} else {
+//								jaehrlich[stufe]++;
+//							}
+//						} else {
+//							int stufe = 0;
+//							if(neben.getStufe()!=null) {
+//								stufe = Integer.parseInt(neben.getStufe().split(" ")[1]);
+//							}
+//							
+//							onetime[stufe]++;
+//						}
+//						
+//					}
+//					
+//					int minZusatzBund = 0;
+//					
+//					for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten()) {
+//						if(nt.isGouvernmentJob()) {
+//						
+//							if (nt.getStufe().contains("1")) {
+//								if (nt.isMonthly()) {
+//									minZusatzBund += this.getMonthsOnJobNumber(nt)*1000;
+//									
+//								} else if (nt.isYearly()) {
+//									minZusatzBund += this.getYearsOnJobNumber(nt)*1000;
+//								
+//								} else {
+//									minZusatzBund += 1000;
+//									
+//								}
+//							} else if (nt.getStufe().contains("2")) {
+//								if (nt.isMonthly()) {
+//									minZusatzBund += this.getMonthsOnJobNumber(nt)*3501;
+//									
+//								} else if (nt.isYearly()) {
+//									minZusatzBund += this.getYearsOnJobNumber(nt)*3501;
+//									
+//								} else {
+//									minZusatzBund += 3501;
+//								
+//								}
+//							} else if (nt.getStufe().contains("3")) {
+//								if (nt.isMonthly()) {
+//									minZusatzBund += this.getMonthsOnJobNumber(nt)*7001;
+//								} else if (nt.isYearly()) {
+//									minZusatzBund += this.getYearsOnJobNumber(nt)*7001;
+//								} else {
+//									minZusatzBund += 7001;
+//								}
+//							
+//							}
+//						}
+//					}
+//					
+//					
+//					out.write(monatlich[0]+","+monatlich[1]+","+monatlich[2]+","+monatlich[3]+","+
+//							jaehrlich[0]+","+jaehrlich[1]+","+jaehrlich[2]+","+jaehrlich[3]+","+
+//							onetime[0]+","+onetime[1]+","+onetime[2]+","+onetime[3]+","+
+//							monatlichBund[0]+","+monatlichBund[1]+","+monatlichBund[2]+","+monatlichBund[3]+","+
+//							jaehrlichBund[0]+","+jaehrlichBund[1]+","+jaehrlichBund[2]+","+jaehrlichBund[3]+","+mdb.getMinZusatzeinkommen()+","+minZusatzBund);
+//					out.newLine();
+//					out.flush();
+//					
+//				}
+//
+//
+//		} catch (FileNotFoundException ex) {
+//			ex.printStackTrace();
+//		} catch (IOException ex) {
+//			ex.printStackTrace();
+//		} finally {
+//			// Close the ObjectOutputStream
+//			try {
+//				if (out != null) {
+//					out.flush();
+//					out.close();
+//				}
+//			} catch (IOException ex) {
+//				ex.printStackTrace();
+//			}
+//		}
+//
+//	}
 
 	private Nebentaetigkeit parseInfoOfTaetigkeit(Nebentaetigkeit nt, String text) {
-
-		// System.out.println("Parsing info of taetigkeit: " + text);
+		
+		//System.out.println("Parsing info of taetigkeit: " + text);
 		// copying values of Nebentaetigkeit in parameter, because there could
 		// be more than one with the same auftraggeber
 		Nebentaetigkeit taetigkeitFound = new Nebentaetigkeit(nt);
 		boolean intervalMonthly = false;
 		boolean intervalYearly = false;
+		boolean gouvernmentJob = false;
 		String[] split = text.split(",");
 		for (int i = 0; i < split.length; i++) {
 
@@ -507,6 +784,9 @@ public class BundestagConverter {
 				intervalMonthly = true;
 			} else if (trimmed.contains("jährlich")) {
 				intervalYearly = true;
+			} else if (trimmed.contains("Bundes")) {
+				gouvernmentJob = true;
+				taetigkeitFound.appendType(trimmed);
 			} else if (isCity(trimmed)) {
 				taetigkeitFound.setPlace(trimmed);
 			} else {
@@ -520,7 +800,7 @@ public class BundestagConverter {
 
 		taetigkeitFound.setMonthly(intervalMonthly);
 		taetigkeitFound.setYearly(intervalYearly);
-
+		taetigkeitFound.setGouvernmentJob(gouvernmentJob);
 		return taetigkeitFound;
 
 	}
@@ -612,8 +892,10 @@ public class BundestagConverter {
 
 				if (place.trim().equals(dbpPlace[0].trim())) {
 					nt.setPlaceUri(dbpPlace[1]);
-					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
-					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					if(dbpPlace[2]!="NAN" && dbpPlace[3]!="NAN" ) {
+						nt.setLatitude(Float.parseFloat(dbpPlace[2]));
+						nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					}
 					return;
 				}
 			}
@@ -622,8 +904,10 @@ public class BundestagConverter {
 			for (String[] dbpPlace : places) {
 				if (dbpPlace[0].trim().contains(place)) {
 					nt.setPlaceUri(dbpPlace[1]);
-					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
-					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					if(dbpPlace[2]!="NAN" && dbpPlace[3]!="NAN" ) {
+						nt.setLatitude(Float.parseFloat(dbpPlace[2]));
+						nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					}
 					return;
 				}
 			}
@@ -640,8 +924,10 @@ public class BundestagConverter {
 				}
 				if (fits) {
 					nt.setPlaceUri(dbpPlace[1]);
-					nt.setLatitude(Float.parseFloat(dbpPlace[2]));
-					nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					if(dbpPlace[2]!="NAN" && dbpPlace[3]!="NAN" ) {
+						nt.setLatitude(Float.parseFloat(dbpPlace[2]));
+						nt.setLongitude(Float.parseFloat(dbpPlace[3]));
+					}
 					return;
 				}
 			}
@@ -808,9 +1094,9 @@ public class BundestagConverter {
 
 			// connecting via proxy, saving the html to a string, parsing it
 			// with jsoup
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("91.187.132.13", 8080));
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("221.194.43.10", 8081));
 			HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
-			uc.setConnectTimeout(60000);
+			uc.setConnectTimeout(20000);
 			uc.connect();
 			String line = null;
 			StringBuffer tmp = new StringBuffer();
@@ -831,13 +1117,20 @@ public class BundestagConverter {
 				System.out.println(url);
 			}
 
+		} catch (ConnectException conex) {
+			System.out.println("failed (ConnectException), trying again");
+			matchSingleAuftraggeber(auftrag, ort, mdb);
+		} catch (SocketTimeoutException ste) {
+			System.out.println("failed (SocketTimeoutException), trying again");
+			matchSingleAuftraggeber(auftrag, ort, mdb);
 		} catch (IOException ioe) {
+		
 			System.out.println("Failed to match " + auftrag);
 			ioe.printStackTrace();
 
 		} catch (UnsupportedCharsetException uce) {
 			System.out.println("Charset UTF-8 not supported by System");
-		}
+		} 
 
 		return auftraggeber;
 	}
@@ -845,16 +1138,20 @@ public class BundestagConverter {
 	public List<Abgeordneter> matchAllAuftraggeber(List<Abgeordneter> mdbs) {
 
 		int count = 0;
+		int total = mdbs.size();
 		for (Abgeordneter mdb : mdbs) {
-
+			
 			if (mdb.getNebentaetigkeiten().size() > 0) {
 				count++;
 				// if(count>50) {
-				System.out.println("Matching Auftraggeber " + count + " of 209 " + mdb.getLastname());
+				System.out.println("Matching Auftraggeber " + count + " of " + total +" "+ mdb.getLastname());
 				String tempAuftrag = "";
 				String tempUri = "";
+				int taetigkeiten = 0;
+				int totaltaet = mdb.getNebentaetigkeiten().size();
 				for (Nebentaetigkeit neben : mdb.getNebentaetigkeiten()) {
-
+					taetigkeiten++;
+					System.out.println("\tNebentätigkeit " + taetigkeiten + " of " + totaltaet);
 					String auftragUri = "";
 
 					if (!tempAuftrag.equals(neben.getAuftraggeber())) {
@@ -902,13 +1199,88 @@ public class BundestagConverter {
 		}
 		return cities;
 	}
+	
+	private int[] findEndOfJob(String jobDescription) {
+		int[] dateArray = null;
+		Matcher matcher = Pattern.compile( "bis(.| )*?(1|2)[0-9]{3}" ).matcher( jobDescription );
+		String date = null;
+		if(matcher.find()) {
+			date = matcher.group();
+		} else {
+			return null;
+		}
+
+		dateArray = this.parseDateString(date.trim());
+		
+		return dateArray;
+	}
+	
+	private int[] findStartOfJob(String jobDescription) {
+		int[] dateArray = null;
+		Matcher matcher = Pattern.compile( "(von|vom|seit)(.| )*?(1|2)[0-9]{3}" ).matcher( jobDescription );
+		String date = null;
+		if(matcher.find()) {
+			date = matcher.group();
+		} else {
+			return null;
+		}
+
+		dateArray = this.parseDateString(date.trim());
+		return dateArray;
+	}
+	
+	private int[] parseDateString(String date) {
+		int[] dateArray = new int[2];
+		dateArray[0] = -1;
+		dateArray[1] = -1;
+		Matcher matcher = Pattern.compile( "[0-9]{2}\\.[0-9]{2}\\.(1|2)[0-9]{3}" ).matcher( date );
+		//if normal date format dd.mm.yyyy
+		if(matcher.find()) {
+			date = matcher.group();
+			String[] dateSplit = date.split("\\.");
+			//only use month and year
+			dateArray[0] = Integer.parseInt(dateSplit[1]);
+			dateArray[1] = Integer.parseInt(dateSplit[2]);
+			
+			return dateArray;
+		//if format is dd. Month yyyy or Month yyyy or yyyy
+		} else {
+			//Month yyyy
+			if(date.matches(".*? [0-9]{4}")) {
+				date = date.toLowerCase();
+				List<String> months = Arrays.asList("januar", "februar", "märz", "april", "mai", "juni","juli","august","september","oktober","november","dezember");
+
+				for(int i = 0; i < months.size(); i++) {
+					String month = months.get(i);
+
+					if(date.contains(month)) {
+						dateArray[0] = i+1;
+					} 
+				}
+
+				matcher = Pattern.compile( "(1|2)[0-9]{3}" ).matcher( date );
+				if(matcher.find()) {
+					dateArray[1] = Integer.parseInt(matcher.group());
+				} else {
+					return null;
+				}
+				//no month found, only a year given. decrement year, set month to 12
+				if(dateArray[0]==-1) {
+					dateArray[0] = 12;
+					dateArray[1]--;
+				}
+						
+			}	
+		}
+		
+		return dateArray;
+	}
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
 
 		/*
 		 * crawl all parliament members
 		 */
-
 		BundestagConverter conv = new BundestagConverter(
 				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
 		List<Abgeordneter> mdbs = conv.getAbgeordnete();
@@ -917,33 +1289,40 @@ public class BundestagConverter {
 		 * try to find latitude and longitude data for given citys
 		 */
 
-		List<String[]> places = conv.getGermanCityNames();
-		mdbs = conv.setAllPlaceUris(mdbs, places);
-		for (Abgeordneter mdb : mdbs) {
-			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		}
+//		List<String[]> places = conv.getGermanCityNames();
+//		mdbs = conv.setAllPlaceUris(mdbs, places);
+//		for (Abgeordneter mdb : mdbs) {
+//			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+//		}
+		
+		//conv.writeAsCSV(mdbs);
 
 		/*
 		 * try to match sources
 		 */
 
-		mdbs = conv.matchAllAuftraggeber(mdbs);
-		for (Abgeordneter mdb : mdbs) {
-			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-		}
-
+//		mdbs = conv.matchAllAuftraggeber(mdbs);
+//		for (Abgeordneter mdb : mdbs) {
+//			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+////			
+//		}
+		conv.writeNebentaetigkeitenToFile(mdbs);
 		/*
 		 * try to set source URIs
 		 */
 
-		mdbs = conv.setAllSourceUris(mdbs);
+		//mdbs = conv.setAllSourceUris(mdbs);
 
 		/*
 		 * try to change homepage of Ingo Gädechens
 		 */
 
 		conv.changeIngosHomepage();
-		
+		for (Abgeordneter mdb : mdbs) {
+			mdb.setFraktion(mdb.getFraktion());
+			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+			
+		}
 		System.out.println("Finished data crawling");
 	}
 }
