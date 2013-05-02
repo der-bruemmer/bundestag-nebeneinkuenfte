@@ -126,7 +126,9 @@ public class BundestagConverter {
 		this.properties = new Properties();
 		BufferedInputStream stream;
 		try {
-			stream = new BufferedInputStream(new FileInputStream("./WebContent/external_data/config.properties"));
+			stream = new BufferedInputStream(new FileInputStream(NebeneinkuenfteApplication.getInstance().getContext()
+					.getBaseDirectory()
+					+ "/external_data/config.properties"));
 			this.properties.load(stream);
 			stream.close();
 		} catch (FileNotFoundException e) {

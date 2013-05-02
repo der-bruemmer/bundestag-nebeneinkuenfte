@@ -221,7 +221,7 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		Query q = QueryFactory.create(query.toString());
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// iterate over ResultSet and fill list with politicans
@@ -381,7 +381,7 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		Query q = QueryFactory.create(query.toString());
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// iterate over ResultSet and add sidelineJobs for every politican
@@ -600,7 +600,7 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		Query q = QueryFactory.create(query.toString());
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// iterate over ResultSet
@@ -824,7 +824,7 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		Query q = QueryFactory.create(query.toString());
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// iterate over ResultSet
@@ -869,7 +869,7 @@ public class RDFImport extends RDFModel implements Serializable {
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// create OntModel to serialize graph
@@ -902,7 +902,7 @@ public class RDFImport extends RDFModel implements Serializable {
 		Query query = QueryFactory.create(queryString);
 
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query,
-				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
 
 		// create OntModel to serialize graph
