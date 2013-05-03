@@ -73,6 +73,7 @@ public abstract class RDFModel {
 
 	// ObjectProperties
 	protected ObjectProperty propHomepage;
+	protected ObjectProperty propBundestagPage;
 	protected ObjectProperty propMbox;
 	protected ObjectProperty propMember;
 	protected ObjectProperty propHatNebeneinkunft;
@@ -195,6 +196,9 @@ public abstract class RDFModel {
 		propHatWahlkreis = model.createObjectProperty(model.getNsPrefixURI(INamespace.BTD) + "hatWahlkreis");
 		propHatWahlkreis.setDomain(classAbgeordneter);
 		propHatWahlkreis.setRange(classWahlkreis);
+		
+		propBundestagPage = model.createObjectProperty(model.getNsPrefixURI(INamespace.BTD) + "bundestagWebsite");
+		propBundestagPage.setDomain(classAbgeordneter);
 
 	}
 
