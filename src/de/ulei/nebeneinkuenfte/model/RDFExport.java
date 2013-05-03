@@ -211,7 +211,7 @@ public class RDFExport extends RDFModel implements Serializable {
 			}
 			
 			//add bundestag.de source uri
-			politician.addProperty(propHomepage, createDocumentResource(this.getBundestagURI(mdb)));		
+			politician.addProperty(propBundestagPage, createDocumentResource(this.getBundestagURI(mdb)));		
 			
 			politician.addProperty(propNebeneinkuenfteAnzahl, model.createTypedLiteral(mdb.getAnzahlNebeneinkuenfte()));
 			politician.addProperty(propNebeneinkuenfteMaximum, model.createTypedLiteral(mdb.getMaxZusatzeinkommen()));
