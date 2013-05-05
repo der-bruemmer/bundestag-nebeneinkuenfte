@@ -64,7 +64,8 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append(propFirstName.getLocalName());
 		query.append(" ?");
 		query.append(propGivenName.getLocalName());
-		query.append(" ?");
+		//if ?home (contains mdb.getHomepage()) is bound, select it as propHomepage. if not, use bundestagPage
+		query.append("(<bif:either>(BOUND(?home),?home,?+"+propBundestagPage.getLocalName()+")) as ?");
 		query.append(propHomepage.getLocalName());
 		query.append(" ?");
 		query.append(propMbox.getLocalName());
@@ -129,13 +130,13 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append("> ?");
 		query.append(propGivenName.getLocalName());
 		query.append(".\n ");
-
+		
 		query.append("?");
 		query.append(politicanURI);
 		query.append(" <");
-		query.append(propHomepage.getURI());
+		query.append(propBundestagPage.getURI());
 		query.append("> ?");
-		query.append(propHomepage.getLocalName());
+		query.append(propBundestagPage.getLocalName());
 		query.append(".\n ");
 
 		query.append("?");
@@ -209,6 +210,15 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append("> ?");
 		query.append(classWahlkreis.getLocalName());
 		query.append(".\n ");
+		
+		//homepage is optional and saved to ?home variable, evaluated by bif:either in SELECT clause
+		query.append("OPTIONAL{?");
+		query.append(politicanURI);
+		query.append(" <");
+		query.append(propHomepage.getURI());
+		query.append("> ?");
+		query.append("home");
+		query.append(".}\n ");
 
 		query.append("}");
 
