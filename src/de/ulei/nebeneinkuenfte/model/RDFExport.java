@@ -530,7 +530,7 @@ public class RDFExport extends RDFModel implements Serializable {
 		RDFExport export = new RDFExport();
 		export.createModel(conv.getAbgeordnete());
 		
-		export.fileExport(System.getProperty("user.home") + "/Desktop/bundestagdata_01_05_13", IRDFExport.TURTLE);
+		export.fileExport(System.getProperty("user.home") + "/Desktop/bundestagdata_05_05_13", IRDFExport.TURTLE);
 
 //		try {
 //			model.tripleStoreExport(INamespace.NAMSESPACE_MAP.get(INamespace.BTD));

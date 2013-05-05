@@ -96,6 +96,7 @@ public class BundestagConverter {
 		this.cities = this.readCityFile("./WebContent/external_data/staedte_osm");
 
 		ArrayList<String> failed = new ArrayList<String>();
+		
 		if (scrape) {
 			this.fillMdBList(URI);
 			int count = 0;
@@ -110,6 +111,7 @@ public class BundestagConverter {
 						failed.add(mdb.getURI());
 					}
 				}
+				
 				mdb.setFinalURI();
 				this.writeMdBObjectToFile(path, mdb);
 				System.out.println("Parsed Mdb " + count + " of " + this.mdbs.size());
@@ -120,6 +122,7 @@ public class BundestagConverter {
 		} else {
 			this.readMdbsFromFolder(path);
 		}
+		
 	}
 	
 	private void loadProperties() {
@@ -129,6 +132,7 @@ public class BundestagConverter {
 			stream = new BufferedInputStream(new FileInputStream(NebeneinkuenfteApplication.getInstance().getContext()
 					.getBaseDirectory()
 					+ "/external_data/config.properties"));
+//			stream = new BufferedInputStream(new FileInputStream("./WebContent/external_data/config.properties"));
 			this.properties.load(stream);
 			stream.close();
 		} catch (FileNotFoundException e) {
@@ -193,12 +197,14 @@ public class BundestagConverter {
 		try {
 			Document doc = Jsoup.connect(mdb.getURI())
 					.userAgent("Screenscraper Abgeordnete: Uni-Leipzig, Institut für Informatik").timeout(20000).get();
-			Elements externeLinks = doc.getElementsByClass("linkExtern");
-
-			if (externeLinks.first() != null) {
-				String homepage = externeLinks.first().child(0).attr("href");
+			Elements contextBox = doc.getElementsByClass("contextBox");
+			Elements contextChildren = contextBox.select(".standardBox .standardLinkliste .linkExtern");
+			if (contextChildren.first() != null) {
+				
+				String homepage = contextChildren.first().child(0).attr("href");
 				mdb.setHomepage(homepage);
 			}
+			
 
 			Elements mail = doc.getElementsByClass("linkEmail");
 
@@ -1096,7 +1102,7 @@ public class BundestagConverter {
 
 			// connecting via proxy, saving the html to a string, parsing it
 			// with jsoup
-			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("221.194.43.10", 8081));
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("202.171.253.108", 83));
 			HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
 			uc.setConnectTimeout(20000);
 			uc.connect();
@@ -1128,11 +1134,13 @@ public class BundestagConverter {
 		} catch (IOException ioe) {
 		
 			System.out.println("Failed to match " + auftrag);
-			ioe.printStackTrace();
-
+			matchSingleAuftraggeber(auftrag, ort, mdb);
+			
 		} catch (UnsupportedCharsetException uce) {
 			System.out.println("Charset UTF-8 not supported by System");
-		} 
+		} catch(Exception e) {
+			matchSingleAuftraggeber(auftrag, ort, mdb);
+		}
 
 		return auftraggeber;
 	}
@@ -1302,29 +1310,29 @@ public class BundestagConverter {
 		/*
 		 * try to match sources
 		 */
-
+//
 //		mdbs = conv.matchAllAuftraggeber(mdbs);
 //		for (Abgeordneter mdb : mdbs) {
 //			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-////			
+//			
 //		}
-		conv.writeNebentaetigkeitenToFile(mdbs);
+//		conv.writeNebentaetigkeitenToFile(mdbs);
 		/*
 		 * try to set source URIs
 		 */
 
-		//mdbs = conv.setAllSourceUris(mdbs);
+//		mdbs = conv.setAllSourceUris(mdbs);
 
 		/*
 		 * try to change homepage of Ingo Gädechens
 		 */
 
-		conv.changeIngosHomepage();
-		for (Abgeordneter mdb : mdbs) {
-			mdb.setFraktion(mdb.getFraktion());
-			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
-			
-		}
+//		conv.changeIngosHomepage();
+//		for (Abgeordneter mdb : mdbs) {
+//			mdb.setFraktion(mdb.getFraktion());
+//			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
+////			
+//		}
 		System.out.println("Finished data crawling");
 	}
 }
