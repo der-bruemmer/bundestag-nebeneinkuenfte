@@ -6,7 +6,7 @@ public interface IConstants {
 	 * placeholder integer value for infinite and character
 	 */
 
-	public static int INFINITE_VALUE = 2500000;
+	public static int INFINITE_VALUE = 2000000;
 	public static String INFINITE_SIGN = String.valueOf('\u221e');
 
 	/*

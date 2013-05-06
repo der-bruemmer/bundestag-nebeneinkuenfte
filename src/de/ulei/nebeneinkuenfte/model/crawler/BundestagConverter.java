@@ -1316,7 +1316,7 @@ public class BundestagConverter {
 //			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 //			
 //		}
-//		conv.writeNebentaetigkeitenToFile(mdbs);
+		conv.writeNebentaetigkeitenToFile(mdbs);
 		/*
 		 * try to set source URIs
 		 */

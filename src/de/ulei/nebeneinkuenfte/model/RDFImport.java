@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
@@ -39,6 +42,7 @@ public class RDFImport extends RDFModel implements Serializable {
 	private String nebenjobURI = "nebenjobURI";
 	private String auftraggeberURI = "auftraggeberURI";
 	private String placeURI = "placeURI";
+	private static Logger logger = LogManager.getLogger("RDFImport");
 
 	private Map<String, City> cityCache;
 
@@ -64,8 +68,7 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append(propFirstName.getLocalName());
 		query.append(" ?");
 		query.append(propGivenName.getLocalName());
-		//if ?home (contains mdb.getHomepage()) is bound, select it as propHomepage. if not, use bundestagPage
-		query.append("(<bif:either>(BOUND(?home),?home,?+"+propBundestagPage.getLocalName()+")) as ?");
+		query.append(" ?");
 		query.append(propHomepage.getLocalName());
 		query.append(" ?");
 		query.append(propMbox.getLocalName());
@@ -130,21 +133,13 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append("> ?");
 		query.append(propGivenName.getLocalName());
 		query.append(".\n ");
-		
-		query.append("?");
-		query.append(politicanURI);
-		query.append(" <");
-		query.append(propBundestagPage.getURI());
-		query.append("> ?");
-		query.append(propBundestagPage.getLocalName());
-		query.append(".\n ");
 
 		query.append("?");
 		query.append(politicanURI);
 		query.append(" <");
-		query.append(propMbox.getURI());
+		query.append(propHomepage.getURI());
 		query.append("> ?");
-		query.append(propMbox.getLocalName());
+		query.append(propHomepage.getLocalName());
 		query.append(".\n ");
 
 		query.append("?");
@@ -211,13 +206,12 @@ public class RDFImport extends RDFModel implements Serializable {
 		query.append(classWahlkreis.getLocalName());
 		query.append(".\n ");
 		
-		//homepage is optional and saved to ?home variable, evaluated by bif:either in SELECT clause
 		query.append("OPTIONAL{?");
 		query.append(politicanURI);
 		query.append(" <");
-		query.append(propHomepage.getURI());
+		query.append(propMbox.getURI());
 		query.append("> ?");
-		query.append("home");
+		query.append(propMbox.getLocalName());
 		query.append(".}\n ");
 
 		query.append("}");
@@ -231,20 +225,21 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		Query q = QueryFactory.create(query.toString());
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
-				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+		
+//		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q);
 		ResultSet rs = qexec.execSelect();
 
 		// iterate over ResultSet and fill list with politicans
 		while (rs.hasNext()) {
-
 			QuerySolution qs = rs.next();
-
 			politican = new Abgeordneter();
 			politican.setURI(qs.getResource(politicanURI).getURI());
 			politican.setForename(qs.getLiteral(propFirstName.getLocalName()).getString());
 			politican.setLastname(qs.getLiteral(propGivenName.getLocalName()).getString());
 			politican.setHomepage(qs.getResource(propHomepage.getLocalName()).getURI());
-			politican.setEmail(qs.getResource(propMbox.getLocalName()).getURI());
+			if(qs.getResource(propMbox.getLocalName())!=null)
+				politican.setEmail(qs.getResource(propMbox.getLocalName()).getURI());
 			politican.setWahlkreisUri(qs.getResource(wahlkreisURI).getURI());
 			politican.setWahlkreisName(qs.getLiteral(classWahlkreis.getLocalName()).getString());
 			politican.setFraktionUri(qs.getResource(fractionURI).getURI());
@@ -393,12 +388,11 @@ public class RDFImport extends RDFModel implements Serializable {
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
 				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
-
+	
 		// iterate over ResultSet and add sidelineJobs for every politican
 		while (rs.hasNext()) {
 
 			QuerySolution qs = rs.next();
-
 			sidelineJob = new Nebentaetigkeit();
 			sidelineJob.setType(qs.getLiteral(propNebeneinkuenftTyp.getLocalName()).getString());
 			sidelineJob.setYear(qs.getLiteral(propNebeneinkuenftJahr.getLocalName()).getString());
@@ -984,11 +978,9 @@ public class RDFImport extends RDFModel implements Serializable {
 
 			if (citySet.size() <= 0)
 				run = false;
-
 			query.replace(query.length() - 6, query.length(), "");
 			query.append(" FILTER(langMatches(lang(?label),'DE')) . ");
 			query.append("}");
-
 			q = QueryFactory.create(query.toString());
 			qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", q);
 			rs = qexec.execSelect();
