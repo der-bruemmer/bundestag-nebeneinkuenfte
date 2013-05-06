@@ -62,6 +62,7 @@ public abstract class RDFModel {
 	protected DatatypeProperty propNebeneinkuenftJahr;
 	protected DatatypeProperty propNebeneinkuenftFrom;
 	protected DatatypeProperty propNebeneinkuenftTo;
+	protected DatatypeProperty propNebeneinkuenfteInterval;
 	protected DatatypeProperty propCreator;
 	protected DatatypeProperty propProvenance;
 	protected DatatypeProperty propLicence;
@@ -90,6 +91,7 @@ public abstract class RDFModel {
 			stream = new BufferedInputStream(new FileInputStream(NebeneinkuenfteApplication.getInstance().getContext()
 					.getBaseDirectory()
 					+ "/external_data/config.properties"));
+//			stream = new BufferedInputStream(new FileInputStream("./WebContent/external_data/config.properties"));
 			properties.load(stream);
 			stream.close();
 		} catch (FileNotFoundException e) {
@@ -161,6 +163,8 @@ public abstract class RDFModel {
 				+ "maxNebeneinkuenfte");
 		propNebeneinkuenftStufe = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
 				+ "stufeNebeneinkunft");
+		propNebeneinkuenfteInterval = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
+				+ "intervallNebeneinkunft");
 		propNebeneinkuenftJahr = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD)
 				+ "jahrNebeneinkunft");
 		propNebeneinkuenftTyp = model.createDatatypeProperty(model.getNsPrefixURI(INamespace.BTD) + "typNebeneinkunft");

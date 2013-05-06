@@ -208,6 +208,8 @@ public class RDFExport extends RDFModel implements Serializable {
 			// create Resource for homepage
 			if (mdb.getHomepage() != null && !mdb.getHomepage().trim().isEmpty()) {
 				politician.addProperty(propHomepage, createDocumentResource(mdb.getHomepage()));
+			} else {
+				politician.addProperty(propHomepage, createDocumentResource(this.getBundestagURI(mdb)));
 			}
 			
 			//add bundestag.de source uri
@@ -234,8 +236,6 @@ public class RDFExport extends RDFModel implements Serializable {
 						classNebeneinkunft);
 				sidelineJob.addProperty(propNebeneinkuenftStufe,
 						model.createTypedLiteral(nt.getStufe() != null ? nt.getStufe() : "unbekannt"));
-				sidelineJob.addProperty(propNebeneinkuenftJahr,
-						model.createTypedLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
 				sidelineJob.addProperty(propNebeneinkuenftTyp,
 						model.createTypedLiteral(nt.getType() != null ? nt.getType() : "unbekannt"));
 				String from = nt.getJobStart()[1]+"-"+nt.getJobStart()[0]+"-01";
@@ -259,6 +259,24 @@ public class RDFExport extends RDFModel implements Serializable {
 						model.createTypedLiteral(from,XSDDatatype.XSDdate));
 				sidelineJob.addProperty(propNebeneinkuenftTo,
 						model.createTypedLiteral(end,XSDDatatype.XSDdate));
+				
+				if(nt.isYearly()) {
+					sidelineJob.addProperty(propNebeneinkuenfteInterval,
+							model.createTypedLiteral("jährlich"));
+					sidelineJob.addProperty(propNebeneinkuenftJahr,
+							model.createTypedLiteral(reformatDate(from)+"-"+reformatDate(end)));
+				} else if(nt.isMonthly()) {
+					sidelineJob.addProperty(propNebeneinkuenfteInterval,
+							model.createTypedLiteral("monatlich"));
+					sidelineJob.addProperty(propNebeneinkuenftJahr,
+							model.createTypedLiteral(reformatDate(from)+"-"+reformatDate(end)));
+				} else {
+					sidelineJob.addProperty(propNebeneinkuenfteInterval,
+							model.createTypedLiteral("einmalig"));
+					sidelineJob.addProperty(propNebeneinkuenftJahr,
+							model.createTypedLiteral(nt.getYear() != null ? nt.getYear() : "unbekannt"));
+				}
+				
 				sidelineJob.addProperty(propNebeneinkuenftOrt, createPlaceResource(nt, index));
 				if(nt.getSourceString()!= null) {
 					sidelineJob.addProperty(propNebeneinkuenftSourceString, model.createTypedLiteral(nt.getSourceString()));
@@ -326,6 +344,13 @@ public class RDFExport extends RDFModel implements Serializable {
 		homepageDocument = model.createResource(homepageURI, classDocument);
 
 		return homepageDocument;
+	}
+	
+	private String reformatDate(String date) {
+		String[] dateArray = date.split("-");
+		date = dateArray[2]+"."+dateArray[1]+"."+dateArray[0];
+		
+		return date;
 	}
 
 	private Resource createOriginResource(Nebentaetigkeit nebentaetigkeit, int index) {
