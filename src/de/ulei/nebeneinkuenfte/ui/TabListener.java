@@ -37,6 +37,9 @@ public class TabListener implements SelectedTabChangeListener {
 			case IConstants.ABOUT_PROJECT_VIEW:
 				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.ABOUT_PROJECT_VIEW_FRAG);
 				break;
+			case IConstants.ANALYSIS_VIEW:
+				NebeneinkuenfteApplication.getInstance().setURIFragment(IConstants.ANALYSIS_VIEW_FRAG);
+				break;
 
 			default:
 				break;

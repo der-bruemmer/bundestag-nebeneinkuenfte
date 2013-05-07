@@ -904,7 +904,7 @@ public class RDFImport extends RDFModel implements Serializable {
 
 		String queryString = "SELECT * WHERE {<".concat(resourceURI).concat("> ?p ?o}");
 		Query query = QueryFactory.create(queryString);
-
+		
 		QueryExecution qexec = QueryExecutionFactory.sparqlService(triplestoreURL, query,
 				 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
 		ResultSet rs = qexec.execSelect();
