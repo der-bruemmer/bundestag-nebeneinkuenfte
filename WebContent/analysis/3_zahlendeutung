@@ -1,0 +1,11 @@
+Die einzige Aussage, die wir auf Basis der momentanen Praxis der Offenlegung treffen können, ist die, wieviel ein Mitglied des Bundestages in der 
+Legislaturperiode mindestens neben seinem Mandat verdient hat. Eine Schätzung der Obergrenze der Nebeneinkünfte ist in dem Moment, wo Stufe 3 erreicht 
+ist, nicht mehr möglich. Die Berechnung von Differenzen zwischen Abgeordneten macht ebenso wenig Sinn – so können wir nicht annehmen, dass Peer 
+Steinbrück (SPD, mindestens 717.103€) etwa 11.000€ weniger an Nebeneinkünften zu verbuchen hat als Michael Glos (CDU, mindestens 728.104€), schließlich 
+wissen wir, dass Herr Steinbrück tatsächlich irgendwo im siebenstelligen Bereich rangiert. 
+Das arithmetische Mittel, was wir weiter unten berechnet haben (jeweils Gesamtsumme geteilt durch Zahl der Abgeordneten) ist in diesem Fall nicht besonders 
+aussagekräftig: Es liefert den Wert, den man erhalten würde, wenn man allen jeweiligen Abgeordneten ihre Mindestnebeneinkünfte nimmt und diese dann 
+gleichmäßig an alle Abgeordneten der jeweiligen Bezugsgruppe verteilt. Aussagekräftiger ist der Median, der robust ist gegen Ausreißer: Er ist der mittlere Wert 
+in dem Sinne, dass jeweils 50% der Fälle ihn unterschreiten/überschreiten. Der Median bezieht sich hier immer auf die Abgeordneten, die Nebeneinkünfte 
+offengelegt haben. Werden dir Abgeordneten ohne Nebeneinkünfte miteinbezogen, wird er 0, da in jeder Partei mehr als die Hälfte der Abgeordneten keinerlei 
+Nebeneinkünfte vermerkt haben.

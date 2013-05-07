@@ -18,7 +18,8 @@ public interface IConstants {
 	public static int PERSON_FRACTION_VIEW = 2;
 	public static int PERSON_ORIGIN_VIEW = 3;
 	public static int IMPRESSUM_VIEW = 4;
-	public static int ABOUT_PROJECT_VIEW = 5;
+	public static int ANALYSIS_VIEW = 5;
+	public static int ABOUT_PROJECT_VIEW = 6;
 
 	/*
 	 * URI fragments
@@ -28,6 +29,7 @@ public interface IConstants {
 	public static String PERSON_FRACTION_VIEW_FRAG = "fraction";
 	public static String PERSON_ORIGIN_VIEW_FRAG = "source";
 	public static String IMPRESSUM_VIEW_FRAG = "impressum";
+	public static String ANALYSIS_VIEW_FRAG = "analysis";
 	public static String ABOUT_PROJECT_VIEW_FRAG = "about";
 
 	/*

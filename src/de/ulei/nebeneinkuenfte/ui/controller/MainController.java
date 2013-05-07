@@ -16,6 +16,7 @@ import de.ulei.nebeneinkuenfte.ui.model.FraktionAuftraggeber;
 import de.ulei.nebeneinkuenfte.ui.model.Nebentaetigkeit;
 import de.ulei.nebeneinkuenfte.ui.view.AboutProjectView;
 import de.ulei.nebeneinkuenfte.ui.view.AbstractView;
+import de.ulei.nebeneinkuenfte.ui.view.AnalysisView;
 import de.ulei.nebeneinkuenfte.ui.view.BasicView;
 import de.ulei.nebeneinkuenfte.ui.view.ImpressumView;
 import de.ulei.nebeneinkuenfte.ui.view.OriginView;
@@ -30,7 +31,7 @@ public class MainController implements IActionListener {
 	private static final long serialVersionUID = -2602673556758294975L;
 
 	private BeanItemContainer<Abgeordneter> abgeordnetenContainer;
-//	private List<Abgeordneter> mdbList;
+	// private List<Abgeordneter> mdbList;
 	private String actualObjectURI;
 
 	private BasicController basicController;
@@ -40,6 +41,7 @@ public class MainController implements IActionListener {
 
 	private ImpressumView impressumView;
 	private AboutProjectView aboutProjectView;
+	private AnalysisView analysisView;
 
 	private BasicView basicView;
 	private PersonView personView;
@@ -58,17 +60,21 @@ public class MainController implements IActionListener {
 		this.rdfImport = new RDFImport();
 		this.abgeordnetenContainer = rdfImport.getPersonBasicContainer();
 
-//		String path = NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory() + "/abgeordnete";
-	
-//		BundestagConverter conv = new BundestagConverter(
-//				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false, path);
-//		mdbList = conv.getAbgeordnete();
+		// String path =
+		// NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory()
+		// + "/abgeordnete";
+
+		// BundestagConverter conv = new BundestagConverter(
+		// "http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
+		// false, path);
+		// mdbList = conv.getAbgeordnete();
 
 		this.mainFrame = mainFrame;
 
 		// creates views
 		impressumView = new ImpressumView();
 		aboutProjectView = new AboutProjectView();
+		analysisView = new AnalysisView();
 
 		basicView = new BasicView();
 		personView = new PersonView();
@@ -90,6 +96,7 @@ public class MainController implements IActionListener {
 		// open basic view as app entry
 		mainFrame.addTab(aboutProjectView, "Das Projekt", new ThemeResource("icons/16/about.png"));
 		mainFrame.addTab(basicView, "Abgeordnete", new ThemeResource("icons/16/user.png"));
+		mainFrame.addTab(analysisView, "Auswertung", new ThemeResource("icons/16/office-chart-bar.png"));
 		mainFrame.addTab(impressumView, "Impressum", null);
 		mainFrame.selectTab(0);
 		actualPersonView = basicView;
@@ -172,7 +179,7 @@ public class MainController implements IActionListener {
 	}
 
 	private void openPersonOriginView(String originURI) {
-		
+
 		BeanItemContainer<FraktionAuftraggeber> container = rdfImport.getPersonOriginContainer(originURI);
 		originView.setOriginContainerDataSource(container);
 
@@ -290,14 +297,14 @@ public class MainController implements IActionListener {
 
 		String caption = "";
 
-//		for (Abgeordneter mdb : mdbList)
-//			if (mdb.getFraktionUri().equals(fractionURI)) {
-//				caption = mdb.getFraktion();
-//				for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten())
-//					container.addItem(new FraktionAuftraggeber(mdb, nt));
-//			}
+		// for (Abgeordneter mdb : mdbList)
+		// if (mdb.getFraktionUri().equals(fractionURI)) {
+		// caption = mdb.getFraktion();
+		// for (Nebentaetigkeit nt : mdb.getNebentaetigkeiten())
+		// container.addItem(new FraktionAuftraggeber(mdb, nt));
+		// }
 		partyView.setPartyContainerDataSource(container);
-//		partyView.setPanelCaption(container.getIdByIndex(0).getFraktion());
+		// partyView.setPanelCaption(container.getIdByIndex(0).getFraktion());
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
@@ -380,6 +387,9 @@ public class MainController implements IActionListener {
 					// open about view
 				} else if (tabSheet.equals(IConstants.ABOUT_PROJECT_VIEW_FRAG)) {
 					mainFrame.selectTab(aboutProjectView);
+					// open analysis view
+				} else if (tabSheet.equals(IConstants.ANALYSIS_VIEW_FRAG)) {
+					mainFrame.selectTab(analysisView);
 				}
 
 			} else {
@@ -399,7 +409,7 @@ public class MainController implements IActionListener {
 	public void setActualObjectURI(String actualObjectURI) {
 		this.actualObjectURI = actualObjectURI;
 	}
-	
+
 	private void setURIFragment(String fragment) {
 
 		NebeneinkuenfteApplication.getInstance().removeURIFragmentListener();
