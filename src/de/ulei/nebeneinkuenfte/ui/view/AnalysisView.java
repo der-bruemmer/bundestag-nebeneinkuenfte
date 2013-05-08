@@ -1,8 +1,11 @@
 package de.ulei.nebeneinkuenfte.ui.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class AnalysisView extends AbstractTextView  {
+public class AnalysisView extends AbstractTextView {
 
 	private static final long serialVersionUID = -8531164488190420084L;
 
@@ -29,7 +32,19 @@ public class AnalysisView extends AbstractTextView  {
 		addParagraph("4_verteilung");
 
 		addTable("table_1", "Der 17. Bundestag – Alle Fraktionen", false);
+
+		List<String> fileNames = new ArrayList<String>();
+		fileNames.add("hand.png");
+		fileNames.add("dollars.png");
 		
+		List<String> fileCaptions = new ArrayList<String>();
+		fileCaptions.add("hand.png");
+		fileCaptions.add("dollars.png");
+		
+		addImages(fileNames, fileCaptions);
+		
+		
+
 	}
 
 }
