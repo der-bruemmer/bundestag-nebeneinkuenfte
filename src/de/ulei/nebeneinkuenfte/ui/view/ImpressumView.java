@@ -1,10 +1,8 @@
 package de.ulei.nebeneinkuenfte.ui.view;
 
-import java.io.Serializable;
-
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class ImpressumView extends AbstractTextView implements Serializable {
+public class ImpressumView extends AbstractTextView {
 
 	private static final long serialVersionUID = -3207647187091883100L;
 

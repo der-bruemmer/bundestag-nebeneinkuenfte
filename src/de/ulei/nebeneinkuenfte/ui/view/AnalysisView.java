@@ -1,12 +1,10 @@
 package de.ulei.nebeneinkuenfte.ui.view;
 
-import java.io.Serializable;
-
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class AnalysisView extends AbstractTextView implements Serializable {
+public class AnalysisView extends AbstractTextView  {
 
-	private static final long serialVersionUID = -3207647187091883100L;
+	private static final long serialVersionUID = -8531164488190420084L;
 
 	public AnalysisView() {
 
@@ -31,7 +29,7 @@ public class AnalysisView extends AbstractTextView implements Serializable {
 		addParagraph("4_verteilung");
 
 		addTable("table_1", "Der 17. Bundestag – Alle Fraktionen", false);
-
+		
 	}
 
 }

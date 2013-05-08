@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
@@ -13,7 +14,7 @@ import com.vaadin.ui.Table;
 
 import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
 
-public abstract class AbstractTextView extends GridLayout {
+public abstract class AbstractTextView extends GridLayout implements Serializable {
 
 	private static final long serialVersionUID = -6261121273077228637L;
 	private final int TEXT_WIDTH = 60;
