@@ -1,10 +1,8 @@
 package de.ulei.nebeneinkuenfte.ui.view;
 
-import java.io.Serializable;
-
 import de.ulei.nebeneinkuenfte.util.IConstants;
 
-public class AboutProjectView extends AbstractTextView implements Serializable {
+public class AboutProjectView extends AbstractTextView {
 
 	private static final long serialVersionUID = -6253578581349325665L;
 
