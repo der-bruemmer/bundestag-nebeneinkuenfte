@@ -6,8 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -119,6 +122,49 @@ public abstract class AbstractTextView extends GridLayout implements Serializabl
 
 		addComponent(table);
 		setComponentAlignment(table, Alignment.MIDDLE_CENTER);
+
+	}
+
+	public void addImage(String fileName, String imageCaption) {
+
+		GridLayout gridLayout = new GridLayout(1, 1);
+		gridLayout.setImmediate(true);
+		gridLayout.setWidth(TEXT_WIDTH, UNITS_PERCENTAGE);
+		gridLayout.setSpacing(true);
+		gridLayout.setMargin(true);
+
+		Embedded image = new Embedded("", new ThemeResource("images/".concat(fileName)));
+		image.setCaption(imageCaption);
+		gridLayout.addComponent(image);
+		gridLayout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+
+		addComponent(gridLayout);
+		setComponentAlignment(gridLayout, Alignment.MIDDLE_CENTER);
+
+	}
+
+	public void addImages(List<String> fileNames, List<String> imageCaptions) {
+
+		GridLayout gridLayout = new GridLayout(fileNames.size(), 1);
+		gridLayout.setImmediate(true);
+		gridLayout.setWidth(TEXT_WIDTH, UNITS_PERCENTAGE);
+		gridLayout.setSpacing(true);
+		gridLayout.setMargin(true);
+
+		Embedded image;
+
+		for (int i = 0; i < fileNames.size(); i++) {
+
+			image = new Embedded("", new ThemeResource("images/".concat(fileNames.get(i))));
+			image.setCaption(imageCaptions.get(i));
+			gridLayout.addComponent(image);
+			gridLayout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+
+		}
+
+		addComponent(gridLayout);
+		setComponentAlignment(gridLayout, Alignment.MIDDLE_CENTER);
+
 	}
 
 }
