@@ -197,7 +197,12 @@ public class RDFExport extends RDFModel implements Serializable {
 		// create resource for each member of the parliament
 		for (Abgeordneter mdb : personList) {
 
-			politician = model.createResource(mdb.getURI(), classAbgeordneter);
+			if(mdb.getURI().endsWith("html")) {
+				politician = model.createResource(mdb.getURI().substring(0,mdb.getURI().lastIndexOf(".")), classAbgeordneter);
+			} else {
+				politician = model.createResource(mdb.getURI(), classAbgeordneter);
+			}
+			
 			politician.addProperty(propFirstName, model.createTypedLiteral(mdb.getForename()));
 			politician.addProperty(propGivenName, model.createTypedLiteral(mdb.getLastname()));
 
@@ -537,7 +542,12 @@ public class RDFExport extends RDFModel implements Serializable {
 	 */
 	
 	private String getBundestagURI(Abgeordneter mdb) {
-		String uriName = mdb.getURI().substring(mdb.getURI().lastIndexOf("/")+1);
+		String uriName = "";
+		if(mdb.getURI().endsWith("html")) {
+			uriName = mdb.getURI().substring(mdb.getURI().lastIndexOf("/")+1,mdb.getURI().lastIndexOf("."));
+		} else {
+			uriName = mdb.getURI().substring(mdb.getURI().lastIndexOf("/")+1);
+		}
 		String bundestagUri = "";
 		String baseUri = "http://www.bundestag.de/bundestag/abgeordnete17/biografien/";
 		bundestagUri = baseUri + uriName.substring(0,1).toUpperCase() + "/" + uriName + ".html";

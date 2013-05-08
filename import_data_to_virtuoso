@@ -1,0 +1,11 @@
+
+
+#graph anlegen und daten laden
+sparql create graph <http://www.opendata-bundestag.de/Nebeneinkuenfte/b17/> ;
+
+ttlp_mt(file_to_string_output('/usr/share/virtuoso/vad/bundestagdata_05_05_13.ttl'),'','http://www.opendata-bundestag.de/Nebeneinkuenfte/b17/');
+
+
+#so löscht man es wieder:
+sparql CLEAR GRAPH <http://www.opendata-bundestag.de/Nebeneinkuenfte/b17/> ;
+sparql drop graph <http://www.opendata-bundestag.de/Nebeneinkuenfte/b17/> ; 

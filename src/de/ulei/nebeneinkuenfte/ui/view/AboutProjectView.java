@@ -9,7 +9,18 @@ public class AboutProjectView extends AbstractTextView {
 	public AboutProjectView() {
 
 		super(IConstants.ABOUT_PROJECT_VIEW);
-		addHeadline("In Arbeit", 1);
+		
+		setSizeFull();
+		setImmediate(true);
+		setColumns(1);
+		setMargin(true);
+		setSpacing(true);
+		
+		addHeadline("Motivation", 1);
+		addParagraph("1_motivation","about");
+		addHeadline("Nutzung", 1);
+		addParagraph("2_nutzung","about");
+		
 
 	}
 

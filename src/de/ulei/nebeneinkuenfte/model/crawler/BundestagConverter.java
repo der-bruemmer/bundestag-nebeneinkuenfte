@@ -1292,7 +1292,7 @@ public class BundestagConverter {
 		 * crawl all parliament members
 		 */
 		BundestagConverter conv = new BundestagConverter(
-				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", false);
+				"http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html", true);
 		List<Abgeordneter> mdbs = conv.getAbgeordnete();
 
 		/*
@@ -1316,7 +1316,7 @@ public class BundestagConverter {
 //			conv.writeMdBObjectToFile("./WebContent/abgeordnete/", mdb);
 //			
 //		}
-		conv.writeNebentaetigkeitenToFile(mdbs);
+		//conv.writeNebentaetigkeitenToFile(mdbs);
 		/*
 		 * try to set source URIs
 		 */

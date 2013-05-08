@@ -983,23 +983,51 @@ public class RDFImport extends RDFModel implements Serializable {
 			query.append("}");
 			q = QueryFactory.create(query.toString());
 			qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", q);
-			rs = qexec.execSelect();
+			try {
+				rs = qexec.execSelect();
+	
+				cityCache = new HashMap<String, City>();
+	
+				// iterate over ResultSet and get city informations
+				while (rs.hasNext()) {
+	
+					QuerySolution qs = rs.next();
+	
+					city = new City();
+					city.setLabel(qs.get("label").asLiteral().getString());
+					city.setLatitude(qs.get("lat").asLiteral().getFloat());
+					city.setLongitude(qs.get("long").asLiteral().getFloat());
+	
+					cityCache.put(qs.getResource("uri").getURI().toString(), city);
+					city = null;
+	
+				}
+				//this is too broad, but there could be a number of exceptions (httpexception. timeouts etc)
+				//fallback to our dataset
+			} catch(Exception e) {
+				//remove the lang filter
+				String queryString = query.substring(0, query.length()-43);
+				queryString+="}";
+				q = QueryFactory.create(queryString);
+				qexec = QueryExecutionFactory.sparqlService(triplestoreURL, q,
+						 INamespace.NAMSESPACE_MAP.get(INamespace.BTD));
+				rs = qexec.execSelect();
+				cityCache = new HashMap<String, City>();
 
-			cityCache = new HashMap<String, City>();
-
-			// iterate over ResultSet and get city informations
-			while (rs.hasNext()) {
-
-				QuerySolution qs = rs.next();
-
-				city = new City();
-				city.setLabel(qs.get("label").asLiteral().getString());
-				city.setLatitude(qs.get("lat").asLiteral().getFloat());
-				city.setLongitude(qs.get("long").asLiteral().getFloat());
-
-				cityCache.put(qs.getResource("uri").getURI().toString(), city);
-				city = null;
-
+				// iterate over ResultSet and get city informations
+				while (rs.hasNext()) {
+	
+					QuerySolution qs = rs.next();
+	
+					city = new City();
+					city.setLabel(qs.get("label").asLiteral().getString());
+					city.setLatitude(qs.get("lat").asLiteral().getFloat());
+					city.setLongitude(qs.get("long").asLiteral().getFloat());
+	
+					cityCache.put(qs.getResource("uri").getURI().toString(), city);
+					city = null;
+	
+				}
 			}
 
 		}
