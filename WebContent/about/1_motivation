@@ -1,0 +1,10 @@
+Im Oktober 2012 beschäftigten die Nebeneinkünfte von Peer Steinbrück Politik und deutsche Medien gleichermaßen. Für seine ungewöhnlich hohen Tätigkeiten neben dem Mandat wurde er fraktionsübergreifend scharf kritisiert. Vor allem CDU/CSU und FDP ergriffen die Gelegenheit den Kanzlerkandidaten zu attackieren. Dass die Mitglieder der Regierungskoalition bei diesem Thema im Glashaus sitzen, wurde ebenfalls von den Medien berichtet.<br/>
+
+Was allerdings fehlt ist eine gründliche Schätzung des Ausmaßes der Nebentätigkeiten von Bundestagsabgeordneten. Zwar müssen alle Einkünfte über 1000 € veröffentlicht werden, die Art und Weise, wie das geschieht ist allerdings hochgradig intransparent. Diesem Mißstand hat sich dieses Projekt angenommen. Momentan sind die Nebeneinkünfte in 3 Stufen zu veröffentlichen:<br/>
+<ul>
+<li>Stufe 1: 1000-3500 Euro</li>
+<li>Stufe 2: 3501-7000 Euro</li>
+<li>Stufe 3: über 7000 Euro</li>
+</ul>
+Die Veröffentlichung selbst geschieht dabei auf der Website des Bundestages. Allerdings erfolgen sie auf den Seiten der Abgeordneten, 620 an der Zahl. Es gibt keinen direkten Zugriff auf die Daten, was statistische Auswertungen und direkte Vergleiche schwierig macht. Darum haben wir uns entschieden, die Daten zu Scrapen, in eine hierarchische Struktur zu bringen, mit Metadaten zu annotieren, mit weiteren Informationen zu verknüpfen und hier zugänglich zu machen.
+

@@ -44,7 +44,7 @@ public abstract class AbstractTextView extends GridLayout implements Serializabl
 
 	}
 
-	public void addParagraph(String fileName) {
+	public void addParagraph(String fileName, String folder) {
 
 		StringBuffer buffer = new StringBuffer();
 		String line = null;
@@ -54,7 +54,7 @@ public abstract class AbstractTextView extends GridLayout implements Serializabl
 
 			reader = new BufferedReader(new FileReader(new File(NebeneinkuenfteApplication.getInstance().getContext()
 					.getBaseDirectory()
-					+ "/analysis/" + fileName)));
+					+ "/"+folder+"/" + fileName)));
 			while ((line = reader.readLine()) != null) {
 
 				buffer.append(line);
