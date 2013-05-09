@@ -2,13 +2,11 @@ package de.ulei.nebeneinkuenfte.ui.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.ThemeResource;
 
 import de.ulei.nebeneinkuenfte.model.RDFImport;
-import de.ulei.nebeneinkuenfte.model.crawler.BundestagConverter;
 import de.ulei.nebeneinkuenfte.ui.MainFrameWindow;
 import de.ulei.nebeneinkuenfte.ui.NebeneinkuenfteApplication;
 import de.ulei.nebeneinkuenfte.ui.model.Abgeordneter;
@@ -31,7 +29,6 @@ public class MainController implements IActionListener {
 	private static final long serialVersionUID = -2602673556758294975L;
 
 	private BeanItemContainer<Abgeordneter> abgeordnetenContainer;
-	// private List<Abgeordneter> mdbList;
 	private String actualObjectURI;
 
 	private BasicController basicController;
@@ -59,16 +56,6 @@ public class MainController implements IActionListener {
 
 		this.rdfImport = new RDFImport();
 		this.abgeordnetenContainer = rdfImport.getPersonBasicContainer();
-
-		// String path =
-		// NebeneinkuenfteApplication.getInstance().getContext().getBaseDirectory()
-		// + "/abgeordnete";
-
-		// BundestagConverter conv = new BundestagConverter(
-		// "http://www.bundestag.de/bundestag/abgeordnete17/alphabet/index.html",
-		// false, path);
-		// mdbList = conv.getAbgeordnete();
-
 		this.mainFrame = mainFrame;
 
 		// creates views
@@ -304,7 +291,7 @@ public class MainController implements IActionListener {
 		// container.addItem(new FraktionAuftraggeber(mdb, nt));
 		// }
 		partyView.setPartyContainerDataSource(container);
-		// partyView.setPanelCaption(container.getIdByIndex(0).getFraktion());
+		partyView.setPanelCaption(container.getIdByIndex(0).getFraktion());
 		setActualPersonView(partyView, partyController);
 
 		// set URI fragment
