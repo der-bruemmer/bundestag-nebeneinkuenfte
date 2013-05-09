@@ -18,6 +18,7 @@ public class PersonView extends AbstractView {
 	
 	public PersonView() {
 
+		setCaption(String.valueOf(IConstants.PERSON_PERSON_VIEW));
 		createNavigationSection();
 		addTableListener();
 
