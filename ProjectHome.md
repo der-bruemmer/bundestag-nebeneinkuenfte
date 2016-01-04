@@ -1,0 +1,1 @@
+Das Projekt hat zum Ziel, mehr Offenheit und Transparenz der Nebentätigkeiten und -einkünfte von Bundestagsabgeordneten zu schaffen, indem die dazu veröffentlichten Daten besser zugänglich gemacht werden. Eine Verknüpfung als semantisches Netz und eine granulare Such- und Visualisierungsfunktion machen Datenjournalismus für jeden interessierten Bürger zugänglich.
